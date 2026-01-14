@@ -3,26 +3,22 @@
   "version": "1.0.0",
   "description": "A comprehensive online bookstore system with Next.js frontend and NestJS backend",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run start:dev",
-    "build": "npm run build:backend && npm run build:frontend",
-    "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:frontend": "cd frontend && npm run test",
-    "test:backend": "cd backend && npm run test",
-    "lint": "npm run lint:frontend && npm run lint:backend",
-    "lint:frontend": "cd frontend && npm run lint",
-    "lint:backend": "cd backend && npm run lint",
-    "format": "npm run format:frontend && npm run format:backend",
-    "format:frontend": "cd frontend && npm run format",
-    "format:backend": "cd backend && npm run format",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend start:dev",
+    "build": "pnpm run build:backend && pnpm run build:frontend",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "test": "pnpm run test:backend && pnpm run test:frontend",
+    "test:frontend": "pnpm --filter frontend test",
+    "test:backend": "pnpm --filter backend test",
+    "lint": "pnpm run lint:frontend && pnpm run lint:backend",
+    "lint:frontend": "pnpm --filter frontend lint",
+    "lint:backend": "pnpm --filter backend lint",
+    "format": "pnpm run format:frontend && pnpm run format:backend",
+    "format:frontend": "pnpm --filter frontend format",
+    "format:backend": "pnpm --filter backend format",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "docker:down": "docker-compose down"
@@ -32,6 +28,6 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "pnpm": ">=8.0.0"
   }
 }
