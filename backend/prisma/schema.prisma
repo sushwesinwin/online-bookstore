@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  orders    Order[]
+  cart      CartItem[]
+  
+  @@map("users")
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  isbn        String   @unique
+  title       String
+  author      String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  inventory   Int      @default(0)
+  category    String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  
+  @@map("books")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  status      OrderStatus @default(PENDING)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+  payment     Payment?
+  
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String  @id @default(cuid())
+  orderId  String
+  bookId   String
+  quantity Int
+  price    Decimal @db.Decimal(10, 2)
+  
+  order    Order   @relation(fields: [orderId], references: [id])
+  book     Book    @relation(fields: [bookId], references: [id])
+  
+  @@map("order_items")
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  userId   String
+  bookId   String
+  quantity Int
+  
+  user     User   @relation(fields: [userId], references: [id])
+  book     Book   @relation(fields: [bookId], references: [id])
+  
+  @@unique([userId, bookId])
+  @@map("cart_items")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String        @unique
+  stripePaymentId String        @unique
+  amount          Decimal       @db.Decimal(10, 2)
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  
+  order           Order         @relation(fields: [orderId], references: [id])
+  
+  @@map("payments")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}

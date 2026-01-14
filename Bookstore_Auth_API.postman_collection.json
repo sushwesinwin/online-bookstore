@@ -1,0 +1,339 @@
+{
+    "info": {
+        "name": "Bookstore Authentication API",
+        "description": "Complete authentication API collection for the Online Bookstore",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3001",
+            "type": "string"
+        },
+        {
+            "key": "accessToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refreshToken",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Register",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 201) {",
+                            "    const response = pm.response.json();",
+                            "    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                            "    pm.collectionVariables.set(\"refreshToken\", response.refreshToken);",
+                            "    pm.test(\"Registration successful\", () => {",
+                            "        pm.expect(response.user).to.have.property('email');",
+                            "        pm.expect(response).to.have.property('accessToken');",
+                            "        pm.expect(response).to.have.property('refreshToken');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"securePassword123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/register",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                },
+                "description": "Register a new user account"
+            },
+            "response": []
+        },
+        {
+            "name": "2. Login",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                            "    pm.collectionVariables.set(\"refreshToken\", response.refreshToken);",
+                            "    pm.test(\"Login successful\", () => {",
+                            "        pm.expect(response.user).to.have.property('email');",
+                            "        pm.expect(response).to.have.property('accessToken');",
+                            "        pm.expect(response).to.have.property('refreshToken');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"securePassword123\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login"
+                    ]
+                },
+                "description": "Login with existing credentials"
+            },
+            "response": []
+        },
+        {
+            "name": "3. Get Profile",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    pm.test(\"Profile retrieved successfully\", () => {",
+                            "        pm.expect(response).to.have.property('id');",
+                            "        pm.expect(response).to.have.property('email');",
+                            "        pm.expect(response).to.not.have.property('password');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/auth/profile",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "profile"
+                    ]
+                },
+                "description": "Get authenticated user's profile (requires JWT token)"
+            },
+            "response": []
+        },
+        {
+            "name": "4. Refresh Token",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                            "    pm.collectionVariables.set(\"refreshToken\", response.refreshToken);",
+                            "    pm.test(\"Token refreshed successfully\", () => {",
+                            "        pm.expect(response).to.have.property('accessToken');",
+                            "        pm.expect(response).to.have.property('refreshToken');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/refresh",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "refresh"
+                    ]
+                },
+                "description": "Get a new access token using refresh token"
+            },
+            "response": []
+        },
+        {
+            "name": "5. Logout",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    pm.test(\"Logout successful\", () => {",
+                            "        const response = pm.response.json();",
+                            "        pm.expect(response.message).to.equal('Successfully logged out');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/auth/logout",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "logout"
+                    ]
+                },
+                "description": "Logout and invalidate tokens (requires JWT token)"
+            },
+            "response": []
+        },
+        {
+            "name": "6. Forgot Password",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    pm.test(\"Password reset request successful\", () => {",
+                            "        const response = pm.response.json();",
+                            "        pm.expect(response.message).to.include('password reset link');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/forgot-password",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "forgot-password"
+                    ]
+                },
+                "description": "Request a password reset email"
+            },
+            "response": []
+        },
+        {
+            "name": "7. Reset Password",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    pm.test(\"Password reset successful\", () => {",
+                            "        const response = pm.response.json();",
+                            "        pm.expect(response.message).to.equal('Password successfully reset');",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"token\": \"PASTE_TOKEN_FROM_EMAIL_OR_CONSOLE\",\n  \"newPassword\": \"newSecurePassword123\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/reset-password",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "reset-password"
+                    ]
+                },
+                "description": "Reset password using the token from email"
+            },
+            "response": []
+        }
+    ]
+}
