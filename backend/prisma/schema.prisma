@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -19,10 +18,10 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  orders    Order[]
-  cart      CartItem[]
-  
+
+  orders Order[]
+  cart   CartItem[]
+
   @@map("users")
 }
 
@@ -38,10 +37,10 @@ model Book {
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  orderItems  OrderItem[]
-  cartItems   CartItem[]
-  
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
   @@map("books")
 }
 
@@ -52,11 +51,11 @@ model Order {
   totalAmount Decimal     @db.Decimal(10, 2)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  
-  user        User        @relation(fields: [userId], references: [id])
-  items       OrderItem[]
-  payment     Payment?
-  
+
+  user    User        @relation(fields: [userId], references: [id])
+  items   OrderItem[]
+  payment Payment?
+
   @@map("orders")
 }
 
@@ -66,10 +65,10 @@ model OrderItem {
   bookId   String
   quantity Int
   price    Decimal @db.Decimal(10, 2)
-  
-  order    Order   @relation(fields: [orderId], references: [id])
-  book     Book    @relation(fields: [bookId], references: [id])
-  
+
+  order Order @relation(fields: [orderId], references: [id])
+  book  Book  @relation(fields: [bookId], references: [id])
+
   @@map("order_items")
 }
 
@@ -78,10 +77,10 @@ model CartItem {
   userId   String
   bookId   String
   quantity Int
-  
-  user     User   @relation(fields: [userId], references: [id])
-  book     Book   @relation(fields: [bookId], references: [id])
-  
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
   @@unique([userId, bookId])
   @@map("cart_items")
 }
@@ -93,9 +92,9 @@ model Payment {
   amount          Decimal       @db.Decimal(10, 2)
   status          PaymentStatus @default(PENDING)
   createdAt       DateTime      @default(now())
-  
-  order           Order         @relation(fields: [orderId], references: [id])
-  
+
+  order Order @relation(fields: [orderId], references: [id])
+
   @@map("payments")
 }
 
