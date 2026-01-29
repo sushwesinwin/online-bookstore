@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartItem } from '@prisma/client';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -58,7 +62,7 @@ export class CartService {
     if (existingItem) {
       // Update existing item
       const newQuantity = existingItem.quantity + quantity;
-      
+
       if (book.inventory < newQuantity) {
         throw new BadRequestException(
           `Insufficient inventory. Available: ${book.inventory}, Total requested: ${newQuantity}`,
@@ -88,7 +92,11 @@ export class CartService {
     });
   }
 
-  async updateItem(userId: string, itemId: string, updateCartItemDto: UpdateCartItemDto): Promise<CartItem> {
+  async updateItem(
+    userId: string,
+    itemId: string,
+    updateCartItemDto: UpdateCartItemDto,
+  ): Promise<CartItem> {
     const { quantity } = updateCartItemDto;
 
     // Find the cart item
@@ -141,7 +149,9 @@ export class CartService {
     });
   }
 
-  async validateCartItems(userId: string): Promise<{ valid: boolean; issues: string[] }> {
+  async validateCartItems(
+    userId: string,
+  ): Promise<{ valid: boolean; issues: string[] }> {
     const cartItems = await this.prisma.cartItem.findMany({
       where: { userId },
       include: { book: true },

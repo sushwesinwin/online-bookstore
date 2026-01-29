@@ -9,7 +9,12 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -43,13 +48,20 @@ export class CartController {
   @ApiResponse({ status: 200, description: 'Cart item updated successfully' })
   @ApiResponse({ status: 400, description: 'Insufficient inventory' })
   @ApiResponse({ status: 404, description: 'Cart item not found' })
-  updateItem(@Request() req, @Param('id') id: string, @Body() updateCartItemDto: UpdateCartItemDto) {
+  updateItem(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() updateCartItemDto: UpdateCartItemDto,
+  ) {
     return this.cartService.updateItem(req.user.id, id, updateCartItemDto);
   }
 
   @Delete('items/:id')
   @ApiOperation({ summary: 'Remove item from cart' })
-  @ApiResponse({ status: 200, description: 'Item removed from cart successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item removed from cart successfully',
+  })
   @ApiResponse({ status: 404, description: 'Cart item not found' })
   removeItem(@Request() req, @Param('id') id: string) {
     return this.cartService.removeItem(req.user.id, id);

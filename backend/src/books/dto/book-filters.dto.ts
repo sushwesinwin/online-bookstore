@@ -27,14 +27,14 @@ export class BookFiltersDto {
   @IsString()
   category?: string;
 
-  @ApiProperty({ required: false, example: 10.00 })
+  @ApiProperty({ required: false, example: 10.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Type(() => Number)
   minPrice?: number;
 
-  @ApiProperty({ required: false, example: 50.00 })
+  @ApiProperty({ required: false, example: 50.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -46,7 +46,11 @@ export class BookFiltersDto {
   @IsString()
   author?: string;
 
-  @ApiProperty({ required: false, example: 'title', enum: ['title', 'author', 'price', 'createdAt'] })
+  @ApiProperty({
+    required: false,
+    example: 'title',
+    enum: ['title', 'author', 'price', 'createdAt'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['title', 'author', 'price', 'createdAt'])

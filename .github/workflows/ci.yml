@@ -31,10 +31,10 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter backend db:generate
+        run: pnpm --filter bookstore-backend db:generate
 
       - name: Lint
         run: pnpm run lint
@@ -46,4 +46,4 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:3000
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test:backend

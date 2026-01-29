@@ -4,7 +4,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     const adapter = new PrismaPg(pool);
@@ -22,8 +25,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async cleanDatabase() {
     if (process.env.NODE_ENV === 'production') return;
 
-    const models = Reflect.ownKeys(this).filter((key) => key[0] !== '_');
+    const models = Reflect.ownKeys(this).filter(key => key[0] !== '_');
 
-    return Promise.all(models.map((modelKey) => this[modelKey].deleteMany()));
+    return Promise.all(models.map(modelKey => this[modelKey].deleteMany()));
   }
 }

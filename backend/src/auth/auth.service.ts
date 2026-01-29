@@ -1,11 +1,17 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from './email.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User, Role } from '@prisma/client';
+import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -28,7 +34,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private emailService: EmailService,
-  ) { }
+  ) {}
 
   async register(createUserDto: CreateUserDto): Promise<AuthResult> {
     const { email, password, firstName, lastName } = createUserDto;
@@ -155,7 +161,9 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
     const { email } = forgotPasswordDto;
 
     // Find user
@@ -165,7 +173,9 @@ export class AuthService {
 
     if (!user) {
       // Don't reveal if email exists or not for security
-      return { message: 'If the email exists, a password reset link has been sent' };
+      return {
+        message: 'If the email exists, a password reset link has been sent',
+      };
     }
 
     // Generate reset token
@@ -183,10 +193,14 @@ export class AuthService {
       // Don't throw error to avoid revealing email existence
     }
 
-    return { message: 'If the email exists, a password reset link has been sent' };
+    return {
+      message: 'If the email exists, a password reset link has been sent',
+    };
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
     const { token, newPassword } = resetPasswordDto;
 
     // Validate reset token
@@ -219,7 +233,10 @@ export class AuthService {
     return { message: 'Password successfully reset' };
   }
 
-  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -248,7 +265,10 @@ export class AuthService {
     return this.invalidatedTokens.has(token);
   }
 
-  private generateTokens(user: User): { accessToken: string; refreshToken: string } {
+  private generateTokens(user: User): {
+    accessToken: string;
+    refreshToken: string;
+  } {
     const payload = {
       sub: user.id,
       email: user.email,

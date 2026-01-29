@@ -8,7 +8,12 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -27,7 +32,10 @@ export class OrdersController {
   @Post()
   @ApiOperation({ summary: 'Create a new order' })
   @ApiResponse({ status: 201, description: 'Order successfully created' })
-  @ApiResponse({ status: 400, description: 'Insufficient inventory or invalid data' })
+  @ApiResponse({
+    status: 400,
+    description: 'Insufficient inventory or invalid data',
+  })
   create(@Request() req, @Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(req.user.id, createOrderDto);
   }
@@ -43,7 +51,10 @@ export class OrdersController {
 
   @Get('my-orders')
   @ApiOperation({ summary: 'Get current user orders' })
-  @ApiResponse({ status: 200, description: 'User orders retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User orders retrieved successfully',
+  })
   getUserOrders(@Request() req) {
     return this.ordersService.getUserOrders(req.user.id);
   }
@@ -62,9 +73,15 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Update order status (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Order status updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Order status updated successfully',
+  })
   @ApiResponse({ status: 404, description: 'Order not found' })
-  updateStatus(@Param('id') id: string, @Body() updateOrderStatusDto: UpdateOrderStatusDto) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
+  ) {
     return this.ordersService.updateStatus(id, updateOrderStatusDto);
   }
 

@@ -6,150 +6,164 @@ import * as nodemailer from 'nodemailer';
 jest.mock('nodemailer');
 
 describe('EmailService', () => {
-    let service: EmailService;
-    let configService: ConfigService;
-    let mockTransporter: any;
+  let service: EmailService;
+  let configService: ConfigService;
+  let mockTransporter: any;
 
-    const mockConfigService = {
-        get: jest.fn((key: string, defaultValue?: any) => {
-            const config: Record<string, any> = {
-                EMAIL_HOST: 'smtp.example.com',
-                EMAIL_PORT: 587,
-                EMAIL_USER: 'test@example.com',
-                EMAIL_PASS: 'password',
-                FRONTEND_URL: 'http://localhost:3000',
-            };
-            return config[key] || defaultValue;
-        }),
+  const mockConfigService = {
+    get: jest.fn((key: string, defaultValue?: any) => {
+      const config: Record<string, any> = {
+        EMAIL_HOST: 'smtp.example.com',
+        EMAIL_PORT: 587,
+        EMAIL_USER: 'test@example.com',
+        EMAIL_PASS: 'password',
+        FRONTEND_URL: 'http://localhost:3000',
+      };
+      return config[key] || defaultValue;
+    }),
+  };
+
+  beforeEach(async () => {
+    mockTransporter = {
+      sendMail: jest.fn().mockResolvedValue({ messageId: 'test-message-id' }),
     };
 
-    beforeEach(async () => {
-        mockTransporter = {
-            sendMail: jest.fn().mockResolvedValue({ messageId: 'test-message-id' }),
-        };
+    (nodemailer.createTransport as jest.Mock).mockReturnValue(mockTransporter);
 
-        (nodemailer.createTransport as jest.Mock).mockReturnValue(mockTransporter);
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        EmailService,
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+      ],
+    }).compile();
 
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                EmailService,
-                {
-                    provide: ConfigService,
-                    useValue: mockConfigService,
-                },
-            ],
-        }).compile();
+    service = module.get<EmailService>(EmailService);
+    configService = module.get<ConfigService>(ConfigService);
+  });
 
-        service = module.get<EmailService>(EmailService);
-        configService = module.get<ConfigService>(ConfigService);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('constructor', () => {
+    it('should create transporter with correct configuration', () => {
+      expect(nodemailer.createTransport).toHaveBeenCalledWith({
+        host: 'smtp.example.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'test@example.com',
+          pass: 'password',
+        },
+      });
+    });
+  });
+
+  describe('sendPasswordResetEmail', () => {
+    it('should send password reset email with correct parameters', async () => {
+      const email = 'user@example.com';
+      const resetToken = 'test-reset-token';
+
+      await service.sendPasswordResetEmail(email, resetToken);
+
+      expect(mockTransporter.sendMail).toHaveBeenCalledWith({
+        from: 'test@example.com',
+        to: email,
+        subject: 'Password Reset Request',
+        html: expect.stringContaining('Password Reset Request'),
+      });
+
+      const callArgs = mockTransporter.sendMail.mock.calls[0][0];
+      expect(callArgs.html).toContain(resetToken);
+      expect(callArgs.html).toContain(
+        'http://localhost:3000/reset-password?token=',
+      );
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
+    it('should include reset URL in email', async () => {
+      const email = 'user@example.com';
+      const resetToken = 'test-reset-token';
+
+      await service.sendPasswordResetEmail(email, resetToken);
+
+      const callArgs = mockTransporter.sendMail.mock.calls[0][0];
+      expect(callArgs.html).toContain(
+        `http://localhost:3000/reset-password?token=${resetToken}`,
+      );
     });
 
-    describe('constructor', () => {
-        it('should create transporter with correct configuration', () => {
-            expect(nodemailer.createTransport).toHaveBeenCalledWith({
-                host: 'smtp.example.com',
-                port: 587,
-                secure: false,
-                auth: {
-                    user: 'test@example.com',
-                    pass: 'password',
-                },
-            });
-        });
+    it('should throw error if email sending fails', async () => {
+      const email = 'user@example.com';
+      const resetToken = 'test-reset-token';
+      const error = new Error('Email sending failed');
+
+      mockTransporter.sendMail.mockRejectedValue(error);
+
+      await expect(
+        service.sendPasswordResetEmail(email, resetToken),
+      ).rejects.toThrow(error);
+    });
+  });
+
+  describe('sendOrderConfirmationEmail', () => {
+    it('should send order confirmation email with correct parameters', async () => {
+      const email = 'user@example.com';
+      const orderNumber = 'ORD-12345';
+      const orderDetails = {
+        items: [{ title: 'Book 1', quantity: 2, price: 20 }],
+        total: 40,
+      };
+
+      await service.sendOrderConfirmationEmail(
+        email,
+        orderNumber,
+        orderDetails,
+      );
+
+      expect(mockTransporter.sendMail).toHaveBeenCalledWith({
+        from: 'test@example.com',
+        to: email,
+        subject: `Order Confirmation - ${orderNumber}`,
+        html: expect.stringContaining('Order Confirmation'),
+      });
+
+      const callArgs = mockTransporter.sendMail.mock.calls[0][0];
+      expect(callArgs.html).toContain(orderNumber);
+      expect(callArgs.html).toContain(JSON.stringify(orderDetails, null, 2));
     });
 
-    describe('sendPasswordResetEmail', () => {
-        it('should send password reset email with correct parameters', async () => {
-            const email = 'user@example.com';
-            const resetToken = 'test-reset-token';
+    it('should include order details in email', async () => {
+      const email = 'user@example.com';
+      const orderNumber = 'ORD-12345';
+      const orderDetails = {
+        items: [{ title: 'Book 1', quantity: 1, price: 15 }],
+        total: 15,
+      };
 
-            await service.sendPasswordResetEmail(email, resetToken);
+      await service.sendOrderConfirmationEmail(
+        email,
+        orderNumber,
+        orderDetails,
+      );
 
-            expect(mockTransporter.sendMail).toHaveBeenCalledWith({
-                from: 'test@example.com',
-                to: email,
-                subject: 'Password Reset Request',
-                html: expect.stringContaining('Password Reset Request'),
-            });
-
-            const callArgs = mockTransporter.sendMail.mock.calls[0][0];
-            expect(callArgs.html).toContain(resetToken);
-            expect(callArgs.html).toContain('http://localhost:3000/reset-password?token=');
-        });
-
-        it('should include reset URL in email', async () => {
-            const email = 'user@example.com';
-            const resetToken = 'test-reset-token';
-
-            await service.sendPasswordResetEmail(email, resetToken);
-
-            const callArgs = mockTransporter.sendMail.mock.calls[0][0];
-            expect(callArgs.html).toContain(`http://localhost:3000/reset-password?token=${resetToken}`);
-        });
-
-        it('should throw error if email sending fails', async () => {
-            const email = 'user@example.com';
-            const resetToken = 'test-reset-token';
-            const error = new Error('Email sending failed');
-
-            mockTransporter.sendMail.mockRejectedValue(error);
-
-            await expect(service.sendPasswordResetEmail(email, resetToken)).rejects.toThrow(error);
-        });
+      const callArgs = mockTransporter.sendMail.mock.calls[0][0];
+      expect(callArgs.html).toContain('Book 1');
     });
 
-    describe('sendOrderConfirmationEmail', () => {
-        it('should send order confirmation email with correct parameters', async () => {
-            const email = 'user@example.com';
-            const orderNumber = 'ORD-12345';
-            const orderDetails = {
-                items: [{ title: 'Book 1', quantity: 2, price: 20 }],
-                total: 40,
-            };
+    it('should throw error if email sending fails', async () => {
+      const email = 'user@example.com';
+      const orderNumber = 'ORD-12345';
+      const orderDetails = { items: [], total: 0 };
+      const error = new Error('Email sending failed');
 
-            await service.sendOrderConfirmationEmail(email, orderNumber, orderDetails);
+      mockTransporter.sendMail.mockRejectedValue(error);
 
-            expect(mockTransporter.sendMail).toHaveBeenCalledWith({
-                from: 'test@example.com',
-                to: email,
-                subject: `Order Confirmation - ${orderNumber}`,
-                html: expect.stringContaining('Order Confirmation'),
-            });
-
-            const callArgs = mockTransporter.sendMail.mock.calls[0][0];
-            expect(callArgs.html).toContain(orderNumber);
-            expect(callArgs.html).toContain(JSON.stringify(orderDetails, null, 2));
-        });
-
-        it('should include order details in email', async () => {
-            const email = 'user@example.com';
-            const orderNumber = 'ORD-12345';
-            const orderDetails = {
-                items: [{ title: 'Book 1', quantity: 1, price: 15 }],
-                total: 15,
-            };
-
-            await service.sendOrderConfirmationEmail(email, orderNumber, orderDetails);
-
-            const callArgs = mockTransporter.sendMail.mock.calls[0][0];
-            expect(callArgs.html).toContain('Book 1');
-        });
-
-        it('should throw error if email sending fails', async () => {
-            const email = 'user@example.com';
-            const orderNumber = 'ORD-12345';
-            const orderDetails = { items: [], total: 0 };
-            const error = new Error('Email sending failed');
-
-            mockTransporter.sendMail.mockRejectedValue(error);
-
-            await expect(
-                service.sendOrderConfirmationEmail(email, orderNumber, orderDetails)
-            ).rejects.toThrow(error);
-        });
+      await expect(
+        service.sendOrderConfirmationEmail(email, orderNumber, orderDetails),
+      ).rejects.toThrow(error);
     });
+  });
 });

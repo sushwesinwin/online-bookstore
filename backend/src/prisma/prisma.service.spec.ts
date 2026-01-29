@@ -39,7 +39,7 @@ describe('PrismaService - Database Schema Integrity', () => {
     }).compile();
 
     service = module.get<PrismaService>(PrismaService);
-    
+
     // Reset all mocks
     jest.clearAllMocks();
   });
@@ -118,12 +118,14 @@ describe('PrismaService - Database Schema Integrity', () => {
             totalAmount: mockBook.price,
             createdAt: new Date(),
             updatedAt: new Date(),
-            items: [{
-              id: 'order-item-123',
-              bookId: mockBook.id,
-              quantity: 1,
-              price: mockBook.price,
-            }],
+            items: [
+              {
+                id: 'order-item-123',
+                bookId: mockBook.id,
+                quantity: 1,
+                price: mockBook.price,
+              },
+            ],
           };
           service.order.create.mockResolvedValue(mockOrder);
 
@@ -267,8 +269,12 @@ describe('PrismaService - Database Schema Integrity', () => {
         fc.string({ minLength: 1, maxLength: 50 }),
         async (nonExistentUserId, nonExistentBookId) => {
           // Mock referential integrity violations
-          service.cartItem.create.mockRejectedValue(new Error('Foreign key constraint failed'));
-          service.order.create.mockRejectedValue(new Error('Foreign key constraint failed'));
+          service.cartItem.create.mockRejectedValue(
+            new Error('Foreign key constraint failed'),
+          );
+          service.order.create.mockRejectedValue(
+            new Error('Foreign key constraint failed'),
+          );
 
           // Attempt to create cart item with non-existent user should fail
           await expect(

@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ConflictException, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as fc from 'fast-check';
 import { AuthService } from './auth.service';
@@ -79,7 +84,7 @@ describe('AuthService', () => {
   describe('Property-Based Tests', () => {
     /**
      * Feature: online-bookstore-system, Property 1: User Registration Integrity
-     * For any valid user registration data, creating an account should result in a new user record 
+     * For any valid user registration data, creating an account should result in a new user record
      * with securely hashed password and no plain text password storage.
      * Validates: Requirements 1.1, 1.5
      */
@@ -92,14 +97,14 @@ describe('AuthService', () => {
             firstName: fc.string({ minLength: 1, maxLength: 10 }),
             lastName: fc.string({ minLength: 1, maxLength: 10 }),
           }),
-          async (userData) => {
+          async userData => {
             // Setup mocks
             mockPrismaService.user.findUnique.mockResolvedValue(null);
 
             // Pre-hash password to avoid timeout
             const hashedPassword = await bcrypt.hash(userData.password, 12);
 
-            mockPrismaService.user.create.mockImplementation(async (args) => {
+            mockPrismaService.user.create.mockImplementation(async args => {
               return {
                 id: 'test-id',
                 email: args.data.email,
@@ -128,15 +133,15 @@ describe('AuthService', () => {
             expect(result.accessToken).toBeDefined();
             expect(result.refreshToken).toBeDefined();
             expect(result.user.email).toBe(userData.email);
-          }
+          },
         ),
-        { numRuns: 20 } // Reduced runs due to bcrypt performance
+        { numRuns: 20 }, // Reduced runs due to bcrypt performance
       );
     }, 30000); // Increased timeout for bcrypt operations
 
     /**
      * Feature: online-bookstore-system, Property 2: Authentication Round Trip
-     * For any registered user, successful login followed by accessing protected resources 
+     * For any registered user, successful login followed by accessing protected resources
      * should maintain consistent user identity and permissions throughout the session.
      * Validates: Requirements 1.2, 1.4
      */
@@ -149,7 +154,7 @@ describe('AuthService', () => {
             firstName: fc.string({ minLength: 1, maxLength: 10 }),
             lastName: fc.string({ minLength: 1, maxLength: 10 }),
           }),
-          async (userData) => {
+          async userData => {
             const hashedPassword = await bcrypt.hash(userData.password, 12);
             const mockUser = {
               id: 'test-id',
@@ -186,15 +191,15 @@ describe('AuthService', () => {
             expect(foundUser!.email).toBe(loginResult.user.email);
             expect(foundUser!.id).toBe(loginResult.user.id);
             expect(foundUser).not.toHaveProperty('password');
-          }
+          },
         ),
-        { numRuns: 20 } // Reduced runs due to bcrypt performance
+        { numRuns: 20 }, // Reduced runs due to bcrypt performance
       );
     }, 30000); // Increased timeout for bcrypt operations
 
     /**
      * Feature: online-bookstore-system, Property 3: Session Lifecycle Management
-     * For any authenticated user session, logout should invalidate the session 
+     * For any authenticated user session, logout should invalidate the session
      * such that subsequent requests with that session token are rejected.
      * Validates: Requirements 1.6
      */
@@ -202,7 +207,7 @@ describe('AuthService', () => {
       await fc.assert(
         fc.asyncProperty(
           fc.string({ minLength: 10, maxLength: 50 }),
-          async (tokenId) => {
+          async tokenId => {
             // Setup mocks
             mockConfigService.get.mockReturnValue('test-secret');
             mockJwtService.decode.mockReturnValue({ tokenId });
@@ -218,56 +223,58 @@ describe('AuthService', () => {
             // Test that the same token remains invalidated on subsequent checks
             const stillInvalidated = service.isTokenInvalidated(tokenId);
             expect(stillInvalidated).toBe(true);
-          }
+          },
         ),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     }, 15000); // Increased timeout
 
     /**
      * Feature: online-bookstore-system, Property 4: Password Reset Security
-     * For any user requesting password reset, the system should generate a unique, 
+     * For any user requesting password reset, the system should generate a unique,
      * time-limited reset token and send it via email without exposing sensitive information.
      * Validates: Requirements 1.3
      */
     it('should maintain password reset security for all users', async () => {
       await fc.assert(
-        fc.asyncProperty(
-          fc.emailAddress(),
-          async (email) => {
-            // Setup mocks
-            const mockUser = {
-              id: 'test-id',
-              email,
-              password: 'hashed-password',
-              firstName: 'Test',
-              lastName: 'User',
-              role: 'USER',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            };
+        fc.asyncProperty(fc.emailAddress(), async email => {
+          // Setup mocks
+          const mockUser = {
+            id: 'test-id',
+            email,
+            password: 'hashed-password',
+            firstName: 'Test',
+            lastName: 'User',
+            role: 'USER',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
 
-            mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
-            mockEmailService.sendPasswordResetEmail.mockResolvedValue(undefined);
+          mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+          mockEmailService.sendPasswordResetEmail.mockResolvedValue(undefined);
 
-            const result = await service.forgotPassword({ email } as ForgotPasswordDto);
+          const result = await service.forgotPassword({
+            email,
+          } as ForgotPasswordDto);
 
-            // Verify response doesn't reveal if email exists
-            expect(result.message).toBe('If the email exists, a password reset link has been sent');
+          // Verify response doesn't reveal if email exists
+          expect(result.message).toBe(
+            'If the email exists, a password reset link has been sent',
+          );
 
-            // Verify email service was called with email and a token
-            expect(mockEmailService.sendPasswordResetEmail).toHaveBeenCalledWith(
-              email,
-              expect.any(String)
-            );
+          // Verify email service was called with email and a token
+          expect(mockEmailService.sendPasswordResetEmail).toHaveBeenCalledWith(
+            email,
+            expect.any(String),
+          );
 
-            // Verify token is a hex string (crypto.randomBytes output)
-            const callArgs = mockEmailService.sendPasswordResetEmail.mock.calls[0];
-            const token = callArgs[1];
-            expect(token).toMatch(/^[a-f0-9]{64}$/); // 32 bytes = 64 hex chars
-          }
-        ),
-        { numRuns: 100 }
+          // Verify token is a hex string (crypto.randomBytes output)
+          const callArgs =
+            mockEmailService.sendPasswordResetEmail.mock.calls[0];
+          const token = callArgs[1];
+          expect(token).toMatch(/^[a-f0-9]{64}$/); // 32 bytes = 64 hex chars
+        }),
+        { numRuns: 100 },
       );
     }, 15000); // Increased timeout
   });
@@ -283,10 +290,16 @@ describe('AuthService', () => {
             lastName: 'User',
           };
 
-          mockPrismaService.user.findUnique.mockResolvedValue({ id: 'existing-user' });
+          mockPrismaService.user.findUnique.mockResolvedValue({
+            id: 'existing-user',
+          });
 
-          await expect(service.register(userData)).rejects.toThrow(ConflictException);
-          await expect(service.register(userData)).rejects.toThrow('User with this email already exists');
+          await expect(service.register(userData)).rejects.toThrow(
+            ConflictException,
+          );
+          await expect(service.register(userData)).rejects.toThrow(
+            'User with this email already exists',
+          );
         });
 
         it('should accept valid email formats during registration', async () => {
@@ -485,7 +498,11 @@ describe('AuthService', () => {
         });
 
         it('should hash passwords regardless of length', async () => {
-          const testPasswords = ['pass1234', 'mediumPassword123', 'p'.repeat(100)];
+          const testPasswords = [
+            'pass1234',
+            'mediumPassword123',
+            'p'.repeat(100),
+          ];
 
           for (const password of testPasswords) {
             const userData: CreateUserDto = {
@@ -496,7 +513,7 @@ describe('AuthService', () => {
             };
 
             mockPrismaService.user.findUnique.mockResolvedValue(null);
-            mockPrismaService.user.create.mockImplementation(async (args) => {
+            mockPrismaService.user.create.mockImplementation(async args => {
               // Verify password is hashed
               expect(args.data.password).not.toBe(password);
               expect(args.data.password).toMatch(/^\$2[aby]\$\d+\$/); // bcrypt hash pattern
@@ -754,8 +771,12 @@ describe('AuthService', () => {
 
           mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-          await expect(service.login(loginData)).rejects.toThrow(UnauthorizedException);
-          await expect(service.login(loginData)).rejects.toThrow('Email Not Found, Register first!');
+          await expect(service.login(loginData)).rejects.toThrow(
+            UnauthorizedException,
+          );
+          await expect(service.login(loginData)).rejects.toThrow(
+            'Email Not Found, Register first!',
+          );
         });
 
         it('should handle valid email formats correctly', async () => {
@@ -836,8 +857,12 @@ describe('AuthService', () => {
 
           mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-          await expect(service.login(loginData)).rejects.toThrow(UnauthorizedException);
-          await expect(service.login(loginData)).rejects.toThrow('Email Not Found, Register first!');
+          await expect(service.login(loginData)).rejects.toThrow(
+            UnauthorizedException,
+          );
+          await expect(service.login(loginData)).rejects.toThrow(
+            'Email Not Found, Register first!',
+          );
         });
       });
 
@@ -951,8 +976,12 @@ describe('AuthService', () => {
           updatedAt: new Date(),
         });
 
-        await expect(service.login(loginData)).rejects.toThrow(UnauthorizedException);
-        await expect(service.login(loginData)).rejects.toThrow('Email and Password do not match!');
+        await expect(service.login(loginData)).rejects.toThrow(
+          UnauthorizedException,
+        );
+        await expect(service.login(loginData)).rejects.toThrow(
+          'Email and Password do not match!',
+        );
       });
 
       it('should successfully login with valid credentials', async () => {
@@ -994,8 +1023,12 @@ describe('AuthService', () => {
           throw new Error('Invalid token');
         });
 
-        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(UnauthorizedException);
-        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow('Invalid refresh token');
+        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(
+          UnauthorizedException,
+        );
+        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(
+          'Invalid refresh token',
+        );
       });
 
       it('should throw UnauthorizedException for invalidated token', async () => {
@@ -1009,7 +1042,9 @@ describe('AuthService', () => {
         // Manually add token to invalidated set
         (service as any).invalidatedTokens.add('valid-but-invalidated-token');
 
-        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(UnauthorizedException);
+        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(
+          UnauthorizedException,
+        );
       });
 
       it('should throw UnauthorizedException when user not found', async () => {
@@ -1021,7 +1056,9 @@ describe('AuthService', () => {
         mockConfigService.get.mockReturnValue('test-secret');
         mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(UnauthorizedException);
+        await expect(service.refreshToken(refreshTokenDto)).rejects.toThrow(
+          UnauthorizedException,
+        );
       });
 
       it('should successfully refresh token', async () => {
@@ -1048,7 +1085,9 @@ describe('AuthService', () => {
         expect(result.user.email).toBe('test@example.com');
         expect(result.accessToken).toBeDefined();
         expect(result.refreshToken).toBeDefined();
-        expect(service.isTokenInvalidated(refreshTokenDto.refreshToken)).toBe(true);
+        expect(service.isTokenInvalidated(refreshTokenDto.refreshToken)).toBe(
+          true,
+        );
       });
     });
 
@@ -1093,10 +1132,12 @@ describe('AuthService', () => {
 
         const result = await service.forgotPassword(forgotPasswordDto);
 
-        expect(result.message).toBe('If the email exists, a password reset link has been sent');
+        expect(result.message).toBe(
+          'If the email exists, a password reset link has been sent',
+        );
         expect(mockEmailService.sendPasswordResetEmail).toHaveBeenCalledWith(
           forgotPasswordDto.email,
-          expect.any(String)
+          expect.any(String),
         );
       });
 
@@ -1109,7 +1150,9 @@ describe('AuthService', () => {
 
         const result = await service.forgotPassword(forgotPasswordDto);
 
-        expect(result.message).toBe('If the email exists, a password reset link has been sent');
+        expect(result.message).toBe(
+          'If the email exists, a password reset link has been sent',
+        );
         expect(mockEmailService.sendPasswordResetEmail).not.toHaveBeenCalled();
       });
 
@@ -1128,11 +1171,15 @@ describe('AuthService', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-        mockEmailService.sendPasswordResetEmail.mockRejectedValue(new Error('Email service error'));
+        mockEmailService.sendPasswordResetEmail.mockRejectedValue(
+          new Error('Email service error'),
+        );
 
         const result = await service.forgotPassword(forgotPasswordDto);
 
-        expect(result.message).toBe('If the email exists, a password reset link has been sent');
+        expect(result.message).toBe(
+          'If the email exists, a password reset link has been sent',
+        );
       });
     });
 
@@ -1143,8 +1190,12 @@ describe('AuthService', () => {
           newPassword: 'newPassword123',
         };
 
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(BadRequestException);
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow('Invalid or expired reset token');
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          BadRequestException,
+        );
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          'Invalid or expired reset token',
+        );
       });
 
       it('should throw BadRequestException for expired token', async () => {
@@ -1160,8 +1211,12 @@ describe('AuthService', () => {
           expires: expiredDate,
         });
 
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(BadRequestException);
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow('Invalid or expired reset token');
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          BadRequestException,
+        );
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          'Invalid or expired reset token',
+        );
       });
 
       it('should throw NotFoundException when user not found', async () => {
@@ -1178,8 +1233,12 @@ describe('AuthService', () => {
 
         mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(NotFoundException);
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow('User not found');
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          NotFoundException,
+        );
+        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrow(
+          'User not found',
+        );
       });
 
       it('should successfully reset password', async () => {
@@ -1250,7 +1309,10 @@ describe('AuthService', () => {
       it('should return null for invalid user validation', async () => {
         mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-        const result = await service.validateUser('test@example.com', 'password');
+        const result = await service.validateUser(
+          'test@example.com',
+          'password',
+        );
 
         expect(result).toBeNull();
       });
@@ -1268,7 +1330,10 @@ describe('AuthService', () => {
           updatedAt: new Date(),
         });
 
-        const result = await service.validateUser('test@example.com', 'wrongpassword');
+        const result = await service.validateUser(
+          'test@example.com',
+          'wrongpassword',
+        );
 
         expect(result).toBeNull();
       });

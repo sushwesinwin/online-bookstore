@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Book, Prisma } from '@prisma/client';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -47,7 +51,9 @@ export class BooksService {
           { description: { contains: search, mode: 'insensitive' } },
         ],
       }),
-      ...(category && { category: { contains: category, mode: 'insensitive' } }),
+      ...(category && {
+        category: { contains: category, mode: 'insensitive' },
+      }),
       ...(author && { author: { contains: author, mode: 'insensitive' } }),
       ...(minPrice !== undefined || maxPrice !== undefined
         ? {
@@ -146,6 +152,6 @@ export class BooksService {
       distinct: ['category'],
     });
 
-    return categories.map((c) => c.category);
+    return categories.map(c => c.category);
   }
 }

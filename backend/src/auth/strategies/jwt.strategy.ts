@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(req: any, payload: any) {
     // Extract token from request
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    
+
     // Check if token is invalidated
     if (token && this.authService.isTokenInvalidated(token)) {
       throw new UnauthorizedException('Token has been invalidated');

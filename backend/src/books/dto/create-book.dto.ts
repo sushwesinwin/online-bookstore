@@ -36,7 +36,10 @@ export class CreateBookDto {
   @IsString()
   category: string;
 
-  @ApiProperty({ example: 'https://example.com/book-cover.jpg', required: false })
+  @ApiProperty({
+    example: 'https://example.com/book-cover.jpg',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   imageUrl?: string;

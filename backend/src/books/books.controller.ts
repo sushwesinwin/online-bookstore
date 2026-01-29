@@ -9,7 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -44,7 +49,10 @@ export class BooksController {
 
   @Get('categories')
   @ApiOperation({ summary: 'Get all book categories' })
-  @ApiResponse({ status: 200, description: 'Categories retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories retrieved successfully',
+  })
   getCategories() {
     return this.booksService.getCategories();
   }

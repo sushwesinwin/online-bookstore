@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -41,7 +45,7 @@ export class OrdersService {
     }
 
     // Create order with items in a transaction
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async tx => {
       // Create the order
       const order = await tx.order.create({
         data: {
@@ -106,7 +110,7 @@ export class OrdersService {
 
   async findOne(id: string, userId?: string): Promise<Order> {
     const where: Prisma.OrderWhereUniqueInput = { id };
-    
+
     const order = await this.prisma.order.findUnique({
       where,
       include: {
@@ -139,7 +143,10 @@ export class OrdersService {
     return order;
   }
 
-  async updateStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto): Promise<Order> {
+  async updateStatus(
+    id: string,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+  ): Promise<Order> {
     try {
       return await this.prisma.order.update({
         where: { id },
@@ -174,12 +181,15 @@ export class OrdersService {
   async cancelOrder(id: string, userId?: string): Promise<Order> {
     const order = await this.findOne(id, userId);
 
-    if (order.status !== OrderStatus.PENDING && order.status !== OrderStatus.CONFIRMED) {
+    if (
+      order.status !== OrderStatus.PENDING &&
+      order.status !== OrderStatus.CONFIRMED
+    ) {
       throw new BadRequestException('Order cannot be cancelled at this stage');
     }
 
     // Cancel order and restore inventory in a transaction
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async tx => {
       // Update order status
       const updatedOrder = await tx.order.update({
         where: { id },
