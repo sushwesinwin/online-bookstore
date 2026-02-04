@@ -10,7 +10,27 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
+
+  /**
+   * Generate a unique order number
+   * Format: ORD-YYYYMMDD-XXXXXX (e.g., ORD-20240115-A1B2C3)
+   */
+  private generateOrderNumber(): string {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Generate a random 6-character alphanumeric string
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomStr = '';
+    for (let i = 0; i < 6; i++) {
+      randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return `ORD-${year}${month}${day}-${randomStr}`;
+  }
 
   async create(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
     const { items } = createOrderDto;
@@ -44,11 +64,33 @@ export class OrdersService {
       });
     }
 
+    // Generate unique order number with retry logic
+    let orderNumber: string;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      orderNumber = this.generateOrderNumber();
+      const existingOrder = await this.prisma.order.findUnique({
+        where: { orderNumber },
+      });
+
+      if (!existingOrder) {
+        break;
+      }
+
+      attempts++;
+      if (attempts === maxAttempts) {
+        throw new BadRequestException('Failed to generate unique order number');
+      }
+    }
+
     // Create order with items in a transaction
     return await this.prisma.$transaction(async tx => {
       // Create the order
       const order = await tx.order.create({
         data: {
+          orderNumber,
           userId,
           totalAmount,
           items: {
@@ -81,31 +123,84 @@ export class OrdersService {
     });
   }
 
-  async findAll(userId?: string) {
-    const where: Prisma.OrderWhereInput = userId ? { userId } : {};
+  async findAll(userId?: string, query?: any) {
+    const { page = 1, limit = 10, search, status, startDate, endDate, sortBy = 'createdAt', sortOrder = 'desc' } = query || {};
 
-    return await this.prisma.order.findMany({
-      where,
-      include: {
-        items: {
-          include: {
-            book: true,
+    const where: Prisma.OrderWhereInput = {};
+
+    if (userId) {
+      where.userId = userId;
+    }
+
+    // Search by order number or user email
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search, mode: 'insensitive' } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { user: { firstName: { contains: search, mode: 'insensitive' } } },
+        { user: { lastName: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    // Filter by status
+    if (status) {
+      where.status = status;
+    }
+
+    // Filter by date range
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) {
+        where.createdAt.gte = new Date(startDate);
+      }
+      if (endDate) {
+        where.createdAt.lte = new Date(endDate);
+      }
+    }
+
+    // Pagination
+    const skip = (page - 1) * limit;
+
+    // Execute query with count
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          items: {
+            include: {
+              book: true,
+            },
           },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
           },
+          payment: true,
         },
-        payment: true,
+        orderBy: { [sortBy]: sortOrder },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    };
   }
 
   async findOne(id: string, userId?: string): Promise<Order> {
@@ -228,7 +323,7 @@ export class OrdersService {
     });
   }
 
-  async getUserOrders(userId: string) {
-    return this.findAll(userId);
+  async getUserOrders(userId: string, query?: any) {
+    return this.findAll(userId, query);
   }
 }

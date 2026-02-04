@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,18 @@ async function bootstrap() {
   app.use(helmet());
   app.use(compression());
   app.use(cookieParser());
+
+  // Configure raw body for Stripe webhooks
+  app.use(
+    express.json({
+      verify: (req: any, res, buf) => {
+        // Store raw body for webhook signature verification
+        if (req.url === '/orders/webhook') {
+          req.rawBody = buf;
+        }
+      },
+    }),
+  );
 
   // CORS configuration
   app.enableCors({

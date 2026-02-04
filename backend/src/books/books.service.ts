@@ -7,11 +7,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Book, Prisma } from '@prisma/client';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { BookFiltersDto } from './dto/book-filters.dto';
+import { QueryBooksDto } from './dto/query-books.dto';
+import { PaginatedResult } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class BooksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     try {
@@ -28,7 +29,7 @@ export class BooksService {
     }
   }
 
-  async findAll(filters: BookFiltersDto) {
+  async findAll(query?: QueryBooksDto): Promise<PaginatedResult<Book>> {
     const {
       page = 1,
       limit = 10,
@@ -39,33 +40,44 @@ export class BooksService {
       author,
       sortBy = 'createdAt',
       sortOrder = 'desc',
-    } = filters;
+      inStock,
+    } = query || {};
 
     const skip = (page - 1) * limit;
 
-    const where: Prisma.BookWhereInput = {
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { author: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-      ...(category && {
-        category: { contains: category, mode: 'insensitive' },
-      }),
-      ...(author && { author: { contains: author, mode: 'insensitive' } }),
-      ...(minPrice !== undefined || maxPrice !== undefined
-        ? {
-            price: {
-              ...(minPrice !== undefined && { gte: minPrice }),
-              ...(maxPrice !== undefined && { lte: maxPrice }),
-            },
-          }
-        : {}),
-    };
+    const where: Prisma.BookWhereInput = {};
 
-    const [books, total] = await Promise.all([
+    // Search across multiple fields
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { author: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { isbn: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Filters
+    if (category) {
+      where.category = { contains: category, mode: 'insensitive' };
+    }
+    if (author) {
+      where.author = { contains: author, mode: 'insensitive' };
+    }
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.price = {};
+      if (minPrice !== undefined) {
+        where.price.gte = minPrice;
+      }
+      if (maxPrice !== undefined) {
+        where.price.lte = maxPrice;
+      }
+    }
+    if (inStock !== undefined && inStock) {
+      where.inventory = { gt: 0 };
+    }
+
+    const [data, total] = await Promise.all([
       this.prisma.book.findMany({
         where,
         skip,
@@ -75,12 +87,18 @@ export class BooksService {
       this.prisma.book.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
+
     return {
-      books,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     };
   }
 

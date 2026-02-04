@@ -18,7 +18,7 @@ import {
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { BookFiltersDto } from './dto/book-filters.dto';
+import { QueryBooksDto } from './dto/query-books.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -27,7 +27,7 @@ import { Role } from '@prisma/client';
 @ApiTags('Books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -41,10 +41,10 @@ export class BooksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all books with filtering and pagination' })
+  @ApiOperation({ summary: 'Get all books with filtering, sorting, and pagination' })
   @ApiResponse({ status: 200, description: 'Books retrieved successfully' })
-  findAll(@Query() filters: BookFiltersDto) {
-    return this.booksService.findAll(filters);
+  findAll(@Query() query: QueryBooksDto) {
+    return this.booksService.findAll(query);
   }
 
   @Get('categories')

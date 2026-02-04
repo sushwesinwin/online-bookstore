@@ -144,12 +144,12 @@ This implementation plan breaks down the online bookstore system into discrete, 
     - Add atomic order processing with database transactions
     - _Requirements: 5.1, 5.3_
 
-  - [ ] 8.2 Write property tests for checkout and order creation
+  - [x] 8.2 Write property tests for checkout and order creation
     - **Property 13: Checkout Validation Completeness**
     - **Property 14: Order Creation Atomicity**
     - **Validates: Requirements 5.1, 5.2, 5.3**
 
-  - [ ] 8.3 Integrate Stripe payment processing
+  - [x] 8.3 Integrate Stripe payment processing
     - Set up Stripe SDK and webhook handling
     - Implement secure payment processing service
     - Add payment failure handling with cart preservation
@@ -160,7 +160,7 @@ This implementation plan breaks down the online bookstore system into discrete, 
     - **Property 15: Payment Failure Handling**
     - **Validates: Requirements 5.4**
 
-  - [ ] 8.5 Implement order confirmation and notifications
+  - [-] 8.5 Implement order confirmation and notifications
     - Add unique order number generation
     - Enhance email service for order confirmations
     - Create order confirmation with tracking details

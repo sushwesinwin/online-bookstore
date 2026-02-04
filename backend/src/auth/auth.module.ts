@@ -32,6 +32,6 @@ import { PrismaService } from '../prisma/prisma.service';
     PrismaService,
     ConfigService,
   ],
-  exports: [AuthService],
+  exports: [AuthService, EmailService],
 })
-export class AuthModule {}
+export class AuthModule { }
