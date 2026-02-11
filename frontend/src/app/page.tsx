@@ -18,7 +18,6 @@ import { useBooks } from '@/lib/hooks/use-books';
 import { formatPrice } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { booksApi } from '@/lib/api/books';
-import { ApiTest } from '@/components/debug/api-test';
 
 export default function HomePage() {
   const queryClient = useQueryClient();
@@ -57,7 +56,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Header />
-      <ApiTest />
 
       <main>
         {/* Hero Section with Background Image */}

@@ -43,7 +43,7 @@ async function main() {
 
   console.log('✅ Created test user:', user.email);
 
-  // Sample books data
+  // Sample books data with real cover images
   const booksData = [
     {
       isbn: '978-0-7432-7356-5',
@@ -53,7 +53,7 @@ async function main() {
       price: 12.99,
       inventory: 50,
       category: 'Fiction',
-      imageUrl: 'https://example.com/great-gatsby.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg',
     },
     {
       isbn: '978-0-06-112008-4',
@@ -63,7 +63,7 @@ async function main() {
       price: 14.99,
       inventory: 30,
       category: 'Fiction',
-      imageUrl: 'https://example.com/mockingbird.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg',
     },
     {
       isbn: '978-0-452-28423-4',
@@ -73,7 +73,7 @@ async function main() {
       price: 13.99,
       inventory: 40,
       category: 'Science Fiction',
-      imageUrl: 'https://example.com/1984.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780452284234-L.jpg',
     },
     {
       isbn: '978-0-7432-4722-4',
@@ -83,7 +83,7 @@ async function main() {
       price: 11.99,
       inventory: 25,
       category: 'Romance',
-      imageUrl: 'https://example.com/pride-prejudice.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780743477222-L.jpg',
     },
     {
       isbn: '978-0-06-085052-4',
@@ -93,7 +93,7 @@ async function main() {
       price: 13.49,
       inventory: 35,
       category: 'Fiction',
-      imageUrl: 'https://example.com/catcher-rye.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg',
     },
     {
       isbn: '978-0-7432-7357-2',
@@ -103,7 +103,7 @@ async function main() {
       price: 12.49,
       inventory: 20,
       category: 'Fiction',
-      imageUrl: 'https://example.com/lord-flies.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780399501487-L.jpg',
     },
     {
       isbn: '978-0-553-21311-7',
@@ -113,7 +113,7 @@ async function main() {
       price: 14.49,
       inventory: 28,
       category: 'Science Fiction',
-      imageUrl: 'https://example.com/brave-new-world.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg',
     },
     {
       isbn: '978-0-14-243724-7',
@@ -123,7 +123,7 @@ async function main() {
       price: 15.99,
       inventory: 45,
       category: 'Fantasy',
-      imageUrl: 'https://example.com/hobbit.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg',
     },
     {
       isbn: '978-0-7432-7358-9',
@@ -133,7 +133,7 @@ async function main() {
       price: 13.99,
       inventory: 22,
       category: 'Romance',
-      imageUrl: 'https://example.com/jane-eyre.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780141441146-L.jpg',
     },
     {
       isbn: '978-0-06-112009-1',
@@ -143,7 +143,7 @@ async function main() {
       price: 12.99,
       inventory: 38,
       category: 'Fantasy',
-      imageUrl: 'https://example.com/narnia.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780064404990-L.jpg',
     },
     {
       isbn: '978-0-7432-7359-6',
@@ -153,7 +153,7 @@ async function main() {
       price: 13.49,
       inventory: 18,
       category: 'Romance',
-      imageUrl: 'https://example.com/wuthering-heights.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780141439556-L.jpg',
     },
     {
       isbn: '978-0-553-57340-1',
@@ -163,7 +163,7 @@ async function main() {
       price: 16.99,
       inventory: 55,
       category: 'Fantasy',
-      imageUrl: 'https://example.com/game-thrones.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780553573404-L.jpg',
     },
     {
       isbn: '978-0-7432-7360-2',
@@ -173,7 +173,7 @@ async function main() {
       price: 12.99,
       inventory: 26,
       category: 'Fiction',
-      imageUrl: 'https://example.com/dorian-gray.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780141439570-L.jpg',
     },
     {
       isbn: '978-0-14-144930-4',
@@ -183,7 +183,7 @@ async function main() {
       price: 17.99,
       inventory: 32,
       category: 'Science Fiction',
-      imageUrl: 'https://example.com/dune.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg',
     },
     {
       isbn: '978-0-7432-7361-9',
@@ -193,7 +193,7 @@ async function main() {
       price: 14.99,
       inventory: 29,
       category: 'Mystery',
-      imageUrl: 'https://example.com/sherlock-holmes.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/isbn/9780486474915-L.jpg',
     },
   ];
 
