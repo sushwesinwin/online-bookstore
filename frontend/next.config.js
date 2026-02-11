@@ -4,7 +4,7 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['localhost', 'images.unsplash.com', 'covers.openlibrary.org'],
+    domains: ['localhost', 'images.unsplash.com', 'covers.openlibrary.org', 'upload.wikimedia.org'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +15,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        pathname: '/wikipedia/**',
       },
     ],
   },

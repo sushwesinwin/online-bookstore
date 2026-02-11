@@ -268,32 +268,32 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
-                  name: 'Stephen King',
-                  books: '60+ Books',
-                  genre: 'Horror & Thriller',
-                  image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-                  bio: 'Master of horror and suspense'
+                  name: 'George Orwell',
+                  books: '20+ Books',
+                  genre: 'Political Fiction',
+                  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/George_Orwell_press_photo.jpg/440px-George_Orwell_press_photo.jpg',
+                  bio: 'Author of 1984 and Animal Farm'
                 },
                 {
-                  name: 'J.K. Rowling',
-                  books: '15+ Books',
-                  genre: 'Fantasy',
-                  image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
-                  bio: 'Creator of Harry Potter universe'
-                },
-                {
-                  name: 'Agatha Christie',
-                  books: '80+ Books',
-                  genre: 'Mystery',
-                  image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
-                  bio: 'Queen of mystery novels'
+                  name: 'Jane Austen',
+                  books: '6 Major Novels',
+                  genre: 'Romance & Social Commentary',
+                  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg/440px-CassandraAusten-JaneAusten%28c.1810%29_hires.jpg',
+                  bio: 'Author of Pride and Prejudice'
                 },
                 {
                   name: 'Ernest Hemingway',
                   books: '20+ Books',
                   genre: 'Classic Literature',
-                  image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+                  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/ErnestHemingway.jpg/440px-ErnestHemingway.jpg',
                   bio: 'Nobel Prize winning author'
+                },
+                {
+                  name: 'Agatha Christie',
+                  books: '80+ Books',
+                  genre: 'Mystery',
+                  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Agatha_Christie_%281925%29.jpg/440px-Agatha_Christie_%281925%29.jpg',
+                  bio: 'Queen of mystery novels'
                 }
               ].map((author, index) => (
                 <div key={index} className="group text-center">
@@ -309,7 +309,7 @@ export default function HomePage() {
                   <p className="text-sm text-gray-600 mb-1">{author.books}</p>
                   <p className="text-sm text-indigo-600 font-medium mb-2">{author.genre}</p>
                   <p className="text-sm text-gray-500 mb-4">{author.bio}</p>
-                  <Link href={`/books?author=${encodeURIComponent(author.name)}`}>
+                  <Link href={`/authors/${encodeURIComponent(author.name)}`}>
                     <Button variant="outline" size="sm">View Books</Button>
                   </Link>
                 </div>
