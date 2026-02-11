@@ -16,8 +16,13 @@ import {
 } from 'lucide-react';
 import { useBooks } from '@/lib/hooks/use-books';
 import { formatPrice } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+import { booksApi } from '@/lib/api/books';
+import { ApiTest } from '@/components/debug/api-test';
 
 export default function HomePage() {
+  const queryClient = useQueryClient();
+
   // Fetch books for different sections
   const { data: trendingBooks, isLoading: trendingLoading } = useBooks({
     page: 1,
@@ -40,9 +45,19 @@ export default function HomePage() {
     sortOrder: 'desc',
   });
 
+  // Prefetch book details on hover for better UX
+  const prefetchBook = (bookId: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['book', bookId],
+      queryFn: () => booksApi.getBook(bookId),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Header />
+      <ApiTest />
 
       <main>
         {/* Hero Section with Background Image */}
@@ -143,7 +158,11 @@ export default function HomePage() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {trendingBooks?.data.map((book, index) => (
-                  <Link key={book.id} href={`/books/${book.id}`}>
+                  <Link
+                    key={book.id}
+                    href={`/books/${book.id}`}
+                    onMouseEnter={() => prefetchBook(book.id)}
+                  >
                     <div className="group cursor-pointer">
                       <div className="relative mb-4 overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-shadow">
                         <img
@@ -205,7 +224,11 @@ export default function HomePage() {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {bestsellers?.data.map((book, index) => (
-                  <Link key={book.id} href={`/books/${book.id}`}>
+                  <Link
+                    key={book.id}
+                    href={`/books/${book.id}`}
+                    onMouseEnter={() => prefetchBook(book.id)}
+                  >
                     <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
                       <div className="relative">
                         <img
@@ -330,7 +353,11 @@ export default function HomePage() {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {newBooks?.data.map((book) => (
-                  <Link key={book.id} href={`/books/${book.id}`}>
+                  <Link
+                    key={book.id}
+                    href={`/books/${book.id}`}
+                    onMouseEnter={() => prefetchBook(book.id)}
+                  >
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
                       <div className="relative">
                         <img
