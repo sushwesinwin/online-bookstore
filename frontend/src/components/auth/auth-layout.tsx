@@ -12,49 +12,52 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
     return (
         <div className="min-h-screen flex">
             {/* Left side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative z-10">
-                <div className="w-full max-w-md">
-                    {/* Header with Logo and Back to Home */}
-                    <div className="mb-8">
-                        <Link href="/" className="flex items-center space-x-2 mb-3 group w-fit">
-                            <div className="p-2 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
-                                <BookOpen className="h-6 w-6 text-white" />
-                            </div>
-                            <span className="font-bold text-2xl bg-gradient-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
-                                Bookstore
-                            </span>
-                        </Link>
-                        <Link
-                            href="/"
-                            className="text-sm text-[#848785] hover:text-[#0B7C6B] inline-flex items-center transition-colors"
-                        >
-                            <svg
-                                className="w-4 h-4 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                                />
-                            </svg>
-                            Back to Home
-                        </Link>
-                    </div>
-
-                    {/* Optional Title */}
-                    {title && (
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold text-[#101313] mb-2">{title}</h1>
-                            {subtitle && <p className="text-[#848785]">{subtitle}</p>}
+            <div className="w-full lg:w-1/2 flex flex-col bg-white relative z-10">
+                {/* Header with Logo and Back to Home */}
+                <div className="p-8 pb-4">
+                    <Link href="/" className="flex items-center space-x-2 mb-3 group w-fit">
+                        <div className="p-2 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
+                            <BookOpen className="h-6 w-6 text-white" />
                         </div>
-                    )}
+                        <span className="font-bold text-2xl bg-gradient-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
+                            Bookstore
+                        </span>
+                    </Link>
+                    <Link
+                        href="/"
+                        className="text-sm text-[#848785] hover:text-[#0B7C6B] inline-flex items-center transition-colors"
+                    >
+                        <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
 
-                    {/* Form Content */}
-                    {children}
+                {/* Main Content - Takes remaining space and centers vertically */}
+                <div className="flex-1 flex items-center justify-center px-8 pb-8">
+                    <div className="w-full max-w-md">
+                        {/* Optional Title */}
+                        {title && (
+                            <div className="mb-8">
+                                <h1 className="text-3xl font-bold text-[#101313] mb-2">{title}</h1>
+                                {subtitle && <p className="text-[#848785]">{subtitle}</p>}
+                            </div>
+                        )}
+
+                        {/* Form Content */}
+                        {children}
+                    </div>
                 </div>
             </div>
 
