@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { AuthLayout } from '@/components/auth/auth-layout';
+import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -38,54 +39,65 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-[#F9FCFB]">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Create an Account</CardTitle>
-                    <CardDescription>Sign up to start shopping for books</CardDescription>
-                </CardHeader>
-                <form onSubmit={handleSubmit}>
-                    <CardContent className="space-y-4">
-                        {registerError && (
-                            <div className="p-3 text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-md border border-[#FF4E3E]">
-                                {registerError.message || 'Registration failed'}
-                            </div>
-                        )}
+        <AuthLayout>
+            <div className="space-y-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#101313]">Create an account</h2>
+                    <p className="text-[#848785] mt-1">Sign up to start your reading journey</p>
+                </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="firstName" className="text-sm font-medium text-[#101313]">
-                                    First Name
-                                </label>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    {registerError && (
+                        <div className="flex items-start space-x-3 p-4 text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
+                            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <span>{registerError.message || 'Registration failed. Please try again.'}</span>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label htmlFor="firstName" className="text-sm font-medium text-[#101313]">
+                                First Name
+                            </label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
                                 <Input
                                     id="firstName"
                                     name="firstName"
                                     placeholder="John"
                                     value={formData.firstName}
                                     onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label htmlFor="lastName" className="text-sm font-medium text-[#101313]">
-                                    Last Name
-                                </label>
-                                <Input
-                                    id="lastName"
-                                    name="lastName"
-                                    placeholder="Doe"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
+                                    className="pl-11 h-12"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-[#101313]">
-                                Email
+                            <label htmlFor="lastName" className="text-sm font-medium text-[#101313]">
+                                Last Name
                             </label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
+                                <Input
+                                    id="lastName"
+                                    name="lastName"
+                                    placeholder="Doe"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    className="pl-11 h-12"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="email" className="text-sm font-medium text-[#101313]">
+                            Email Address
+                        </label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
                             <Input
                                 id="email"
                                 name="email"
@@ -93,45 +105,94 @@ export default function RegisterPage() {
                                 placeholder="you@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
+                                className="pl-11 h-12"
                                 required
                             />
                         </div>
+                    </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-[#101313]">
-                                Password
-                            </label>
+                    <div className="space-y-2">
+                        <label htmlFor="password" className="text-sm font-medium text-[#101313]">
+                            Password
+                        </label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
                             <Input
                                 id="password"
                                 name="password"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder="Create a password (min. 6 characters)"
                                 value={formData.password}
                                 onChange={handleChange}
+                                className="pl-11 h-12"
                                 required
                                 minLength={6}
                             />
                         </div>
-                    </CardContent>
+                    </div>
 
-                    <CardFooter className="flex flex-col space-y-4">
-                        <Button type="submit" className="w-full" disabled={isRegistering}>
-                            {isRegistering ? 'Creating account...' : 'Sign Up'}
-                        </Button>
+                    <Button type="submit" className="w-full h-12 text-base" disabled={isRegistering}>
+                        {isRegistering ? (
+                            <div className="flex items-center space-x-2">
+                                <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Creating account...</span>
+                            </div>
+                        ) : (
+                            'Create Account'
+                        )}
+                    </Button>
 
-                        <p className="text-sm text-center text-[#848785]">
-                            Already have an account?{' '}
-                            <Link href="/login" className="text-[#0B7C6B] hover:underline font-medium">
-                                Login
-                            </Link>
-                        </p>
-
-                        <Link href="/" className="text-sm text-center text-[#848785] hover:text-[#0B7C6B]">
-                            ← Back to Home
+                    <p className="text-xs text-center text-[#848785]">
+                        By signing up, you agree to our{' '}
+                        <Link href="/terms" className="text-[#0B7C6B] hover:underline">
+                            Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="text-[#0B7C6B] hover:underline">
+                            Privacy Policy
                         </Link>
-                    </CardFooter>
+                    </p>
                 </form>
-            </Card>
-        </div>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-[#E4E9E8]"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-4 bg-white text-[#848785]">Already have an account?</span>
+                    </div>
+                </div>
+
+                <div className="text-center">
+                    <Link href="/login">
+                        <Button variant="outline" className="w-full h-12 text-base">
+                            Login
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="text-center">
+                    <Link
+                        href="/"
+                        className="text-sm text-[#848785] hover:text-[#0B7C6B] inline-flex items-center"
+                    >
+                        <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
+            </div>
+        </AuthLayout>
     );
 }

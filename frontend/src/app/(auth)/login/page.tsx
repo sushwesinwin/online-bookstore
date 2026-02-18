@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { AuthLayout } from '@/components/auth/auth-layout';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -27,73 +28,116 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-[#F9FCFB]">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Login</CardTitle>
-                    <CardDescription>Enter your credentials to access your account</CardDescription>
-                </CardHeader>
-                <form onSubmit={handleSubmit}>
-                    <CardContent className="space-y-4">
-                        {loginError && (
-                            <div className="p-3 text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-md border border-[#FF4E3E]">
-                                {loginError.message || 'Invalid email or password'}
-                            </div>
-                        )}
+        <AuthLayout>
+            <div className="space-y-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#101313]">Welcome back</h2>
+                    <p className="text-[#848785] mt-1">Login to access your account</p>
+                </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-[#101313]">
-                                Email
-                            </label>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    {loginError && (
+                        <div className="flex items-start space-x-3 p-4 text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
+                            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <span>{loginError.message || 'Invalid email or password'}</span>
+                        </div>
+                    )}
+
+                    <div className="space-y-2">
+                        <label htmlFor="email" className="text-sm font-medium text-[#101313]">
+                            Email Address
+                        </label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
                             <Input
                                 id="email"
                                 type="email"
                                 placeholder="you@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                className="pl-11 h-12"
                                 required
                             />
                         </div>
+                    </div>
 
-                        <div className="space-y-2">
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
                             <label htmlFor="password" className="text-sm font-medium text-[#101313]">
                                 Password
                             </label>
-                            <Input
-                                id="password"
-                                type="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="text-sm">
-                            <Link href="/forgot-password" className="text-[#0B7C6B] hover:underline">
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm text-[#0B7C6B] hover:text-[#096355] font-medium"
+                            >
                                 Forgot password?
                             </Link>
                         </div>
-                    </CardContent>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785]" />
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="pl-11 h-12"
+                                required
+                            />
+                        </div>
+                    </div>
 
-                    <CardFooter className="flex flex-col space-y-4">
-                        <Button type="submit" className="w-full" disabled={isLoggingIn}>
-                            {isLoggingIn ? 'Logging in...' : 'Login'}
-                        </Button>
-
-                        <p className="text-sm text-center text-[#848785]">
-                            Don't have an account?{' '}
-                            <Link href="/register" className="text-[#0B7C6B] hover:underline font-medium">
-                                Sign up
-                            </Link>
-                        </p>
-
-                        <Link href="/" className="text-sm text-center text-[#848785] hover:text-[#0B7C6B]">
-                            ← Back to Home
-                        </Link>
-                    </CardFooter>
+                    <Button type="submit" className="w-full h-12 text-base" disabled={isLoggingIn}>
+                        {isLoggingIn ? (
+                            <div className="flex items-center space-x-2">
+                                <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Logging in...</span>
+                            </div>
+                        ) : (
+                            'Login'
+                        )}
+                    </Button>
                 </form>
-            </Card>
-        </div>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-[#E4E9E8]"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-4 bg-white text-[#848785]">New to Bookstore?</span>
+                    </div>
+                </div>
+
+                <div className="text-center">
+                    <Link href="/register">
+                        <Button variant="outline" className="w-full h-12 text-base">
+                            Create an Account
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="text-center">
+                    <Link
+                        href="/"
+                        className="text-sm text-[#848785] hover:text-[#0B7C6B] inline-flex items-center"
+                    >
+                        <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
+            </div>
+        </AuthLayout>
     );
 }
