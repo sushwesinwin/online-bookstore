@@ -37,7 +37,7 @@ export class AuthService {
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<AuthResult> {
-    const { email, password, firstName, lastName } = createUserDto;
+    const { email, password, firstName, lastName, role } = createUserDto;
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -58,6 +58,7 @@ export class AuthService {
         password: hashedPassword,
         firstName,
         lastName,
+        ...(role && { role }), // Only include role if provided, otherwise uses default USER
       },
     });
 
