@@ -1,25 +1,59 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
+  /* Color Palette */
+  /* Primary Colors */
+  --color-primary: #0B7C6B;
+  --color-primary-light: #E4FFFB;
+  --color-primary-foreground: #ffffff;
+
+  /* Secondary Colors */
+  --color-secondary: #FF6320;
+  --color-secondary-light: #FFECE3;
+  --color-secondary-foreground: #ffffff;
+
+  /* Dark Colors */
+  --color-dark: #101313;
+  --color-dark-2: #383A3A;
+  --color-dark-3: #848785;
+  --color-dark-4: #CCCCCC;
+  --color-dark-5: #E4E9E8;
+  --color-dark-6: #F4F8F8;
+  --color-dark-7: #F9FCFB;
+
+  /* Status Colors */
+  --color-info: #219FFF;
+  --color-info-light: #E4F4FF;
+  --color-success: #17BD8D;
+  --color-success-light: #DFFEF5;
+  --color-warning: #FFA118;
+  --color-warning-light: #FFF1DC;
+  --color-error: #FF4E3E;
+  --color-error-light: #FFECEB;
+
+  /* Backgrounds */
+  --color-background: #F9FCFB;
+  --color-foreground: #101313;
   --color-card: #ffffff;
-  --color-card-foreground: #0a0a0a;
+  --color-card-foreground: #101313;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0a0a0a;
-  --color-primary: #18181b;
-  --color-primary-foreground: #fafafa;
-  --color-secondary: #f4f4f5;
-  --color-secondary-foreground: #18181b;
-  --color-muted: #f4f4f5;
-  --color-muted-foreground: #71717a;
-  --color-accent: #f4f4f5;
-  --color-accent-foreground: #18181b;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #fafafa;
-  --color-border: #e4e4e7;
-  --color-input: #e4e4e7;
-  --color-ring: #18181b;
+  --color-popover-foreground: #101313;
+
+  /* Text Colors */
+  --color-muted: #F4F8F8;
+  --color-muted-foreground: #848785;
+  --color-accent: #E4FFFB;
+  --color-accent-foreground: #0B7C6B;
+
+  /* Borders & Inputs */
+  --color-border: #E4E9E8;
+  --color-input: #E4E9E8;
+  --color-ring: #0B7C6B;
+
+  /* Destructive */
+  --color-destructive: #FF4E3E;
+  --color-destructive-foreground: #ffffff;
+
   --radius: 0.5rem;
 }
 
@@ -30,4 +64,23 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+/* Infinite scroll animation */
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 30s linear infinite;
+}
+
+.animate-infinite-scroll:hover {
+  animation-play-state: paused;
 }

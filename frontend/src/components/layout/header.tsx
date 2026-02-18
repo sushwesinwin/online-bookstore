@@ -13,15 +13,15 @@ export function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9E8] shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2 group">
-                        <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg group-hover:scale-110 transition-transform">
+                        <div className="p-2 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
                             <BookOpen className="h-5 w-5 text-white" />
                         </div>
-                        <span className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="font-bold text-xl bg-linear-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
                             Bookstore
                         </span>
                     </Link>
@@ -30,29 +30,29 @@ export function Header() {
                     <nav className="hidden md:flex items-center space-x-8">
                         <Link
                             href="/books"
-                            className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors relative group"
+                            className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
                         >
                             Books
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all" />
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
                         </Link>
 
                         {isAuthenticated && (
                             <>
                                 <Link
                                     href="/orders"
-                                    className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors relative group"
+                                    className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
                                 >
                                     My Orders
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all" />
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
                                 </Link>
 
                                 {user?.role === 'ADMIN' && (
                                     <Link
                                         href="/admin"
-                                        className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors relative group"
+                                        className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
                                     >
                                         Admin
-                                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all" />
+                                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
                                     </Link>
                                 )}
                             </>
@@ -64,10 +64,10 @@ export function Header() {
                         {isAuthenticated ? (
                             <>
                                 <Link href="/cart">
-                                    <Button variant="ghost" size="icon" className="relative hover:bg-indigo-50">
+                                    <Button variant="ghost" size="icon" className="relative">
                                         <ShoppingCart className="h-5 w-5" />
                                         {itemCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 text-xs text-white flex items-center justify-center font-semibold shadow-lg">
+                                            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-linear-to-br from-[#FF6320] to-[#FFA118] text-xs text-white flex items-center justify-center font-semibold shadow-lg">
                                                 {itemCount}
                                             </span>
                                         )}
@@ -75,7 +75,7 @@ export function Header() {
                                 </Link>
 
                                 <Link href="/profile">
-                                    <Button variant="ghost" size="icon" className="hover:bg-indigo-50">
+                                    <Button variant="ghost" size="icon">
                                         <User className="h-5 w-5" />
                                     </Button>
                                 </Link>
@@ -84,7 +84,7 @@ export function Header() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => logout()}
-                                    className="hover:bg-red-50 hover:text-red-600"
+                                    className="hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
                                 >
                                     <LogOut className="h-5 w-5" />
                                 </Button>
@@ -97,7 +97,7 @@ export function Header() {
                                     </Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md">
+                                    <Button className="shadow-md">
                                         Sign Up
                                     </Button>
                                 </Link>
@@ -107,7 +107,7 @@ export function Header() {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="md:hidden p-2 hover:bg-[#F4F8F8] rounded-lg transition-colors"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     >
                         {mobileMenuOpen ? (
@@ -120,11 +120,11 @@ export function Header() {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden py-4 border-t border-gray-200 animate-in slide-in-from-top">
+                    <div className="md:hidden py-4 border-t border-[#E4E9E8] animate-in slide-in-from-top">
                         <nav className="flex flex-col space-y-4">
                             <Link
                                 href="/books"
-                                className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors px-2 py-1"
+                                className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 Books
@@ -134,7 +134,7 @@ export function Header() {
                                 <>
                                     <Link
                                         href="/orders"
-                                        className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors px-2 py-1"
+                                        className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         My Orders
@@ -143,7 +143,7 @@ export function Header() {
                                     {user?.role === 'ADMIN' && (
                                         <Link
                                             href="/admin"
-                                            className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors px-2 py-1"
+                                            className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
                                             onClick={() => setMobileMenuOpen(false)}
                                         >
                                             Admin
@@ -152,7 +152,7 @@ export function Header() {
 
                                     <Link
                                         href="/cart"
-                                        className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors px-2 py-1 flex items-center gap-2"
+                                        className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1 flex items-center gap-2"
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <ShoppingCart className="h-4 w-4" />
@@ -161,7 +161,7 @@ export function Header() {
 
                                     <Link
                                         href="/profile"
-                                        className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors px-2 py-1"
+                                        className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         Profile
@@ -172,7 +172,7 @@ export function Header() {
                                             logout();
                                             setMobileMenuOpen(false);
                                         }}
-                                        className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors px-2 py-1 text-left"
+                                        className="text-sm font-medium text-[#FF4E3E] hover:text-[#E6463A] transition-colors px-2 py-1 text-left"
                                     >
                                         Logout
                                     </button>
@@ -187,7 +187,7 @@ export function Header() {
                                         </Button>
                                     </Link>
                                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600">
+                                        <Button className="w-full">
                                             Sign Up
                                         </Button>
                                     </Link>

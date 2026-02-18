@@ -1,20 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function RegisterPage() {
-    const { register, isRegistering, registerError } = useAuth();
+    const router = useRouter();
+    const { register, isRegistering, registerError, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         firstName: '',
         lastName: '',
     });
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/');
+        }
+    }, [isAuthenticated, router]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +38,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-[#F9FCFB]">
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle>Create an Account</CardTitle>
@@ -38,14 +47,14 @@ export default function RegisterPage() {
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
                         {registerError && (
-                            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+                            <div className="p-3 text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-md border border-[#FF4E3E]">
                                 {registerError.message || 'Registration failed'}
                             </div>
                         )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label htmlFor="firstName" className="text-sm font-medium">
+                                <label htmlFor="firstName" className="text-sm font-medium text-[#101313]">
                                     First Name
                                 </label>
                                 <Input
@@ -59,7 +68,7 @@ export default function RegisterPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label htmlFor="lastName" className="text-sm font-medium">
+                                <label htmlFor="lastName" className="text-sm font-medium text-[#101313]">
                                     Last Name
                                 </label>
                                 <Input
@@ -74,7 +83,7 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium">
+                            <label htmlFor="email" className="text-sm font-medium text-[#101313]">
                                 Email
                             </label>
                             <Input
@@ -89,7 +98,7 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium">
+                            <label htmlFor="password" className="text-sm font-medium text-[#101313]">
                                 Password
                             </label>
                             <Input
@@ -110,12 +119,16 @@ export default function RegisterPage() {
                             {isRegistering ? 'Creating account...' : 'Sign Up'}
                         </Button>
 
-                        <p className="text-sm text-center text-muted-foreground">
+                        <p className="text-sm text-center text-[#848785]">
                             Already have an account?{' '}
-                            <Link href="/login" className="text-primary hover:underline">
+                            <Link href="/login" className="text-[#0B7C6B] hover:underline font-medium">
                                 Login
                             </Link>
                         </p>
+
+                        <Link href="/" className="text-sm text-center text-[#848785] hover:text-[#0B7C6B]">
+                            ← Back to Home
+                        </Link>
                     </CardFooter>
                 </form>
             </Card>

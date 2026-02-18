@@ -1,18 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/layout/header';
+import { InfiniteScrollCategories } from '@/components/ui/infinite-scroll-categories';
 import {
   BookOpen,
   Truck,
   Shield,
   Star,
-  Users,
-  Award,
   ArrowRight,
   Sparkles,
-  Clock
+  TrendingUp,
+  Award,
+  Heart
 } from 'lucide-react';
 import { useBooks } from '@/lib/hooks/use-books';
 import { formatPrice } from '@/lib/utils';
@@ -25,115 +28,130 @@ export default function HomePage() {
   // Fetch books for different sections
   const { data: trendingBooks, isLoading: trendingLoading } = useBooks({
     page: 1,
-    limit: 5,
+    limit: 8,
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
 
   const { data: bestsellers, isLoading: bestsellersLoading } = useBooks({
     page: 1,
-    limit: 4,
+    limit: 6,
     sortBy: 'price',
     sortOrder: 'desc',
   });
 
-  const { data: newBooks, isLoading: newBooksLoading } = useBooks({
-    page: 1,
-    limit: 3,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
-  });
-
-  // Prefetch book details on hover for better UX
+  // Prefetch book details on hover
   const prefetchBook = (bookId: string) => {
     queryClient.prefetchQuery({
       queryKey: ['book', bookId],
       queryFn: () => booksApi.getBook(bookId),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-[#F9FCFB]">
       <Header />
 
       <main>
-        {/* Hero Section with Background Image */}
-        <section className="relative overflow-hidden min-h-[600px] flex items-center">
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2000')",
-            }}
-          />
+        {/* Hero Section - Teal Background with Book Stack */}
+        <section className="relative overflow-hidden bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] py-20 px-4">
+          <div className="container mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="text-white space-y-6">
+                <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  SPECIAL OFFER
+                </Badge>
 
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/85 to-gray-900/70" />
+                <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                  There is nothing
+                  <br />
+                  <span className="text-[#FFE4DB]">better than to read</span>
+                </h1>
 
-          <div className="container relative mx-auto px-4 py-24 md:py-32">
-            <div className="max-w-3xl">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-medium mb-8 border border-white/20">
-                <Sparkles className="h-4 w-4" />
-                <span>Over 10,000+ Books Available</span>
+                <p className="text-lg text-white/90">
+                  Find The Perfect Gift For Everyone On Your List
+                </p>
+
+                <div className="flex gap-4 pt-4">
+                  <Link href="/books">
+                    <Button size="lg" className="bg-white text-[#0B7C6B] hover:bg-white/90 shadow-lg">
+                      SHOP NOW
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Carousel Dots */}
+                <div className="flex gap-2 pt-8">
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                  <div className="w-2 h-2 rounded-full bg-white/40"></div>
+                  <div className="w-2 h-2 rounded-full bg-white/40"></div>
+                </div>
               </div>
 
-              {/* Heading */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white mb-6">
-                Discover Your
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-                  Next Great Read
-                </span>
-              </h1>
+              {/* Right Content - Book Stack Illustration */}
+              <div className="relative h-[400px] lg:h-[500px]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Decorative leaves */}
+                  <div className="absolute top-0 left-0 w-32 h-32 opacity-30">
+                    <svg viewBox="0 0 100 100" className="text-[#FFE4DB]">
+                      <path fill="currentColor" d="M50,10 Q30,30 50,50 Q70,30 50,10 Z" />
+                    </svg>
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-32 h-32 opacity-30">
+                    <svg viewBox="0 0 100 100" className="text-[#FFE4DB]">
+                      <path fill="currentColor" d="M50,90 Q30,70 50,50 Q70,70 50,90 Z" />
+                    </svg>
+                  </div>
 
-              {/* Description */}
-              <p className="text-xl text-gray-200 leading-relaxed mb-8">
-                Explore our curated collection of bestsellers, classics, and hidden gems.
-                From fiction to non-fiction, find books that inspire, educate, and entertain.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link href="/books">
-                  <Button size="lg" className="text-base px-8 py-6 bg-white text-gray-900 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all">
-                    Browse Collection
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 border-white text-gray-900 hover:bg-white/10 backdrop-blur-sm">
-                    Sign Up Free
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/20">
-                <div>
-                  <div className="text-3xl font-bold text-white">10K+</div>
-                  <div className="text-sm text-gray-300">Books</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-white">50K+</div>
-                  <div className="text-sm text-gray-300">Readers</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-white">4.9</div>
-                  <div className="text-sm text-gray-300">Rating</div>
+                  {/* Book stack placeholder - you can replace with actual illustration */}
+                  <div className="relative z-10 text-center">
+                    <div className="text-9xl">📚</div>
+                    <p className="text-white/80 mt-4">Discover Amazing Books</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Trending Books Section */}
-        <section className="py-20 px-4 bg-white">
+        {/* Features Bar */}
+        <section className="py-8 px-4 bg-white border-b border-[#E4E9E8]">
           <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { icon: Truck, text: 'Free Shipping', subtext: 'On orders over $50' },
+                { icon: Shield, text: 'Secure Payment', subtext: '100% protected' },
+                { icon: Award, text: 'Quality Books', subtext: 'Verified sellers' },
+                { icon: Heart, text: 'Easy Returns', subtext: '30-day guarantee' },
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="p-3 bg-[#E4FFFB] rounded-lg">
+                    <feature.icon className="h-6 w-6 text-[#0B7C6B]" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-[#101313]">{feature.text}</div>
+                    <div className="text-sm text-[#848785]">{feature.subtext}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Trending Books Section */}
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-4xl font-bold mb-2">Trending Now</h2>
-                <p className="text-gray-600">Most popular books this week</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-6 w-6 text-[#FF6320]" />
+                  <h2 className="text-3xl font-bold text-[#101313]">Trending Books</h2>
+                </div>
+                <p className="text-[#848785]">Most popular this week</p>
               </div>
               <Link href="/books/trending">
                 <Button variant="outline">
@@ -144,45 +162,45 @@ export default function HomePage() {
             </div>
 
             {trendingLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                {[...Array(5)].map((_, i) => (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {[...Array(8)].map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-[3/4] rounded-lg mb-4" />
-                    <div className="h-4 bg-gray-200 rounded mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
+                    <div className="bg-[#F4F8F8] aspect-3/4 rounded-lg mb-3" />
+                    <div className="h-3 bg-[#F4F8F8] rounded mb-2" />
+                    <div className="h-3 bg-[#F4F8F8] rounded w-2/3" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                {trendingBooks?.data.map((book, index) => (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {trendingBooks?.data.slice(0, 8).map((book) => (
                   <Link
                     key={book.id}
                     href={`/books/${book.id}`}
                     onMouseEnter={() => prefetchBook(book.id)}
                   >
                     <div className="group cursor-pointer">
-                      <div className="relative mb-4 overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-shadow">
+                      <div className="relative mb-3 overflow-hidden rounded-lg border border-[#E4E9E8] shadow-sm group-hover:shadow-lg transition-all">
                         <img
                           src={book.imageUrl || 'https://covers.openlibrary.org/b/id/10909258-L.jpg'}
                           alt={book.title}
-                          className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full aspect-3/4 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        {index < 3 && (
-                          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                            🔥 Hot
-                          </div>
-                        )}
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="secondary" className="text-xs">
+                            Hot
+                          </Badge>
+                        </div>
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                      <h3 className="font-medium text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
                         {book.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-2">{book.author}</p>
+                      <p className="text-xs text-[#848785] mb-1">{book.author}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-indigo-600">{formatPrice(Number(book.price))}</span>
+                        <span className="text-sm font-bold text-[#0B7C6B]">{formatPrice(Number(book.price))}</span>
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">4.5</span>
+                          <Star className="h-3 w-3 fill-[#FFA118] text-[#FFA118]" />
+                          <span className="text-xs">4.5</span>
                         </div>
                       </div>
                     </div>
@@ -193,13 +211,28 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Bestsellers Section */}
-        <section className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white">
+        {/* Categories Section */}
+        <section className="py-16 px-4 bg-[#F9FCFB]">
           <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-12">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-[#101313] mb-2">Explore by Category</h2>
+              <p className="text-[#848785]">Find your favorite genre</p>
+            </div>
+
+            <InfiniteScrollCategories />
+          </div>
+        </section>
+
+        {/* Bestsellers Section */}
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-4xl font-bold mb-2">Bestsellers</h2>
-                <p className="text-gray-600">Top-rated books of all time</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="h-6 w-6 text-[#FFA118]" />
+                  <h2 className="text-3xl font-bold text-[#101313]">Bestsellers</h2>
+                </div>
+                <p className="text-[#848785]">Top-rated books of all time</p>
               </div>
               <Link href="/books/bestsellers">
                 <Button variant="outline">
@@ -210,44 +243,44 @@ export default function HomePage() {
             </div>
 
             {bestsellersLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white rounded-xl shadow-lg p-6">
-                    <div className="bg-gray-200 aspect-[3/4] rounded-lg mb-4" />
-                    <div className="h-4 bg-gray-200 rounded mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
+              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-[#F4F8F8] aspect-3/4 rounded-lg mb-3" />
+                    <div className="h-3 bg-[#F4F8F8] rounded mb-2" />
+                    <div className="h-3 bg-[#F4F8F8] rounded w-2/3" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {bestsellers?.data.map((book, index) => (
+              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+                {bestsellers?.data.slice(0, 6).map((book, index) => (
                   <Link
                     key={book.id}
                     href={`/books/${book.id}`}
                     onMouseEnter={() => prefetchBook(book.id)}
                   >
-                    <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-                      <div className="relative">
+                    <div className="group cursor-pointer">
+                      <div className="relative mb-3 overflow-hidden rounded-lg border border-[#E4E9E8] shadow-sm group-hover:shadow-lg transition-all">
                         <img
                           src={book.imageUrl || 'https://covers.openlibrary.org/b/id/12583098-L.jpg'}
                           alt={book.title}
-                          className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full aspect-3/4 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute top-4 left-4 bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold text-lg w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute top-2 left-2 bg-[#FFA118] text-white font-bold text-xs w-8 h-8 rounded-full flex items-center justify-center">
                           #{index + 1}
                         </div>
                       </div>
-                      <div className="p-6">
-                        <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                          {book.title}
-                        </h3>
-                        <p className="text-gray-600 mb-3">{book.author}</p>
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-2xl font-bold text-indigo-600">{formatPrice(Number(book.price))}</span>
-                          <span className="text-sm text-gray-500">{book.inventory > 0 ? 'In Stock' : 'Out of Stock'}</span>
+                      <h3 className="font-medium text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
+                        {book.title}
+                      </h3>
+                      <p className="text-xs text-[#848785] mb-1">{book.author}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-[#0B7C6B]">{formatPrice(Number(book.price))}</span>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-[#FFA118] text-[#FFA118]" />
+                          <span className="text-xs">4.8</span>
                         </div>
-                        <Button className="w-full">Add to Cart</Button>
                       </div>
                     </div>
                   </Link>
@@ -257,12 +290,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Famous Authors Section */}
-        <section className="py-20 px-4 bg-white">
+        {/* Featured Authors Section */}
+        <section className="py-16 px-4 bg-[#F9FCFB]">
           <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Famous Authors</h2>
-              <p className="text-xl text-gray-600">Discover books from renowned writers</p>
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-3xl font-bold text-[#101313] mb-2">Featured Authors</h2>
+                <p className="text-[#848785]">Discover books from renowned writers</p>
+              </div>
+              <Link href="/authors">
+                <Button variant="outline">
+                  View All
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -272,349 +313,143 @@ export default function HomePage() {
                   books: '20+ Books',
                   genre: 'Political Fiction',
                   image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/George_Orwell_press_photo.jpg/440px-George_Orwell_press_photo.jpg',
-                  bio: 'Author of 1984 and Animal Farm'
+                  bio: 'Author of 1984 and Animal Farm',
+                  color: 'from-[#0B7C6B] to-[#17BD8D]'
                 },
                 {
                   name: 'Jane Austen',
                   books: '6 Major Novels',
-                  genre: 'Romance & Social Commentary',
+                  genre: 'Romance',
                   image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg/440px-CassandraAusten-JaneAusten%28c.1810%29_hires.jpg',
-                  bio: 'Author of Pride and Prejudice'
+                  bio: 'Author of Pride and Prejudice',
+                  color: 'from-[#FF6320] to-[#FFA118]'
                 },
                 {
                   name: 'Ernest Hemingway',
                   books: '20+ Books',
                   genre: 'Classic Literature',
                   image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/ErnestHemingway.jpg/440px-ErnestHemingway.jpg',
-                  bio: 'Nobel Prize winning author'
+                  bio: 'Nobel Prize winning author',
+                  color: 'from-[#219FFF] to-[#17BD8D]'
                 },
                 {
                   name: 'Agatha Christie',
                   books: '80+ Books',
                   genre: 'Mystery',
                   image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Agatha_Christie_%281925%29.jpg/440px-Agatha_Christie_%281925%29.jpg',
-                  bio: 'Queen of mystery novels'
+                  bio: 'Queen of mystery novels',
+                  color: 'from-[#FF4E3E] to-[#FF6320]'
                 }
               ].map((author, index) => (
-                <div key={index} className="group text-center">
-                  <div className="relative mb-6 mx-auto w-48 h-48">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity" />
+                <div key={index} className="group bg-white rounded-xl p-6 border border-[#E4E9E8] hover:shadow-xl transition-all duration-300">
+                  <div className="relative mb-4">
+                    <div className={`absolute inset-0 bg-linear-to-br ${author.color} rounded-full blur-2xl opacity-20 group-hover:opacity-30 transition-opacity`} />
                     <img
                       src={author.image}
                       alt={author.name}
-                      className="relative w-full h-full object-cover rounded-full border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300"
+                      className="relative w-32 h-32 mx-auto object-cover rounded-full border-4 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">{author.name}</h3>
-                  <p className="text-sm text-gray-600 mb-1">{author.books}</p>
-                  <p className="text-sm text-indigo-600 font-medium mb-2">{author.genre}</p>
-                  <p className="text-sm text-gray-500 mb-4">{author.bio}</p>
-                  <Link href={`/authors/${encodeURIComponent(author.name)}`}>
-                    <Button variant="outline" size="sm">View Books</Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* Coming Soon Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-          <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-12">
-              <div className="text-center flex-1">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-4">
-                  <Sparkles className="h-4 w-4" />
-                  <span>New Arrivals</span>
-                </div>
-                <h2 className="text-4xl font-bold mb-2">Coming Soon</h2>
-                <p className="text-xl text-gray-600">Be the first to read these upcoming releases</p>
-              </div>
-              <Link href="/books/new-arrivals">
-                <Button variant="outline">
-                  View All
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-
-            {newBooksLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white rounded-2xl shadow-xl p-6">
-                    <div className="bg-gray-200 aspect-[4/5] rounded-lg mb-4" />
-                    <div className="h-4 bg-gray-200 rounded mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {newBooks?.data.map((book) => (
-                  <Link
-                    key={book.id}
-                    href={`/books/${book.id}`}
-                    onMouseEnter={() => prefetchBook(book.id)}
-                  >
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
-                      <div className="relative">
-                        <img
-                          src={book.imageUrl || 'https://covers.openlibrary.org/b/id/12668456-L.jpg'}
-                          alt={book.title}
-                          className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute top-4 right-4 bg-gradient-to-br from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                          New Arrival
-                        </div>
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium mb-3">
-                          <Clock className="h-4 w-4" />
-                          <span>{book.category || 'Fiction'}</span>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">
-                          {book.title}
-                        </h3>
-                        <p className="text-gray-600 mb-3">{book.author}</p>
-                        <p className="text-sm text-gray-500 mb-4 line-clamp-2">{book.description || 'A captivating new release you won\'t want to miss'}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-indigo-600">{formatPrice(Number(book.price))}</span>
-                          <Button>View Details</Button>
-                        </div>
-                      </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-bold text-[#101313] group-hover:text-[#0B7C6B] transition-colors">
+                      {author.name}
+                    </h3>
+                    <p className="text-sm text-[#848785]">{author.books}</p>
+                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-linear-to-r ${author.color} text-white`}>
+                      {author.genre}
                     </div>
+                    <p className="text-sm text-[#848785] pt-2">{author.bio}</p>
+                  </div>
+
+                  <Link href={`/authors/${encodeURIComponent(author.name)}`}>
+                    <Button variant="outline" size="sm" className="w-full mt-4">
+                      View Books
+                      <ArrowRight className="ml-2 h-3 w-3" />
+                    </Button>
                   </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Features Section - Modern Cards */}
-        <section className="py-20 px-4 bg-white">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Readers Choose Us</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Experience the best in online book shopping with our premium features
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  icon: BookOpen,
-                  title: 'Vast Collection',
-                  description: '10,000+ books across all genres, from bestsellers to rare finds',
-                  color: 'from-blue-500 to-cyan-500'
-                },
-                {
-                  icon: Truck,
-                  title: 'Fast Delivery',
-                  description: 'Free shipping on orders over $50. Get your books in 2-3 days',
-                  color: 'from-green-500 to-emerald-500'
-                },
-                {
-                  icon: Shield,
-                  title: 'Secure Payment',
-                  description: 'Bank-level encryption and secure checkout for peace of mind',
-                  color: 'from-purple-500 to-pink-500'
-                },
-                {
-                  icon: Award,
-                  title: 'Quality Guarantee',
-                  description: '30-day return policy. Love it or get your money back',
-                  color: 'from-orange-500 to-red-500'
-                }
-              ].map((feature, index) => (
-                <div
-                  key={index}
-                  className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-transparent"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />
-
-                  <div className={`inline-flex p-4 rounded-xl bg-gradient-to-br ${feature.color} mb-6`}>
-                    <feature.icon className="h-8 w-8 text-white" />
-                  </div>
-
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="py-20 px-4 bg-gray-50">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Explore by Category</h2>
-              <p className="text-xl text-gray-600">Find exactly what you're looking for</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[
-                { name: 'Fiction', emoji: '📚', color: 'from-blue-500 to-blue-600' },
-                { name: 'Mystery', emoji: '🔍', color: 'from-purple-500 to-purple-600' },
-                { name: 'Romance', emoji: '💕', color: 'from-pink-500 to-pink-600' },
-                { name: 'Sci-Fi', emoji: '🚀', color: 'from-indigo-500 to-indigo-600' },
-                { name: 'Biography', emoji: '👤', color: 'from-green-500 to-green-600' },
-                { name: 'Business', emoji: '💼', color: 'from-orange-500 to-orange-600' }
-              ].map((category, index) => (
-                <Link key={index} href={`/books?category=${category.name}`}>
-                  <div className="group relative bg-white rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity`} />
-                    <div className="text-4xl mb-3">{category.emoji}</div>
-                    <div className="font-semibold text-gray-900">{category.name}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Social Proof Section */}
-        <section className="py-20 px-4 bg-white">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Loved by Readers Worldwide</h2>
-              <p className="text-xl text-gray-600">Join thousands of happy book lovers</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  quote: "The best online bookstore I've ever used. Fast delivery and amazing selection!",
-                  author: "Sarah Johnson",
-                  role: "Book Enthusiast",
-                  rating: 5
-                },
-                {
-                  quote: "I love how easy it is to find exactly what I'm looking for. Highly recommended!",
-                  author: "Michael Chen",
-                  role: "Regular Customer",
-                  rating: 5
-                },
-                {
-                  quote: "Great prices, excellent service, and the books always arrive in perfect condition.",
-                  author: "Emma Williams",
-                  role: "Avid Reader",
-                  rating: 5
-                }
-              ].map((testimonial, index) => (
-                <div key={index} className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.author}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section - Premium */}
-        <section className="relative py-24 px-4 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6TTI0IDM0YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMTBjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00ek0xMiAzNGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMTBjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20" />
-
-          <div className="container relative mx-auto text-center">
-            <div className="max-w-3xl mx-auto space-y-8">
-              <h2 className="text-4xl md:text-5xl font-bold text-white">
-                Start Your Reading Journey Today
+        {/* Newsletter Section */}
+        <section className="py-16 px-4 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D]">
+          <div className="container mx-auto text-center">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
+                Subscribe to Our Newsletter
               </h2>
-              <p className="text-xl text-indigo-100">
-                Join over 50,000 readers and get access to exclusive deals, personalized recommendations, and more
+              <p className="text-lg text-white/90">
+                Get exclusive deals, new arrivals, and reading recommendations delivered to your inbox
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Link href="/books">
-                  <Button size="lg" variant="secondary" className="text-base px-8 py-6 bg-white text-indigo-600 hover:bg-gray-100">
-                    Browse Books
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 border-white text-gray-900 hover:bg-white/10">
-                    Create Free Account
-                  </Button>
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto pt-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-2 rounded-lg border-1 focus:ring-2 focus:ring-white/50 outline-none"
+                />
+                <Button size="lg" variant="default" className="whitespace-nowrap">
+                  Subscribe
+                </Button>
               </div>
 
-              {/* Trust Badges */}
-              <div className="flex flex-wrap justify-center gap-8 pt-8 text-white/80">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  <span className="text-sm">Secure Checkout</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  <span className="text-sm">24/7 Support</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span className="text-sm">50K+ Members</span>
-                </div>
-              </div>
+              <p className="text-sm text-white/70">
+                Join 50,000+ book lovers. Unsubscribe anytime.
+              </p>
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
+      <footer className="bg-white text-green-950 py-12 px-4">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <BookOpen className="h-6 w-6 text-indigo-400" />
-                <span className="font-bold text-white text-xl">Bookstore</span>
+                <BookOpen className="h-6 w-6 text-[#0B7C6B]" />
+                <span className="font-bold text-dark text-xl">Bookstore</span>
               </div>
-              <p className="text-sm text-gray-400">
-                Your trusted source for books since 2024. Discover, read, and grow.
+              <p className="text-sm">
+                Your trusted source for books. Discover, read, and grow with us.
               </p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-white mb-4">Shop</h3>
+              <h3 className="font-semibold text-xl text-dark mb-4">Shop</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/books" className="hover:text-white transition-colors">All Books</Link></li>
-                <li><Link href="/books?category=Fiction" className="hover:text-white transition-colors">Fiction</Link></li>
-                <li><Link href="/books?category=Non-Fiction" className="hover:text-white transition-colors">Non-Fiction</Link></li>
-                <li><Link href="/books?inStock=true" className="hover:text-white transition-colors">New Arrivals</Link></li>
+                <li><Link href="/books" className="hover:text-[#0B7C6B] transition-colors">All Books</Link></li>
+                <li><Link href="/books/trending" className="hover:text-[#0B7C6B] transition-colors">Trending</Link></li>
+                <li><Link href="/books/bestsellers" className="hover:text-[#0B7C6B] transition-colors">Bestsellers</Link></li>
+                <li><Link href="/books/new-arrivals" className="hover:text-[#0B7C6B] transition-colors">New Arrivals</Link></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold text-white mb-4">Support</h3>
+              <h3 className="font-semibold text-xl text-dark mb-4">Support</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Shipping Info</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Returns</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Contact Us</a></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold text-white mb-4">Company</h3>
+              <h3 className="font-semibold text-xl text-dark mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-[#0B7C6B] transition-colors">Terms of Service</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 Online Bookstore. All rights reserved. Made with ❤️ for book lovers.</p>
+          <div className="border-t border-[#383A3A] pt-8 text-center text-sm">
+            <p>&copy; 2024 Bookstore. All rights reserved. Made with ❤️ for book lovers.</p>
           </div>
         </div>
       </footer>
