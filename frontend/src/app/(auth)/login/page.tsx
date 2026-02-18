@@ -115,28 +115,6 @@ export default function LoginPage() {
                         </Button>
                     </Link>
                 </div>
-
-                <div className="text-center">
-                    <Link
-                        href="/"
-                        className="text-sm text-[#848785] hover:text-[#0B7C6B] inline-flex items-center"
-                    >
-                        <svg
-                            className="w-4 h-4 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                            />
-                        </svg>
-                        Back to Home
-                    </Link>
-                </div>
             </div>
         </AuthLayout>
     );
