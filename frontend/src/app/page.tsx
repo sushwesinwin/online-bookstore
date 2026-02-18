@@ -54,64 +54,139 @@ export default function HomePage() {
       <Header />
 
       <main>
-        {/* Hero Section - Teal Background with Book Stack */}
-        <section className="relative overflow-hidden bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] py-20 px-4">
-          <div className="container mx-auto">
+        {/* Hero Section - Enhanced with Animations */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#0B7C6B] via-[#0D8F7A] to-[#17BD8D] py-20 px-4">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-20 left-10 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#FFE4DB] rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          </div>
+
+          {/* Floating Books Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="books" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+                  <text x="20" y="40" fontSize="40" fill="white" opacity="0.3">📖</text>
+                  <text x="120" y="120" fontSize="35" fill="white" opacity="0.3">📕</text>
+                  <text x="60" y="160" fontSize="30" fill="white" opacity="0.3">📘</text>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#books)" />
+            </svg>
+          </div>
+
+          <div className="container mx-auto relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left Content */}
-              <div className="text-white space-y-6">
-                <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  SPECIAL OFFER
-                </Badge>
+              <div className="text-white space-y-6 animate-fade-in">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
+                  <Sparkles className="h-4 w-4 text-[#FFD700] animate-pulse" />
+                  <span className="text-sm font-semibold tracking-wide">LIMITED TIME OFFER</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#FF6320] text-xs font-bold">20% OFF</span>
+                </div>
 
-                <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-                  There is nothing
+                <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+                  Discover Your
                   <br />
-                  <span className="text-[#FFE4DB]">better than to read</span>
+                  <span className="relative inline-block">
+                    <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-[#FFE4DB] to-[#FFF5F2]">
+                      Next Great Read
+                    </span>
+                    <span className="absolute bottom-2 left-0 w-full h-4 bg-[#FF6320]/30 -z-10"></span>
+                  </span>
                 </h1>
 
-                <p className="text-lg text-white/90">
-                  Find The Perfect Gift For Everyone On Your List
+                <p className="text-xl text-white/90 max-w-lg leading-relaxed">
+                  Explore thousands of books across all genres. Find the perfect story that speaks to you.
                 </p>
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6">
                   <Link href="/books">
-                    <Button size="lg" className="bg-white text-[#0B7C6B] hover:bg-white/90 shadow-lg">
-                      SHOP NOW
+                    <Button
+                      size="lg"
+                      className="bg-white text-[#0B7C6B] hover:bg-white/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105 font-semibold px-8"
+                    >
+                      Explore Books
                       <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/authors">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#0B7C6B] font-semibold px-8"
+                    >
+                      Browse Authors
+                      <BookOpen className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                 </div>
 
-                {/* Carousel Dots */}
-                <div className="flex gap-2 pt-8">
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                  <div className="w-2 h-2 rounded-full bg-white/40"></div>
-                  <div className="w-2 h-2 rounded-full bg-white/40"></div>
+                {/* Stats */}
+                <div className="flex gap-8 pt-8">
+                  <div>
+                    <div className="text-3xl font-bold text-white">10,000+</div>
+                    <div className="text-sm text-white/70">Books Available</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-white">5,000+</div>
+                    <div className="text-sm text-white/70">Happy Readers</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-white">4.9★</div>
+                    <div className="text-sm text-white/70">Customer Rating</div>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Content - Book Stack Illustration */}
-              <div className="relative h-[400px] lg:h-[500px]">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Decorative leaves */}
-                  <div className="absolute top-0 left-0 w-32 h-32 opacity-30">
-                    <svg viewBox="0 0 100 100" className="text-[#FFE4DB]">
-                      <path fill="currentColor" d="M50,10 Q30,30 50,50 Q70,30 50,10 Z" />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-32 h-32 opacity-30">
-                    <svg viewBox="0 0 100 100" className="text-[#FFE4DB]">
-                      <path fill="currentColor" d="M50,90 Q30,70 50,50 Q70,70 50,90 Z" />
-                    </svg>
+              {/* Right Content - Enhanced Book Visualization */}
+              <div className="relative h-[400px] lg:h-[600px]">
+                <div className="absolute inset-0">
+                  {/* Stacked Books Illustration */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {/* Book Stack */}
+                    <div className="relative">
+                      {/* Book 1 - Bottom */}
+                      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 h-64 bg-gradient-to-br from-[#FF6320] to-[#FFA118] rounded-lg shadow-2xl transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+                        <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                          <div className="text-white font-bold text-lg">The Great Novel</div>
+                          <div className="w-full h-1 bg-white/30 rounded"></div>
+                        </div>
+                      </div>
+
+                      {/* Book 2 - Middle */}
+                      <div className="absolute bottom-32 left-1/2 -translate-x-1/2 w-48 h-64 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300" style={{ zIndex: 2 }}>
+                        <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                          <div className="text-white font-bold text-lg">Adventure Tales</div>
+                          <div className="w-full h-1 bg-white/30 rounded"></div>
+                        </div>
+                      </div>
+
+                      {/* Book 3 - Top */}
+                      <div className="absolute bottom-44 left-1/2 -translate-x-1/2 w-48 h-64 bg-gradient-to-br from-[#FFE4DB] to-[#FFF5F2] rounded-lg shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300" style={{ zIndex: 3 }}>
+                        <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                          <div className="text-[#0B7C6B] font-bold text-lg">Mystery Series</div>
+                          <div className="w-full h-1 bg-[#0B7C6B]/30 rounded"></div>
+                        </div>
+                      </div>
+
+                      {/* Floating Elements */}
+                      <div className="absolute -top-10 -right-10 animate-bounce" style={{ animationDuration: '3s' }}>
+                        <Star className="h-8 w-8 text-[#FFD700] fill-[#FFD700]" />
+                      </div>
+                      <div className="absolute -bottom-5 -left-10 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}>
+                        <Heart className="h-6 w-6 text-[#FF6320] fill-[#FF6320]" />
+                      </div>
+                      <div className="absolute top-1/2 -right-16 animate-bounce" style={{ animationDuration: '2s', animationDelay: '1s' }}>
+                        <Sparkles className="h-6 w-6 text-[#FFE4DB]" />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Book stack placeholder - you can replace with actual illustration */}
-                  <div className="relative z-10 text-center">
-                    <div className="text-9xl">📚</div>
-                    <p className="text-white/80 mt-4">Discover Amazing Books</p>
-                  </div>
+                  {/* Decorative Circles */}
+                  <div className="absolute top-10 right-10 w-40 h-40 rounded-full border-4 border-white/20 animate-spin-slow"></div>
+                  <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full border-4 border-white/20 animate-spin-slow" style={{ animationDirection: 'reverse' }}></div>
                 </div>
               </div>
             </div>
