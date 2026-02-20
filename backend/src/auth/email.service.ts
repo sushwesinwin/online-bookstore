@@ -5,8 +5,10 @@ import * as nodemailer from 'nodemailer';
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
+  private readonly fromAddress: string;
 
   constructor(private configService: ConfigService) {
+    this.fromAddress = this.configService.get<string>('EMAIL_FROM', 'noreply@bookstore.dev');
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('EMAIL_HOST'),
       port: this.configService.get<number>('EMAIL_PORT'),
@@ -25,16 +27,98 @@ export class EmailService {
     const resetUrl = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/reset-password?token=${resetToken}`;
 
     const mailOptions = {
-      from: this.configService.get<string>('EMAIL_USER'),
+      from: `"📚 BookStore" <${this.fromAddress}>`,
       to: email,
-      subject: 'Password Reset Request',
+      subject: '🔐 Reset Your Password — BookStore',
       html: `
-        <h1>Password Reset Request</h1>
-        <p>You requested a password reset for your account.</p>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetUrl}">${resetUrl}</a>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request this, please ignore this email.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Your Password</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:linear-gradient(135deg,#0B7C6B 0%,#17BD8D 100%);border-radius:16px 16px 0 0;padding:40px 40px 32px;">
+              <div style="font-size:36px;margin-bottom:8px;">📚</div>
+              <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.5px;">BookStore</h1>
+              <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:13px;letter-spacing:1px;text-transform:uppercase;">Your Reading Journey</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="background:#ffffff;padding:48px 48px 40px;">
+
+              <!-- Icon -->
+              <div style="text-align:center;margin-bottom:28px;">
+                <div style="display:inline-block;background:#f0fdf9;border-radius:50%;width:72px;height:72px;line-height:72px;font-size:32px;">🔐</div>
+              </div>
+
+              <h2 style="margin:0 0 12px;color:#101313;font-size:22px;font-weight:700;text-align:center;">Password Reset Request</h2>
+              <p style="margin:0 0 24px;color:#6b7280;font-size:15px;line-height:1.7;text-align:center;">
+                We received a request to reset the password for your BookStore account associated with <strong style="color:#101313;">${email}</strong>.
+              </p>
+
+              <!-- CTA Button -->
+              <div style="text-align:center;margin:32px 0;">
+                <a href="${resetUrl}"
+                   style="display:inline-block;background:linear-gradient(135deg,#0B7C6B,#17BD8D);color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:16px 40px;border-radius:10px;letter-spacing:0.3px;box-shadow:0 4px 15px rgba(11,124,107,0.35);">
+                  Reset My Password
+                </a>
+              </div>
+
+              <p style="margin:0 0 8px;color:#9ca3af;font-size:13px;text-align:center;">Or copy and paste this link into your browser:</p>
+              <p style="margin:0 0 32px;text-align:center;">
+                <a href="${resetUrl}" style="color:#0B7C6B;font-size:12px;word-break:break-all;text-decoration:underline;">${resetUrl}</a>
+              </p>
+
+              <!-- Divider -->
+              <hr style="border:none;border-top:1px solid #e5e7eb;margin:0 0 28px;" />
+
+              <!-- Expiry & Security Notice -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;">
+                    <p style="margin:0 0 6px;color:#92400e;font-size:13px;font-weight:600;">⏱ Link expires in 1 hour</p>
+                    <p style="margin:0;color:#b45309;font-size:13px;line-height:1.6;">
+                      For your security, this link will expire after 1 hour. If you need a new link, simply submit the forgot password form again.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 0;color:#9ca3af;font-size:13px;line-height:1.7;text-align:center;">
+                🛡️ If you didn't request a password reset, you can safely ignore this email.<br/>Your password will remain unchanged.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f8fafc;border-radius:0 0 16px 16px;padding:28px 48px;border-top:1px solid #e5e7eb;">
+              <p style="margin:0 0 8px;color:#9ca3af;font-size:12px;text-align:center;">
+                Need help? Contact us at <a href="mailto:${this.fromAddress}" style="color:#0B7C6B;text-decoration:none;">${this.fromAddress}</a>
+              </p>
+              <p style="margin:0;color:#d1d5db;font-size:11px;text-align:center;">
+                © ${new Date().getFullYear()} BookStore. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
       `,
     };
 
@@ -77,7 +161,7 @@ export class EmailService {
     });
 
     const mailOptions = {
-      from: this.configService.get<string>('EMAIL_USER'),
+      from: this.fromAddress,
       to: email,
       subject: `Order Confirmation - ${orderNumber}`,
       html: `
@@ -164,7 +248,7 @@ export class EmailService {
           </div>
 
           <div style="text-align: center; padding: 20px; color: #7f8c8d; font-size: 14px;">
-            <p>Need help? Contact our support team at ${this.configService.get<string>('EMAIL_USER')}</p>
+            <p>Need help? Contact our support team at ${this.fromAddress}</p>
             <p style="margin: 10px 0;">Thank you for shopping with us!</p>
           </div>
         </body>

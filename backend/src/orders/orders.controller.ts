@@ -154,6 +154,20 @@ export class OrdersController {
     return await this.paymentService.getPaymentByOrderId(orderId);
   }
 
+  @Post('create-checkout-session')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe Checkout Session from cart' })
+  @ApiResponse({ status: 201, description: 'Checkout session created successfully' })
+  @ApiResponse({ status: 400, description: 'Cart is empty or invalid' })
+  async createCheckoutSession(@Request() req) {
+    const session = await this.paymentService.createCheckoutSessionFromCart(req.user.id);
+    return {
+      sessionId: session.id,
+      url: session.url,
+    };
+  }
+
   @Post('webhook')
   @ApiOperation({ summary: 'Stripe webhook endpoint' })
   @ApiResponse({ status: 200, description: 'Webhook processed successfully' })

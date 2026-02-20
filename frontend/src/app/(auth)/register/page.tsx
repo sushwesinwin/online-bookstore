@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { Mail, Lock, User, AlertCircle, Shield } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -17,7 +17,6 @@ export default function RegisterPage() {
         password: '',
         firstName: '',
         lastName: '',
-        role: 'USER' as 'USER' | 'ADMIN',
     });
 
     // Redirect if already authenticated
@@ -29,10 +28,10 @@ export default function RegisterPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        register(formData);
+        register({ ...formData, role: 'USER' });
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
@@ -132,41 +131,6 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="role" className="text-sm font-medium text-[#101313]">
-                            Account Type
-                        </label>
-                        <div className="relative">
-                            <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785] pointer-events-none z-10" />
-                            <select
-                                id="role"
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                                className="w-full h-12 pl-11 pr-4 rounded-md border border-[#E4E9E8] bg-white text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B] focus:border-transparent appearance-none cursor-pointer"
-                                required
-                            >
-                                <option value="USER">User - Regular customer account</option>
-                                <option value="ADMIN">Admin - Full system access</option>
-                            </select>
-                            <svg
-                                className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#848785] pointer-events-none"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 9l-7 7-7-7"
-                                />
-                            </svg>
-                        </div>
-                        <p className="text-xs text-[#848785]">
-                            Choose User for shopping, or Admin for store management
-                        </p>
-                    </div>
 
                     <Button type="submit" className="w-full h-12 text-base" disabled={isRegistering}>
                         {isRegistering ? (

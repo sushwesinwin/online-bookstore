@@ -8,17 +8,17 @@ export const cartApi = {
     },
 
     addItem: async (bookId: string, quantity: number): Promise<CartItem> => {
-        const response = await apiClient.post('/cart', { bookId, quantity });
+        const response = await apiClient.post('/cart/items', { bookId, quantity });
         return response.data;
     },
 
     updateItem: async (itemId: string, quantity: number): Promise<CartItem> => {
-        const response = await apiClient.patch(`/cart/${itemId}`, { quantity });
+        const response = await apiClient.patch(`/cart/items/${itemId}`, { quantity });
         return response.data;
     },
 
     removeItem: async (itemId: string): Promise<void> => {
-        await apiClient.delete(`/cart/${itemId}`);
+        await apiClient.delete(`/cart/items/${itemId}`);
     },
 
     clearCart: async (): Promise<void> => {

@@ -41,4 +41,9 @@ export const ordersApi = {
         const response = await apiClient.get(`/orders/${orderId}/payment`);
         return response.data;
     },
+
+    createCheckoutSession: async (): Promise<{ sessionId: string; url: string }> => {
+        const response = await apiClient.post('/orders/create-checkout-session');
+        return response.data;
+    },
 };

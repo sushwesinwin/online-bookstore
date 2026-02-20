@@ -28,8 +28,19 @@ async function bootstrap() {
   );
 
   // CORS configuration
+  const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, Swagger)
+      if (!origin) return callback(null, true);
+      // In development allow any localhost port; in production match exact URL
+      const isLocalhost = /^http:\/\/localhost:\d+$/.test(origin);
+      if (isLocalhost || origin === allowedOrigin) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+      }
+    },
     credentials: true,
   });
 

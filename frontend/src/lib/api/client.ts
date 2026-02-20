@@ -9,6 +9,15 @@ export const apiClient = axios.create({
     },
 });
 
+// Helper to clear auth state (imported dynamically to avoid circular dependency)
+const clearAuthState = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
+    // Clear Zustand persisted state
+    localStorage.removeItem('auth-storage');
+};
+
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
     (config) => {
@@ -46,8 +55,7 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                clearAuthState();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }

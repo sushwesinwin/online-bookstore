@@ -5,12 +5,37 @@ import { ShoppingCart, User, LogOut, BookOpen, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useCartStore } from '@/lib/stores/cart-store';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Header() {
+    const [mounted, setMounted] = useState(false);
     const { user, isAuthenticated, logout } = useAuth();
     const { itemCount } = useCartStore();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return (
+            <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9E8] shadow-sm">
+                <div className="container mx-auto px-4">
+                    <div className="flex h-16 items-center justify-between">
+                        {/* Logo - always visible */}
+                        <Link href="/" className="flex items-center space-x-2 group">
+                            <div className="p-2 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
+                                <BookOpen className="h-5 w-5 text-white" />
+                            </div>
+                            <span className="font-bold text-xl bg-linear-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
+                                Bookstore
+                            </span>
+                        </Link>
+                    </div>
+                </div>
+            </header>
+        );
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9E8] shadow-sm">
