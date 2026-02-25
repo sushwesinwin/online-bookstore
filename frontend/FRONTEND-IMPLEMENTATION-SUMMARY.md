@@ -1,11 +1,13 @@
 # Frontend Implementation Summary
 
 ## Overview
+
 Comprehensive Next.js 15 frontend implementation for the online bookstore with React 19, TypeScript, Tailwind CSS, and modern state management.
 
 ## Architecture
 
 ### Tech Stack
+
 - **Framework**: Next.js 15 (App Router)
 - **UI Library**: React 19
 - **Styling**: Tailwind CSS v4
@@ -59,17 +61,20 @@ frontend/src/
 ### 1. API Layer (`lib/api/`)
 
 #### API Client (`client.ts`)
+
 - Axios instance with base configuration
 - Request interceptor: Adds JWT token to headers
 - Response interceptor: Handles token refresh on 401
 - Automatic redirect to login on auth failure
 
 #### Type Definitions (`types.ts`)
+
 - User, Book, Cart, Order, Payment interfaces
 - Query parameter types for filtering/pagination
 - Paginated response interface
 
 #### API Modules
+
 - **auth.ts**: Login, register, logout, profile, password reset
 - **books.ts**: CRUD operations, search, filter, pagination
 - **cart.ts**: Add, update, remove items, clear cart
@@ -78,12 +83,14 @@ frontend/src/
 ### 2. State Management
 
 #### Auth Store (`auth-store.ts`)
+
 - User authentication state
 - Token management (access + refresh)
 - Persisted to localStorage
 - Actions: setAuth, clearAuth, updateUser
 
 #### Cart Store (`cart-store.ts`)
+
 - Shopping cart state
 - Item count tracking
 - Actions: setCart, clearCart
@@ -91,24 +98,28 @@ frontend/src/
 ### 3. Custom Hooks
 
 #### `use-auth.ts`
+
 - Login/register/logout mutations
 - Profile query
 - Loading and error states
 - Automatic navigation after auth
 
 #### `use-books.ts`
+
 - Books listing with filters/pagination
 - Single book query
 - Categories query
 - CRUD mutations (admin)
 
 #### `use-cart.ts`
+
 - Cart query
 - Add/update/remove item mutations
 - Clear cart mutation
 - Automatic cart state sync
 
 #### `use-orders.ts`
+
 - Orders listing (admin + user)
 - Single order query
 - Create order mutation
@@ -118,6 +129,7 @@ frontend/src/
 ### 4. UI Components
 
 #### Base Components (`components/ui/`)
+
 - **Button**: Multiple variants (default, outline, ghost, etc.)
 - **Card**: Card container with header, content, footer
 - **Input**: Styled form input
@@ -125,26 +137,31 @@ frontend/src/
 - More Radix UI components ready to use
 
 #### Layout Components
+
 - **Header**: Navigation, cart icon with count, user menu
 - **Footer**: Copyright and links
 
 #### Feature Components
+
 - **BookCard**: Book display with add to cart
 - More components to be added
 
 ### 5. Pages
 
 #### Public Pages
+
 - **Home** (`/`): Landing page with hero, features, CTA
 - **Books** (`/books`): Browse books with search, filters, pagination
 - **Book Details** (`/books/[id]`): Single book view (to be added)
 
 #### Auth Pages
+
 - **Login** (`/login`): Email/password login form
 - **Register** (`/register`): User registration form
 - **Forgot Password**: Password reset (to be added)
 
 #### Protected Pages
+
 - **Cart** (`/cart`): Shopping cart management (to be added)
 - **Orders** (`/orders`): Order history (to be added)
 - **Profile** (`/profile`): User profile (to be added)
@@ -153,6 +170,7 @@ frontend/src/
 ### 6. Utilities
 
 #### `utils.ts`
+
 - `cn()`: Class name merger (clsx + tailwind-merge)
 - `formatPrice()`: Currency formatting
 - `formatDate()`: Date formatting
@@ -161,6 +179,7 @@ frontend/src/
 ## Features Implemented
 
 ### Search & Filtering
+
 - Full-text search across title, author, ISBN
 - Category filtering
 - Price range filtering
@@ -169,6 +188,7 @@ frontend/src/
 - Pagination with metadata
 
 ### Authentication
+
 - JWT-based authentication
 - Automatic token refresh
 - Persistent login state
@@ -176,6 +196,7 @@ frontend/src/
 - Role-based access (USER/ADMIN)
 
 ### Shopping Cart
+
 - Add/remove items
 - Update quantities
 - Real-time total calculation
@@ -183,6 +204,7 @@ frontend/src/
 - Inventory validation
 
 ### Orders
+
 - Create orders from cart
 - View order history
 - Order status tracking
@@ -192,6 +214,7 @@ frontend/src/
 ## Next Steps
 
 ### Pages to Complete
+
 1. Book details page with full description
 2. Shopping cart page with checkout
 3. Order details page
@@ -200,6 +223,7 @@ frontend/src/
 6. Payment integration page
 
 ### Components to Add
+
 1. Loading skeletons
 2. Error boundaries
 3. Toast notifications
@@ -210,6 +234,7 @@ frontend/src/
 8. Payment form
 
 ### Features to Implement
+
 1. Stripe payment integration
 2. Order tracking
 3. Email notifications
@@ -222,6 +247,7 @@ frontend/src/
 ## Environment Variables
 
 Create `.env.local`:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...

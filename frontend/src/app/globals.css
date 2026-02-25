@@ -3,36 +3,36 @@
 @theme {
   /* Color Palette */
   /* Primary Colors */
-  --color-primary: #0B7C6B;
-  --color-primary-light: #E4FFFB;
+  --color-primary: #0b7c6b;
+  --color-primary-light: #e4fffb;
   --color-primary-foreground: #ffffff;
 
   /* Secondary Colors */
-  --color-secondary: #FF6320;
-  --color-secondary-light: #FFECE3;
+  --color-secondary: #ff6320;
+  --color-secondary-light: #ffece3;
   --color-secondary-foreground: #ffffff;
 
   /* Dark Colors */
   --color-dark: #101313;
-  --color-dark-2: #383A3A;
+  --color-dark-2: #383a3a;
   --color-dark-3: #848785;
-  --color-dark-4: #CCCCCC;
-  --color-dark-5: #E4E9E8;
-  --color-dark-6: #F4F8F8;
-  --color-dark-7: #F9FCFB;
+  --color-dark-4: #cccccc;
+  --color-dark-5: #e4e9e8;
+  --color-dark-6: #f4f8f8;
+  --color-dark-7: #f9fcfb;
 
   /* Status Colors */
-  --color-info: #219FFF;
-  --color-info-light: #E4F4FF;
-  --color-success: #17BD8D;
-  --color-success-light: #DFFEF5;
-  --color-warning: #FFA118;
-  --color-warning-light: #FFF1DC;
-  --color-error: #FF4E3E;
-  --color-error-light: #FFECEB;
+  --color-info: #219fff;
+  --color-info-light: #e4f4ff;
+  --color-success: #17bd8d;
+  --color-success-light: #dffef5;
+  --color-warning: #ffa118;
+  --color-warning-light: #fff1dc;
+  --color-error: #ff4e3e;
+  --color-error-light: #ffeceb;
 
   /* Backgrounds */
-  --color-background: #F9FCFB;
+  --color-background: #f9fcfb;
   --color-foreground: #101313;
   --color-card: #ffffff;
   --color-card-foreground: #101313;
@@ -40,18 +40,18 @@
   --color-popover-foreground: #101313;
 
   /* Text Colors */
-  --color-muted: #F4F8F8;
+  --color-muted: #f4f8f8;
   --color-muted-foreground: #848785;
-  --color-accent: #E4FFFB;
-  --color-accent-foreground: #0B7C6B;
+  --color-accent: #e4fffb;
+  --color-accent-foreground: #0b7c6b;
 
   /* Borders & Inputs */
-  --color-border: #E4E9E8;
-  --color-input: #E4E9E8;
-  --color-ring: #0B7C6B;
+  --color-border: #e4e9e8;
+  --color-input: #e4e9e8;
+  --color-ring: #0b7c6b;
 
   /* Destructive */
-  --color-destructive: #FF4E3E;
+  --color-destructive: #ff4e3e;
   --color-destructive-foreground: #ffffff;
 
   --radius: 0.5rem;

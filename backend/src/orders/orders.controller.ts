@@ -22,7 +22,6 @@ import { OrdersService } from './orders.service';
 import { PaymentService } from './payment.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { CreatePaymentDto } from './dto/create-payment.dto';
 import { QueryOrdersDto } from './dto/query-orders.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -37,7 +36,7 @@ export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly paymentService: PaymentService,
-  ) { }
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -56,7 +55,10 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Get all orders with filtering, sorting, and pagination (Admin only)' })
+  @ApiOperation({
+    summary:
+      'Get all orders with filtering, sorting, and pagination (Admin only)',
+  })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
   findAll(@Query() query: QueryOrdersDto) {
     return this.ordersService.findAll(undefined, query);
@@ -65,7 +67,9 @@ export class OrdersController {
   @Get('my-orders')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current user orders with filtering, sorting, and pagination' })
+  @ApiOperation({
+    summary: 'Get current user orders with filtering, sorting, and pagination',
+  })
   @ApiResponse({
     status: 200,
     description: 'User orders retrieved successfully',
@@ -159,11 +163,11 @@ export class OrdersController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Verify Stripe Checkout Session and fulfill order' })
   @ApiResponse({ status: 201, description: 'Order verified and fulfilled' })
-  @ApiResponse({ status: 400, description: 'Payment not completed or session mismatch' })
-  async verifySession(
-    @Request() req,
-    @Body('sessionId') sessionId: string,
-  ) {
+  @ApiResponse({
+    status: 400,
+    description: 'Payment not completed or session mismatch',
+  })
+  async verifySession(@Request() req, @Body('sessionId') sessionId: string) {
     return this.paymentService.verifyAndFulfillSession(sessionId, req.user.id);
   }
 
@@ -171,10 +175,15 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create Stripe Checkout Session from cart' })
-  @ApiResponse({ status: 201, description: 'Checkout session created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Checkout session created successfully',
+  })
   @ApiResponse({ status: 400, description: 'Cart is empty or invalid' })
   async createCheckoutSession(@Request() req) {
-    const session = await this.paymentService.createCheckoutSessionFromCart(req.user.id);
+    const session = await this.paymentService.createCheckoutSessionFromCart(
+      req.user.id,
+    );
     return {
       sessionId: session.id,
       url: session.url,

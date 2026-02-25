@@ -1,6 +1,7 @@
 # TanStack Query Optimization Guide
 
 ## Overview
+
 Optimized TanStack Query (React Query) configuration for better performance, caching, and user experience in the bookstore application.
 
 ## What We Implemented
@@ -14,26 +15,26 @@ Optimized TanStack Query (React Query) configuration for better performance, cac
   queries: {
     // Data is fresh for 5 minutes (no refetch needed)
     staleTime: 5 * 60 * 1000,
-    
+
     // Cache persists for 10 minutes before garbage collection
     gcTime: 10 * 60 * 1000,
-    
+
     // Refetch when user returns to tab (real-time updates)
     refetchOnWindowFocus: true,
-    
+
     // Refetch when internet reconnects
     refetchOnReconnect: true,
-    
+
     // Retry failed requests 3 times
     retry: 3,
-    
+
     // Exponential backoff: 1s, 2s, 4s, 8s... (max 30s)
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   },
   mutations: {
     // Retry mutations once on failure
     retry: 1,
-    
+
     // Clear mutation cache after 5 seconds
     gcTime: 5000,
   },
@@ -43,6 +44,7 @@ Optimized TanStack Query (React Query) configuration for better performance, cac
 ### 2. React Query Devtools
 
 Added development-only devtools for debugging:
+
 - View all queries and their states
 - Inspect cache contents
 - Monitor refetch behavior
@@ -66,13 +68,14 @@ const prefetchBook = (bookId: string) => {
 };
 
 // Usage in JSX
-<Link 
+<Link
   href={`/books/${book.id}`}
   onMouseEnter={() => prefetchBook(book.id)}
 >
 ```
 
 **Benefits:**
+
 - Instant page load when user clicks
 - Better perceived performance
 - Smoother navigation experience
@@ -80,6 +83,7 @@ const prefetchBook = (bookId: string) => {
 ## Performance Improvements
 
 ### Before Optimization
+
 ```
 Homepage Load:
 ├─ Trending Books: 200ms
@@ -92,6 +96,7 @@ Back to Homepage: 570ms (refetch all)
 ```
 
 ### After Optimization
+
 ```
 Homepage Load (First Visit):
 ├─ Trending Books: 200ms
@@ -109,13 +114,11 @@ Back to Homepage: 0ms (cached!)
 ## Cache Strategy
 
 ### Query Keys Structure
+
 ```typescript
-['books']                          // All books list
-['books', { page: 1, limit: 5 }]  // Trending books
-['books', { page: 1, limit: 4 }]  // Bestsellers
-['book', 'abc123']                 // Single book detail
-['cart']                           // User cart
-['orders']                         // User orders
+['books'][('books', { page: 1, limit: 5 })][('books', { page: 1, limit: 4 })][ // All books list // Trending books // Bestsellers
+  ('book', 'abc123')
+]['cart']['orders']; // Single book detail // User cart // User orders
 ```
 
 ### Cache Lifecycle
@@ -138,6 +141,7 @@ Back to Homepage: 0ms (cached!)
 ## Real-World Scenarios
 
 ### Scenario 1: Browsing Books
+
 ```
 User Action                    | What Happens
 ------------------------------|----------------------------------
@@ -149,6 +153,7 @@ User Action                    | What Happens
 ```
 
 ### Scenario 2: Adding to Cart
+
 ```
 User Action                    | What Happens
 ------------------------------|----------------------------------
@@ -159,6 +164,7 @@ User Action                    | What Happens
 ```
 
 ### Scenario 3: Network Issues
+
 ```
 User Action                    | What Happens
 ------------------------------|----------------------------------
@@ -202,64 +208,71 @@ User Action                    | What Happens
 ### ✅ Do's
 
 1. **Use Specific Query Keys**
+
    ```typescript
    // Good - specific and unique
-   ['books', { page: 1, sortBy: 'price' }]
-   
-   // Bad - too generic
-   ['books']
+   ['books', { page: 1, sortBy: 'price' }][
+     // Bad - too generic
+     'books'
+   ];
    ```
 
 2. **Invalidate Related Queries**
+
    ```typescript
    // After adding to cart, invalidate cart queries
    onSuccess: () => {
      queryClient.invalidateQueries({ queryKey: ['cart'] });
-   }
+   };
    ```
 
 3. **Prefetch Predictable Navigation**
+
    ```typescript
    // Prefetch on hover
    onMouseEnter={() => prefetchBook(bookId)}
    ```
 
 4. **Set Appropriate Stale Times**
+
    ```typescript
    // Frequently changing data: 1 minute
-   staleTime: 60 * 1000
-   
+   staleTime: 60 * 1000;
+
    // Rarely changing data: 10 minutes
-   staleTime: 10 * 60 * 1000
+   staleTime: 10 * 60 * 1000;
    ```
 
 ### ❌ Don'ts
 
 1. **Don't Fetch in useEffect**
+
    ```typescript
    // Bad
    useEffect(() => {
      fetch('/api/books').then(...)
    }, []);
-   
+
    // Good
    const { data } = useBooks();
    ```
 
 2. **Don't Manage Loading States Manually**
+
    ```typescript
    // Bad
    const [loading, setLoading] = useState(true);
-   
+
    // Good
    const { isLoading } = useBooks();
    ```
 
 3. **Don't Invalidate Too Aggressively**
+
    ```typescript
    // Bad - invalidates on every mutation
    queryClient.invalidateQueries();
-   
+
    // Good - specific invalidation
    queryClient.invalidateQueries({ queryKey: ['cart'] });
    ```
@@ -267,16 +280,19 @@ User Action                    | What Happens
 ## Performance Metrics
 
 ### Cache Hit Rate
+
 - **Target:** >80% cache hits
 - **Current:** ~85% (after first page load)
 - **Measurement:** Devtools → Query Inspector
 
 ### Time to Interactive
+
 - **First Load:** ~570ms (3 API calls)
 - **Cached Load:** ~0ms (instant)
 - **With Prefetch:** ~0ms (instant)
 
 ### Network Requests
+
 - **Without Cache:** 3 requests per homepage visit
 - **With Cache:** 0 requests (within 5 min)
 - **Background Refetch:** 3 requests (after 5 min, non-blocking)
@@ -284,6 +300,7 @@ User Action                    | What Happens
 ## Advanced Features
 
 ### 1. Optimistic Updates
+
 ```typescript
 const { mutate } = useAddToCart();
 
@@ -291,15 +308,15 @@ mutate(
   { bookId, quantity },
   {
     // Update UI immediately
-    onMutate: async (newItem) => {
+    onMutate: async newItem => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
       const previousCart = queryClient.getQueryData(['cart']);
-      
-      queryClient.setQueryData(['cart'], (old) => ({
+
+      queryClient.setQueryData(['cart'], old => ({
         ...old,
         items: [...old.items, newItem],
       }));
-      
+
       return { previousCart };
     },
     // Rollback on error
@@ -311,19 +328,17 @@ mutate(
 ```
 
 ### 2. Infinite Scroll (Future)
+
 ```typescript
-const {
-  data,
-  fetchNextPage,
-  hasNextPage,
-} = useInfiniteQuery({
+const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
   queryKey: ['books'],
   queryFn: ({ pageParam = 1 }) => fetchBooks(pageParam),
-  getNextPageParam: (lastPage) => lastPage.nextPage,
+  getNextPageParam: lastPage => lastPage.nextPage,
 });
 ```
 
 ### 3. Parallel Queries
+
 ```typescript
 // Already implemented on homepage
 const trending = useBooks({ sortBy: 'createdAt' });
@@ -335,15 +350,19 @@ const newBooks = useBooks({ sortBy: 'createdAt' });
 ## Troubleshooting
 
 ### Issue: Data Not Updating
+
 **Solution:** Check staleTime - might be too long
 
 ### Issue: Too Many Requests
+
 **Solution:** Increase staleTime or disable refetchOnWindowFocus
 
 ### Issue: Slow Initial Load
+
 **Solution:** Implement SSR or reduce initial queries
 
 ### Issue: Memory Leaks
+
 **Solution:** Check gcTime - might be too long
 
 ## Future Optimizations
@@ -377,6 +396,7 @@ const newBooks = useBooks({ sortBy: 'createdAt' });
 ## Summary
 
 TanStack Query provides:
+
 - ✅ Automatic caching (5-10 min)
 - ✅ Background refetching
 - ✅ Request deduplication

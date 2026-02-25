@@ -27,7 +27,7 @@ import { Role } from '@prisma/client';
 @ApiTags('Books')
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) { }
+  constructor(private readonly booksService: BooksService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -41,7 +41,9 @@ export class BooksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all books with filtering, sorting, and pagination' })
+  @ApiOperation({
+    summary: 'Get all books with filtering, sorting, and pagination',
+  })
   @ApiResponse({ status: 200, description: 'Books retrieved successfully' })
   findAll(@Query() query: QueryBooksDto) {
     return this.booksService.findAll(query);

@@ -1,11 +1,13 @@
 # Homepage API Integration - Complete
 
 ## Summary
+
 Successfully integrated real backend API data into the homepage and made all navigation links functional.
 
 ## Changes Made
 
 ### 1. Homepage (`frontend/src/app/page.tsx`)
+
 - **Added React Query hooks** to fetch real data from backend API:
   - `useBooks` for Trending Books section (5 newest books)
   - `useBooks` for Bestsellers section (4 highest-priced books)
@@ -30,6 +32,7 @@ Successfully integrated real backend API data into the homepage and made all nav
   - Smooth transitions from loading to loaded state
 
 ### 2. Books Listing Page (`frontend/src/app/books/page.tsx`)
+
 - **Added URL query parameter support**:
   - Reads `author`, `category`, `sortBy`, `sortOrder`, `search` from URL
   - Initializes filters based on URL parameters on page load
@@ -51,6 +54,7 @@ Successfully integrated real backend API data into the homepage and made all nav
   - Responsive design maintained
 
 ### 3. Data Flow
+
 ```
 Homepage → Click Book Card → /books/[id] (Detail Page)
 Homepage → Click Author "View Books" → /books?author=Name (Filtered List)
@@ -61,33 +65,36 @@ Homepage → Click "View All" → /books (Full List)
 ## API Integration Details
 
 ### Trending Books Section
+
 ```typescript
 useBooks({
   page: 1,
   limit: 5,
   sortBy: 'createdAt',
   sortOrder: 'desc',
-})
+});
 ```
 
 ### Bestsellers Section
+
 ```typescript
 useBooks({
   page: 1,
   limit: 4,
   sortBy: 'price',
   sortOrder: 'desc',
-})
+});
 ```
 
 ### Coming Soon Section
+
 ```typescript
 useBooks({
   page: 1,
   limit: 3,
   sortBy: 'createdAt',
   sortOrder: 'desc',
-})
+});
 ```
 
 ## Features Working

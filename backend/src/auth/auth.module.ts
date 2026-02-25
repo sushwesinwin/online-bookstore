@@ -34,4 +34,4 @@ import { PrismaService } from '../prisma/prisma.service';
   ],
   exports: [AuthService, EmailService],
 })
-export class AuthModule { }
+export class AuthModule {}

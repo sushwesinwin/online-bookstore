@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Prisma } from '@prisma/client';
+import { SortOrder } from './dto/query-books.dto';
 
 describe('BooksService', () => {
   let service: BooksService;
@@ -256,14 +257,14 @@ describe('BooksService', () => {
             });
 
             // Verify pagination metadata
-            expect(result.page).toBe(page);
-            expect(result.limit).toBe(limit);
-            expect(result.total).toBe(total);
-            expect(result.totalPages).toBe(Math.ceil(total / limit));
+            expect(result.meta.page).toBe(page);
+            expect(result.meta.limit).toBe(limit);
+            expect(result.meta.total).toBe(total);
+            expect(result.meta.totalPages).toBe(Math.ceil(total / limit));
 
             // Verify books array is returned
-            expect(Array.isArray(result.books)).toBe(true);
-            expect(result.books.length).toBeLessThanOrEqual(limit);
+            expect(Array.isArray(result.data)).toBe(true);
+            expect(result.data.length).toBeLessThanOrEqual(limit);
 
             // Verify search was called with correct parameters
             expect(mockPrismaService.book.findMany).toHaveBeenCalledWith(
@@ -344,11 +345,14 @@ describe('BooksService', () => {
             mockPrismaService.book.findMany.mockResolvedValue(mockBooks);
             mockPrismaService.book.count.mockResolvedValue(1);
 
+import { SortOrder } from './dto/query-books.dto';
+
+// ... (inside the test)
             const result = await service.findAll({
               ...filters,
               page: 1,
               limit: 10,
-              sortOrder: filters.sortOrder as 'asc' | 'desc',
+              sortOrder: filters.sortOrder as SortOrder,
             });
 
             // Verify findMany was called with correct filter parameters
@@ -386,7 +390,7 @@ describe('BooksService', () => {
             expect(callArgs.orderBy[filters.sortBy]).toBe(filters.sortOrder);
 
             // Verify results are returned
-            expect(Array.isArray(result.books)).toBe(true);
+            expect(Array.isArray(result.data)).toBe(true);
           },
         ),
         { numRuns: 100 },

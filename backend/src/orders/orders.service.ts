@@ -10,7 +10,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   /**
    * Generate a unique order number
@@ -124,7 +124,16 @@ export class OrdersService {
   }
 
   async findAll(userId?: string, query?: any) {
-    const { page = 1, limit = 10, search, status, startDate, endDate, sortBy = 'createdAt', sortOrder = 'desc' } = query || {};
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      status,
+      startDate,
+      endDate,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query || {};
 
     const where: Prisma.OrderWhereInput = {};
 

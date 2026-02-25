@@ -5,16 +5,20 @@
 ### Quick Checklist
 
 1. **Is the backend running?**
+
    ```bash
    curl http://localhost:3001/books?page=1&limit=5
    ```
+
    ✅ Should return JSON with books data
 
 2. **Is the frontend running?**
+
    ```bash
    cd frontend
    pnpm dev
    ```
+
    ✅ Should be running on http://localhost:3000
 
 3. **Check browser console**
@@ -30,11 +34,14 @@
 ## Common Issues & Solutions
 
 ### Issue 1: CORS Error
+
 **Symptoms:**
+
 - Console shows: `Access to XMLHttpRequest blocked by CORS policy`
 - Network tab shows failed requests
 
 **Solution:**
+
 ```bash
 # Check backend CORS settings
 # backend/src/main.ts should have:
@@ -49,11 +56,14 @@ pnpm dev
 ```
 
 ### Issue 2: Wrong API URL
+
 **Symptoms:**
+
 - Network requests go to wrong URL
 - 404 errors in console
 
 **Solution:**
+
 ```bash
 # Check frontend/.env.local
 NEXT_PUBLIC_API_URL=http://localhost:3001
@@ -65,11 +75,14 @@ pnpm dev
 ```
 
 ### Issue 3: Frontend Not Restarted
+
 **Symptoms:**
+
 - Changes not reflected
 - Old code still running
 
 **Solution:**
+
 ```bash
 cd frontend
 # Kill the process (Ctrl+C)
@@ -77,11 +90,14 @@ pnpm dev
 ```
 
 ### Issue 4: No Data in Database
+
 **Symptoms:**
+
 - API returns empty array
 - `{"data":[],"meta":{...}}`
 
 **Solution:**
+
 ```bash
 cd backend
 # Run seed script
@@ -92,20 +108,26 @@ pnpm prisma migrate reset
 ```
 
 ### Issue 5: React Query Cache Issue
+
 **Symptoms:**
+
 - Data was working, now not loading
 - Stale data showing
 
 **Solution:**
+
 1. Open React Query Devtools
 2. Click "Clear Cache" button
 3. Or hard refresh: Ctrl+Shift+R (Windows) / Cmd+Shift+R (Mac)
 
 ### Issue 6: Port Already in Use
+
 **Symptoms:**
+
 - `Error: listen EADDRINUSE: address already in use :::3000`
 
 **Solution:**
+
 ```bash
 # Find and kill process on port 3000
 lsof -ti:3000 | xargs kill -9
@@ -117,6 +139,7 @@ PORT=3001 pnpm dev
 ## Step-by-Step Debugging
 
 ### Step 1: Verify Backend
+
 ```bash
 # Test trending books endpoint
 curl 'http://localhost:3001/books?page=1&limit=5&sortBy=createdAt&sortOrder=desc'
@@ -128,6 +151,7 @@ curl 'http://localhost:3001/books?page=1&limit=4&sortBy=price&sortOrder=desc'
 ```
 
 ### Step 2: Check Frontend Environment
+
 ```bash
 cd frontend
 cat .env.local
@@ -137,6 +161,7 @@ cat .env.local
 ```
 
 ### Step 3: Restart Everything
+
 ```bash
 # Terminal 1: Backend
 cd backend
@@ -148,6 +173,7 @@ pnpm dev
 ```
 
 ### Step 4: Check Browser
+
 1. Open http://localhost:3000
 2. Open DevTools (F12)
 3. Go to Console tab
@@ -155,6 +181,7 @@ pnpm dev
 5. Check for errors
 
 ### Step 5: Check Network Tab
+
 1. Open DevTools → Network tab
 2. Filter by "Fetch/XHR"
 3. Look for requests to `localhost:3001/books`
@@ -166,6 +193,7 @@ pnpm dev
 ## Debug Component
 
 A debug component has been added to the homepage (bottom-left corner) showing:
+
 - ✅ Success: Data loaded
 - ⏳ Loading: Fetching data
 - ❌ Error: Failed to load
@@ -175,6 +203,7 @@ Check this component for real-time status.
 ## React Query Devtools
 
 The devtools show:
+
 - **Fresh** (green): Data is cached and fresh
 - **Fetching** (blue): Currently loading
 - **Stale** (yellow): Data is cached but stale
@@ -184,19 +213,23 @@ The devtools show:
 ## Common Error Messages
 
 ### "Network Error"
+
 - Backend not running
 - Wrong API URL
 - CORS issue
 
 ### "Request failed with status code 404"
+
 - Wrong endpoint URL
 - Backend route not found
 
 ### "Request failed with status code 500"
+
 - Backend error
 - Check backend console logs
 
 ### "Failed to fetch"
+
 - Network issue
 - Backend not accessible
 - CORS blocking request
@@ -216,8 +249,8 @@ async function testAPI() {
         page: 1,
         limit: 5,
         sortBy: 'createdAt',
-        sortOrder: 'desc'
-      }
+        sortOrder: 'desc',
+      },
     });
     console.log('✅ API Working!', response.data);
   } catch (error) {
@@ -229,6 +262,7 @@ testAPI();
 ```
 
 Run with:
+
 ```bash
 npx ts-node test-api.ts
 ```
@@ -236,6 +270,7 @@ npx ts-node test-api.ts
 ## Still Not Working?
 
 1. **Clear all caches:**
+
    ```bash
    # Frontend
    cd frontend
@@ -266,6 +301,7 @@ npx ts-node test-api.ts
 ## Success Indicators
 
 When everything is working:
+
 - ✅ Backend console shows: "Application is running on: http://localhost:3001"
 - ✅ Frontend console shows: "=== API DEBUG INFO ===" with data
 - ✅ Homepage displays book cards
@@ -275,6 +311,7 @@ When everything is working:
 ## Need More Help?
 
 Check these files:
+
 - `frontend/src/lib/api/client.ts` - API configuration
 - `frontend/src/lib/hooks/use-books.ts` - React Query hooks
 - `frontend/src/components/providers.tsx` - Query client setup

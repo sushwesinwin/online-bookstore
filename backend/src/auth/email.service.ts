@@ -8,7 +8,10 @@ export class EmailService {
   private readonly fromAddress: string;
 
   constructor(private configService: ConfigService) {
-    this.fromAddress = this.configService.get<string>('EMAIL_FROM', 'noreply@bookstore.dev');
+    this.fromAddress = this.configService.get<string>(
+      'EMAIL_FROM',
+      'noreply@bookstore.dev',
+    );
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('EMAIL_HOST'),
       port: this.configService.get<number>('EMAIL_PORT'),
@@ -154,14 +157,17 @@ export class EmailService {
       .join('');
 
     const totalAmount = Number(orderDetails.totalAmount).toFixed(2);
-    const orderDate = new Date(orderDetails.createdAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const orderDate = new Date(orderDetails.createdAt).toLocaleDateString(
+      'en-US',
+      {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      },
+    );
 
     const mailOptions = {
-      from: this.fromAddress,
+      from: `"📚 BookStore" <${this.fromAddress}>`,
       to: email,
       subject: `Order Confirmation - ${orderNumber}`,
       html: `

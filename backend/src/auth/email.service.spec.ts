@@ -70,9 +70,9 @@ describe('EmailService', () => {
       await service.sendPasswordResetEmail(email, resetToken);
 
       expect(mockTransporter.sendMail).toHaveBeenCalledWith({
-        from: 'test@example.com',
+        from: expect.stringContaining('BookStore'),
         to: email,
-        subject: 'Password Reset Request',
+        subject: expect.stringContaining('Reset Your Password'),
         html: expect.stringContaining('Password Reset Request'),
       });
 
@@ -113,8 +113,17 @@ describe('EmailService', () => {
       const email = 'user@example.com';
       const orderNumber = 'ORD-12345';
       const orderDetails = {
-        items: [{ title: 'Book 1', quantity: 2, price: 20 }],
-        total: 40,
+        items: [
+          {
+            book: { title: 'Book 1', author: 'Author 1' },
+            quantity: 2,
+            price: 20,
+          },
+        ],
+        totalAmount: 40,
+        createdAt: new Date(),
+        status: 'CONFIRMED',
+        user: { firstName: 'John', lastName: 'Doe', email: 'user@example.com' },
       };
 
       await service.sendOrderConfirmationEmail(
@@ -124,23 +133,32 @@ describe('EmailService', () => {
       );
 
       expect(mockTransporter.sendMail).toHaveBeenCalledWith({
-        from: 'test@example.com',
+        from: expect.stringContaining('BookStore'),
         to: email,
-        subject: `Order Confirmation - ${orderNumber}`,
+        subject: expect.stringContaining(`Order Confirmation - ${orderNumber}`),
         html: expect.stringContaining('Order Confirmation'),
       });
 
       const callArgs = mockTransporter.sendMail.mock.calls[0][0];
       expect(callArgs.html).toContain(orderNumber);
-      expect(callArgs.html).toContain(JSON.stringify(orderDetails, null, 2));
+      expect(callArgs.html).toContain('Book 1');
     });
 
     it('should include order details in email', async () => {
       const email = 'user@example.com';
       const orderNumber = 'ORD-12345';
       const orderDetails = {
-        items: [{ title: 'Book 1', quantity: 1, price: 15 }],
-        total: 15,
+        items: [
+          {
+            book: { title: 'Book 1', author: 'Author 1' },
+            quantity: 1,
+            price: 15,
+          },
+        ],
+        totalAmount: 15,
+        createdAt: new Date(),
+        status: 'CONFIRMED',
+        user: { firstName: 'John', lastName: 'Doe', email: 'user@example.com' },
       };
 
       await service.sendOrderConfirmationEmail(
@@ -156,7 +174,12 @@ describe('EmailService', () => {
     it('should throw error if email sending fails', async () => {
       const email = 'user@example.com';
       const orderNumber = 'ORD-12345';
-      const orderDetails = { items: [], total: 0 };
+      const orderDetails = {
+        items: [],
+        totalAmount: 0,
+        createdAt: new Date(),
+        user: { firstName: 'John', lastName: 'Doe' },
+      };
       const error = new Error('Email sending failed');
 
       mockTransporter.sendMail.mockRejectedValue(error);

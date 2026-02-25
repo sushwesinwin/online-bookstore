@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useCart } from '@/lib/hooks/use-cart';
 
@@ -9,10 +8,10 @@ import { useCart } from '@/lib/hooks/use-cart';
  * Should be placed in the root layout to ensure cart is loaded on app init
  */
 export function CartInitializer() {
-    const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-    // Fetch cart when authenticated
-    useCart(isAuthenticated);
+  // Fetch cart when authenticated
+  useCart(isAuthenticated);
 
-    return null;
+  return null;
 }

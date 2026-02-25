@@ -4,7 +4,12 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['localhost', 'images.unsplash.com', 'covers.openlibrary.org', 'upload.wikimedia.org'],
+    domains: [
+      'localhost',
+      'images.unsplash.com',
+      'covers.openlibrary.org',
+      'upload.wikimedia.org',
+    ],
     remotePatterns: [
       {
         protocol: 'https',

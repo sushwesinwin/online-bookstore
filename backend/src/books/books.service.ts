@@ -12,7 +12,7 @@ import { PaginatedResult } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class BooksService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     try {
