@@ -382,14 +382,73 @@ export class PaymentService {
     }
 
     /**
+     * Verify a Stripe Checkout Session and fulfill the order if not already done.
+     * Called by the frontend after Stripe redirects to /checkout/success?session_id=...
+     * This is idempotent — safe to call multiple times for the same session.
+     */
+    async verifyAndFulfillSession(sessionId: string, userId: string): Promise<{ orderId: string; orderNumber: string }> {
+        // Retrieve the session from Stripe
+        const session = await this.stripe.checkout.sessions.retrieve(sessionId, {
+            expand: ['line_items'],
+        });
+
+        if (session.payment_status !== 'paid') {
+            throw new BadRequestException('Payment has not been completed');
+        }
+
+        // Check if session belongs to this user
+        if (session.metadata?.userId !== userId) {
+            throw new BadRequestException('Session does not belong to this user');
+        }
+
+        // Check if order already exists for this session (idempotent)
+        const stripePaymentId = (session.payment_intent as string) || session.id;
+        const existingPayment = await this.prisma.payment.findUnique({
+            where: { stripePaymentId },
+            include: { order: true },
+        });
+
+        if (existingPayment) {
+            this.logger.log(`Order already exists for session ${sessionId}: ${existingPayment.order.orderNumber}`);
+            return { orderId: existingPayment.orderId, orderNumber: existingPayment.order.orderNumber };
+        }
+
+        // Order doesn't exist yet — fulfill it now
+        this.logger.log(`Fulfilling order for session ${sessionId} (webhook may not have arrived yet)`);
+        await this.handleCheckoutSessionCompleted(session);
+
+        // Fetch the newly created payment/order
+        const payment = await this.prisma.payment.findUnique({
+            where: { stripePaymentId },
+            include: { order: true },
+        });
+
+        if (!payment) {
+            throw new BadRequestException('Order creation failed. Please contact support.');
+        }
+
+        return { orderId: payment.orderId, orderNumber: payment.order.orderNumber };
+    }
+
+    /**
      * Handle successful checkout session
      */
     async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {
         try {
-            const userId = session.metadata.userId;
+            const userId = session.metadata?.userId;
 
             if (!userId) {
                 this.logger.error('No userId in checkout session metadata');
+                return;
+            }
+
+            // Idempotency guard: check if order already created for this session
+            const stripePaymentId = (session.payment_intent as string) || session.id;
+            const existingPayment = await this.prisma.payment.findUnique({
+                where: { stripePaymentId },
+            });
+            if (existingPayment) {
+                this.logger.log(`Order already fulfilled for session ${session.id} — skipping duplicate`);
                 return;
             }
 
@@ -422,6 +481,8 @@ export class PaymentService {
                 throw new Error('Failed to generate unique order number');
             }
 
+            this.logger.log(`Creating order for user ${userId} from session ${session.id}`);
+
             // Create order
             const order = await this.prisma.order.create({
                 data: {
@@ -449,15 +510,19 @@ export class PaymentService {
                 },
             });
 
+            this.logger.log(`Order ${order.orderNumber} created with ID ${order.id}`);
+
             // Create payment record
             await this.prisma.payment.create({
                 data: {
                     orderId: order.id,
-                    stripePaymentId: session.payment_intent as string,
+                    stripePaymentId: (session.payment_intent as string) || session.id,
                     amount: cart.total,
                     status: PaymentStatus.COMPLETED,
                 },
             });
+
+            this.logger.log(`Payment record created for order ${order.orderNumber}`);
 
             // Reduce inventory for each book
             for (const item of cart.items) {
@@ -471,8 +536,11 @@ export class PaymentService {
                 });
             }
 
+            this.logger.log(`Inventory reduced for order ${order.orderNumber}`);
+
             // Clear cart
             await this.cartService.clearCart(userId);
+            this.logger.log(`Cart cleared for user ${userId}`);
 
             // Send confirmation email
             try {
@@ -486,7 +554,7 @@ export class PaymentService {
                 this.logger.error(`Failed to send confirmation email for order ${order.orderNumber}`, error);
             }
 
-            this.logger.log(`Order ${order.id} created from checkout session ${session.id}`);
+            this.logger.log(`Order ${order.id} fully processed from checkout session ${session.id}`);
         } catch (error) {
             this.logger.error(`Failed to handle checkout session completion for session ${session.id}`, error);
             throw error;

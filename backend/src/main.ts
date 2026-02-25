@@ -20,7 +20,8 @@ async function bootstrap() {
     express.json({
       verify: (req: any, res, buf) => {
         // Store raw body for webhook signature verification
-        if (req.url === '/orders/webhook') {
+        const url = req.originalUrl || req.url;
+        if (url.includes('/orders/webhook')) {
           req.rawBody = buf;
         }
       },

@@ -46,4 +46,9 @@ export const ordersApi = {
         const response = await apiClient.post('/orders/create-checkout-session');
         return response.data;
     },
+
+    verifySession: async (sessionId: string): Promise<{ orderId: string; orderNumber: string }> => {
+        const response = await apiClient.post('/orders/verify-session', { sessionId });
+        return response.data;
+    },
 };

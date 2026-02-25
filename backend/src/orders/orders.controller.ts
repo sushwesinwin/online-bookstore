@@ -154,6 +154,19 @@ export class OrdersController {
     return await this.paymentService.getPaymentByOrderId(orderId);
   }
 
+  @Post('verify-session')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Verify Stripe Checkout Session and fulfill order' })
+  @ApiResponse({ status: 201, description: 'Order verified and fulfilled' })
+  @ApiResponse({ status: 400, description: 'Payment not completed or session mismatch' })
+  async verifySession(
+    @Request() req,
+    @Body('sessionId') sessionId: string,
+  ) {
+    return this.paymentService.verifyAndFulfillSession(sessionId, req.user.id);
+  }
+
   @Post('create-checkout-session')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
