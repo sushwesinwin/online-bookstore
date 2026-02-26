@@ -1,8 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, User, LogOut, BookOpen, Menu, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  ShoppingCart,
+  User,
+  LogOut,
+  BookOpen,
+  Menu,
+  X,
+  Search,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useState, useEffect } from 'react';
@@ -12,6 +22,16 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { itemCount } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/books?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -82,6 +102,23 @@ export function Header() {
                 )}
               </>
             )}
+
+            {/* Simple Search Box */}
+            <form
+              onSubmit={handleSearch}
+              className="relative group/search ml-4"
+            >
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-[#848785] group-focus-within/search:text-[#0B7C6B] transition-colors" />
+              </div>
+              <Input
+                type="text"
+                placeholder="what do you want to read?"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 w-[250px] lg:w-[350px] rounded-full bg-[#F4F8F8] border-transparent focus:bg-white focus:border-[#0B7C6B]/30 focus:ring-2 focus:ring-[#0B7C6B]/20 transition-all text-sm"
+              />
+            </form>
           </nav>
 
           {/* Desktop Actions */}
