@@ -1,15 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   ShoppingCart,
   User,
   LogOut,
-  BookOpen,
-  Menu,
-  X,
   Search,
+  Bell,
+  PenLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,9 +20,13 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { itemCount } = useCartStore();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Hide on admin and auth pages
+  const hiddenRoutes = ['/admin', '/login', '/register', '/forgot-password', '/reset-password'];
+  const isHiddenRoute = hiddenRoutes.some((route) => pathname?.startsWith(route));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,226 +40,101 @@ export function Header() {
     setMounted(true);
   }, []);
 
+  if (isHiddenRoute) return null;
+
   if (!mounted) {
     return (
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9E8] shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo - always visible */}
-            <Link href="/" className="flex items-center space-x-2 group">
-              <div className="p-2 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-xl bg-linear-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
-                Bookstore
-              </span>
-            </Link>
-          </div>
+      <header className="sticky top-0 z-40 w-full bg-white border-b border-[#E4E9E8]">
+        <div className="flex h-14 items-center justify-between px-6">
+          <div className="w-[300px]" />
+          <div className="flex items-center gap-3" />
         </div>
       </header>
     );
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9E8] shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="p-2 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg group-hover:scale-110 transition-transform">
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-xl bg-linear-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
-              Bookstore
-            </span>
-          </Link>
+    <header className="sticky top-0 z-40 w-full bg-white border-b border-[#E4E9E8]">
+      <div className="flex h-14 items-center justify-between px-6">
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="relative group/search">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-[#848785] group-focus-within/search:text-[#0B7C6B] transition-colors" />
+          </div>
+          <Input
+            type="text"
+            placeholder="What do you want to read?"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-10 pr-4 py-2 w-[280px] sm:w-[350px] lg:w-[420px] rounded-full bg-[#F4F8F8] border-transparent focus:bg-white focus:border-[#0B7C6B]/30 focus:ring-2 focus:ring-[#0B7C6B]/20 transition-all text-sm"
+          />
+        </form>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/books"
-              className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
-            >
-              Books
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
-            </Link>
-
-            {isAuthenticated && (
-              <>
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
+            <>
+              {/* Write / Sell a Book (for admins) */}
+              {user?.role === 'ADMIN' && (
                 <Link
-                  href="/orders"
-                  className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
+                  href="/admin/books"
+                  className="hidden sm:flex items-center gap-1.5 text-sm text-[#848785] hover:text-[#101313] transition-colors"
                 >
-                  My Orders
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
+                  <PenLine className="h-4 w-4" />
+                  <span>Write</span>
                 </Link>
+              )}
 
-                {user?.role === 'ADMIN' && (
-                  <Link
-                    href="/admin"
-                    className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors relative group"
-                  >
-                    Admin
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0B7C6B] group-hover:w-full transition-all" />
-                  </Link>
-                )}
-              </>
-            )}
+              {/* Notifications placeholder */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-[#848785] hover:text-[#101313]"
+              >
+                <Bell className="h-5 w-5" />
+              </Button>
 
-            {/* Simple Search Box */}
-            <form
-              onSubmit={handleSearch}
-              className="relative group/search ml-4"
-            >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-[#848785] group-focus-within/search:text-[#0B7C6B] transition-colors" />
-              </div>
-              <Input
-                type="text"
-                placeholder="what do you want to read?"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-[250px] lg:w-[350px] rounded-full bg-[#F4F8F8] border-transparent focus:bg-white focus:border-[#0B7C6B]/30 focus:ring-2 focus:ring-[#0B7C6B]/20 transition-all text-sm"
-              />
-            </form>
-          </nav>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <Link href="/cart">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-linear-to-br from-[#FF6320] to-[#FFA118] text-xs text-white flex items-center justify-center font-semibold shadow-lg">
-                        {itemCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-
-                <Link href="/profile">
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
-
+              {/* Cart */}
+              <Link href="/cart">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => logout()}
-                  className="hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
+                  className="relative h-9 w-9 text-[#848785] hover:text-[#101313]"
                 >
-                  <LogOut className="h-5 w-5" />
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#FF6320] text-[10px] text-white flex items-center justify-center font-bold">
+                      {itemCount}
+                    </span>
+                  )}
                 </Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="font-medium">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button className="shadow-md">Sign Up</Button>
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 hover:bg-[#F4F8F8] rounded-lg transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-[#E4E9E8] animate-in slide-in-from-top">
-            <nav className="flex flex-col space-y-4">
-              <Link
-                href="/books"
-                className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Books
               </Link>
 
-              {isAuthenticated && (
-                <>
-                  <Link
-                    href="/orders"
-                    className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    My Orders
-                  </Link>
-
-                  {user?.role === 'ADMIN' && (
-                    <Link
-                      href="/admin"
-                      className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Admin
-                    </Link>
-                  )}
-
-                  <Link
-                    href="/cart"
-                    className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1 flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    Cart {itemCount > 0 && `(${itemCount})`}
-                  </Link>
-
-                  <Link
-                    href="/profile"
-                    className="text-sm font-medium text-[#848785] hover:text-[#0B7C6B] transition-colors px-2 py-1"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-
-                  <button
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="text-sm font-medium text-[#FF4E3E] hover:text-[#E6463A] transition-colors px-2 py-1 text-left"
-                  >
-                    Logout
-                  </button>
-                </>
-              )}
-
-              {!isAuthenticated && (
-                <div className="flex flex-col gap-2 pt-2">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Button className="w-full">Sign Up</Button>
-                  </Link>
+              {/* User Avatar / Profile */}
+              <Link href="/profile">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:opacity-90 transition-opacity">
+                  {user?.firstName?.charAt(0).toUpperCase() || 'U'}
                 </div>
-              )}
-            </nav>
-          </div>
-        )}
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium text-[#848785] hover:text-[#101313]"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button className="rounded-full bg-[#0B7C6B] hover:bg-[#096B5B] text-white text-sm font-semibold px-5 shadow-sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );

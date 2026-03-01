@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { BookCard } from '@/components/books/book-card';
 import { Button } from '@/components/ui/button';
 import { useBooks } from '@/lib/hooks/use-books';
@@ -30,8 +29,6 @@ export default function BestsellersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Header />
-
       <main className="container mx-auto py-8 px-4">
         {/* Header Section */}
         <div className="mb-8">

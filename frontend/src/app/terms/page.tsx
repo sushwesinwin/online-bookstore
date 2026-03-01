@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { ArrowLeft } from 'lucide-react';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Link
           href="/"

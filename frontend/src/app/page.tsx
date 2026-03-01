@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Header } from '@/components/layout/header';
 import { InfiniteScrollCategories } from '@/components/ui/infinite-scroll-categories';
 import {
   BookOpen,
@@ -50,8 +49,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
-
       <main>
         {/* Hero Section - Enhanced with Animations */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#0B7C6B] via-[#0D8F7A] to-[#17BD8D] py-20 px-4">

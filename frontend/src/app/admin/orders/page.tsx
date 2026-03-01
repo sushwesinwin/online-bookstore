@@ -23,6 +23,10 @@ import { Modal } from '@/components/ui/modal';
 export default function AdminOrders() {
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -133,11 +137,10 @@ export default function AdminOrders() {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-                  statusFilter === status
+                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${statusFilter === status
                     ? 'bg-[#0B7C6B] text-white shadow-md'
                     : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                }`}
+                  }`}
               >
                 {status || 'ALL'}
               </button>
@@ -175,69 +178,69 @@ export default function AdminOrders() {
             <tbody className="divide-y divide-[#E4E9E8]">
               {isLoading
                 ? Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td colSpan={6} className="px-6 py-8">
-                          <div className="h-4 w-full rounded bg-[#F3F5F5]"></div>
-                        </td>
-                      </tr>
-                    ))
-                : data?.data.map(order => (
-                    <tr
-                      key={order.id}
-                      className="group transition-colors hover:bg-[#F8FAFB]/50"
-                    >
-                      <td className="px-6 py-5">
-                        <div className="font-bold text-[#101313]">
-                          {order.orderNumber}
-                        </div>
-                        <div className="mt-1 text-xs text-[#848785]">
-                          {new Date(order.createdAt).toLocaleDateString()} at{' '}
-                          {new Date(order.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="font-medium text-[#101313]">
-                          {order.user?.firstName} {order.user?.lastName}
-                        </div>
-                        <div className="text-xs text-[#848785]">
-                          {order.user?.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <Badge
-                          variant="outline"
-                          className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
-                        >
-                          {order.items.length}{' '}
-                          {order.items.length === 1 ? 'book' : 'books'}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-5 font-bold text-[#101313]">
-                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-5">
-                        <div
-                          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${getStatusColor(order.status)}`}
-                        >
-                          {getStatusIcon(order.status)}
-                          {order.status}
-                        </div>
-                      </td>
-                      <td className="px-4 py-5 text-right">
-                        <button
-                          onClick={() => handleViewOrder(order)}
-                          className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
-                        >
-                          <Eye className="h-5 w-5" />
-                        </button>
+                  .fill(0)
+                  .map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={6} className="px-6 py-8">
+                        <div className="h-4 w-full rounded bg-[#F3F5F5]"></div>
                       </td>
                     </tr>
-                  ))}
+                  ))
+                : data?.data.map(order => (
+                  <tr
+                    key={order.id}
+                    className="group transition-colors hover:bg-[#F8FAFB]/50"
+                  >
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-[#101313]">
+                        {order.orderNumber}
+                      </div>
+                      <div className="mt-1 text-xs text-[#848785]">
+                        {new Date(order.createdAt).toLocaleDateString()} at{' '}
+                        {new Date(order.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="font-medium text-[#101313]">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </div>
+                      <div className="text-xs text-[#848785]">
+                        {order.user?.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <Badge
+                        variant="outline"
+                        className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
+                      >
+                        {order.items.length}{' '}
+                        {order.items.length === 1 ? 'book' : 'books'}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-5 font-bold text-[#101313]">
+                      ${parseFloat(order.totalAmount.toString()).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-5">
+                      <div
+                        className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${getStatusColor(order.status)}`}
+                      >
+                        {getStatusIcon(order.status)}
+                        {order.status}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 text-right">
+                      <button
+                        onClick={() => handleViewOrder(order)}
+                        className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
+                      >
+                        <Eye className="h-5 w-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -361,11 +364,10 @@ export default function AdminOrders() {
                       variant={
                         selectedOrder.status === s ? 'default' : 'outline'
                       }
-                      className={`h-11 rounded-xl text-xs font-bold ${
-                        selectedOrder.status === s
+                      className={`h-11 rounded-xl text-xs font-bold ${selectedOrder.status === s
                           ? 'bg-[#0B7C6B] text-white shadow-lg'
                           : 'border-[#E4E9E8]'
-                      }`}
+                        }`}
                       onClick={() => handleUpdateStatus(selectedOrder.id, s)}
                       disabled={
                         updateStatus.isPending || selectedOrder.status === s

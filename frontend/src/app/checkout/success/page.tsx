@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
@@ -81,8 +80,6 @@ export default function CheckoutSuccessPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
-
       <main className="container mx-auto px-4 py-20">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border border-[#E4E9E8]">

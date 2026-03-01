@@ -2,7 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useOrder, useCancelOrder } from '@/lib/hooks/use-orders';
@@ -79,7 +78,6 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F9FCFB]">
-        <Header />
         <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0B7C6B]"></div>
           <p className="mt-4 text-[#848785]">Loading order details...</p>
@@ -91,7 +89,6 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <div className="min-h-screen bg-[#F9FCFB]">
-        <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="h-10 w-10 text-red-600" />
@@ -120,8 +117,6 @@ export default function OrderDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
-
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto">
           {/* Breadcrumbs / Back Button */}

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { BookCard } from '@/components/books/book-card';
 import { Button } from '@/components/ui/button';
 import { useBooks } from '@/lib/hooks/use-books';
@@ -31,8 +30,6 @@ export default function NewArrivalsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <Header />
-
       <main className="container mx-auto py-8 px-4">
         {/* Header Section */}
         <div className="mb-8">

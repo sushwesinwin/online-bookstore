@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useMyOrders } from '@/lib/hooks/use-orders';
 import { formatPrice, formatDate } from '@/lib/utils';
@@ -61,8 +60,6 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
-
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto">
           {/* Header Section */}

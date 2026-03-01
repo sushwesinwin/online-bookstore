@@ -2,7 +2,6 @@
 
 import { useState, use } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
 import { BookCard } from '@/components/books/book-card';
 import { Button } from '@/components/ui/button';
 import { useBooks } from '@/lib/hooks/use-books';
@@ -167,7 +166,6 @@ export default function AuthorPage({
   if (!authorData) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container mx-auto py-20 px-4 text-center">
           <h1 className="text-3xl font-bold mb-4">Author Not Found</h1>
           <p className="text-gray-600 mb-8">
@@ -183,8 +181,6 @@ export default function AuthorPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Header />
-
       <main className="container mx-auto py-8 px-4">
         {/* Back Button */}
         <Link href="/">

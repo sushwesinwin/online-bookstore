@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Header } from '@/components/layout/header';
 import { BookCard } from '@/components/books/book-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,8 +71,6 @@ export default function BooksPage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">Browse Books</h1>

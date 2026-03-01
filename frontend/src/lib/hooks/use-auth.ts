@@ -14,7 +14,11 @@ export function useAuth() {
     onSuccess: data => {
       setAuth(data.user, data.accessToken, data.refreshToken);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.push('/');
+      if (data.user.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     },
   });
 
@@ -23,7 +27,11 @@ export function useAuth() {
     onSuccess: data => {
       setAuth(data.user, data.accessToken, data.refreshToken);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.push('/');
+      if (data.user.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     },
   });
 

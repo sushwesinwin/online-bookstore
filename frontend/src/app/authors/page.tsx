@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Header } from '@/components/layout/header';
 import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -195,8 +194,6 @@ export default function AuthorsPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
-      <Header />
-
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] py-16 px-4">

@@ -121,3 +121,34 @@ export interface OrderQueryParams {
   sortBy?: 'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber';
   sortOrder?: 'asc' | 'desc';
 }
+
+// Admin Dashboard Types
+export interface DashboardStat {
+  value: number;
+  change: number;
+  trend: 'up' | 'down';
+}
+
+export interface DashboardStats {
+  totalRevenue: DashboardStat;
+  booksInCatalog: DashboardStat;
+  totalOrders: DashboardStat;
+  activeCustomers: DashboardStat;
+}
+
+export interface RecentOrder {
+  id: string;
+  customer: string;
+  customerEmail: string;
+  amount: number;
+  status: Order['status'];
+  createdAt: string;
+}
+
+export interface RecentActivity {
+  type: 'inventory_alert' | 'new_user' | 'new_order' | 'system';
+  title: string;
+  description: string;
+  timestamp: string;
+  severity: 'critical' | 'warning' | 'info' | 'success';
+}

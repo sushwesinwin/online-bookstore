@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { BooksModule } from './books/books.module';
 import { OrdersModule } from './orders/orders.module';
 import { CartModule } from './cart/cart.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CartModule } from './cart/cart.module';
     BooksModule,
     OrdersModule,
     CartModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
