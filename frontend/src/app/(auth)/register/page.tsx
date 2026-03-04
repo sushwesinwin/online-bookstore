@@ -140,12 +140,12 @@ export default function RegisterPage() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Create a password (min. 6 characters)"
+                placeholder="Create a password (min. 8 characters)"
                 value={formData.password}
                 onChange={handleChange}
                 className="pl-11 h-12"
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
           </div>
