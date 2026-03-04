@@ -225,10 +225,10 @@ export default function AdminBooks() {
                       <div className="flex items-center">
                         <div
                           className={`mr-2 h-2 w-2 rounded-full ${book.inventory > 10
-                              ? 'bg-[#17BD8D]'
-                              : book.inventory > 0
-                                ? 'bg-[#F9B959]'
-                                : 'bg-[#FF4E3E]'
+                            ? 'bg-[#17BD8D]'
+                            : book.inventory > 0
+                              ? 'bg-[#F9B959]'
+                              : 'bg-[#FF4E3E]'
                             }`}
                         />
                         <span className="font-semibold text-[#101313]">
@@ -421,12 +421,11 @@ export default function AdminBooks() {
               Image URL
             </label>
             <Input
-              required
               value={formData.imageUrl}
               onChange={e =>
                 setFormData({ ...formData, imageUrl: e.target.value })
               }
-              placeholder="https://example.com/cover.jpg"
+              placeholder="https://example.com/cover.jpg (optional)"
               className="h-12 rounded-xl"
             />
           </div>

@@ -1,6 +1,6 @@
-import { IsString, IsNumber, IsOptional, Min, IsUrl } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class CreateBookDto {
   @ApiProperty({ example: '978-0-123456-78-9' })
@@ -41,6 +41,7 @@ export class CreateBookDto {
     required: false,
   })
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @Transform(({ value }) => value === '' ? undefined : value)
   imageUrl?: string;
 }
