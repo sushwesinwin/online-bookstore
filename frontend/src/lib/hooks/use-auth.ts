@@ -7,7 +7,7 @@ import { LoginCredentials, RegisterData } from '../api/types';
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, setAuth, clearAuth } = useAuthStore();
+  const { user, isAuthenticated, setAuth, clearAuth, updateUser } = useAuthStore();
 
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
@@ -50,6 +50,20 @@ export function useAuth() {
     enabled: isAuthenticated,
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: { firstName?: string; lastName?: string }) =>
+      authApi.updateProfile(data),
+    onSuccess: updatedUser => {
+      updateUser(updatedUser);
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
+      authApi.changePassword(data),
+  });
+
   return {
     user,
     profile,
@@ -61,5 +75,13 @@ export function useAuth() {
     isRegistering: registerMutation.isPending,
     loginError: loginMutation.error,
     registerError: registerMutation.error,
+    updateProfile: updateProfileMutation.mutate,
+    isUpdatingProfile: updateProfileMutation.isPending,
+    updateProfileError: updateProfileMutation.error,
+    updateProfileSuccess: updateProfileMutation.isSuccess,
+    changePassword: changePasswordMutation.mutate,
+    isChangingPassword: changePasswordMutation.isPending,
+    changePasswordError: changePasswordMutation.error,
+    changePasswordSuccess: changePasswordMutation.isSuccess,
   };
 }

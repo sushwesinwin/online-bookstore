@@ -37,4 +37,20 @@ export const authApi = {
   resetPassword: async (token: string, newPassword: string): Promise<void> => {
     await apiClient.post('/auth/reset-password', { token, newPassword });
   },
+
+  updateProfile: async (data: {
+    firstName?: string;
+    lastName?: string;
+  }): Promise<User> => {
+    const response = await apiClient.patch('/auth/profile', data);
+    return response.data;
+  },
+
+  changePassword: async (data: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<{ message: string }> => {
+    const response = await apiClient.patch('/auth/change-password', data);
+    return response.data;
+  },
 };
