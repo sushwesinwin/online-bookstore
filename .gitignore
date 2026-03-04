@@ -68,7 +68,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public  ← removed: not a Gatsby project, Next.js public/ must be tracked
 
 # Storybook build outputs
 .out

@@ -9,8 +9,23 @@ import { Header } from '@/components/layout/header';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Online Bookstore',
-  description: 'Browse and purchase books online',
+  title: {
+    default: 'PageTurner — Online Bookstore',
+    template: '%s | PageTurner',
+  },
+  description:
+    'Discover, browse, and purchase books online. Thousands of titles across every genre, delivered to your door.',
+  keywords: ['bookstore', 'books', 'buy books', 'online bookstore', 'ebooks', 'fiction', 'non-fiction'],
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
+  openGraph: {
+    title: 'PageTurner — Online Bookstore',
+    description: 'Discover, browse, and purchase books online.',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
