@@ -8,6 +8,10 @@ export interface User {
   updatedAt: string;
 }
 
+export interface AdminUser extends User {
+  orderCount: number;
+}
+
 export interface Book {
   id: string;
   isbn: string;

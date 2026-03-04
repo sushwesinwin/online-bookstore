@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, Role } from '@prisma/client';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getDashboardStats() {
     // Get total revenue from completed orders
@@ -129,51 +130,27 @@ export class AdminService {
     // Get recent orders for activity feed
     const recentOrders = await this.prisma.order.findMany({
       take: 3,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { firstName: true, lastName: true } } },
     });
 
     // Get low stock books
     const lowStockBooks = await this.prisma.book.findMany({
-      where: {
-        inventory: {
-          lte: 10,
-        },
-      },
+      where: { inventory: { lte: 10 } },
       take: 5,
-      orderBy: {
-        inventory: 'asc',
-      },
+      orderBy: { inventory: 'asc' },
     });
 
     // Get new users (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
     const newUsers = await this.prisma.user.findMany({
-      where: {
-        createdAt: {
-          gte: sevenDaysAgo,
-        },
-      },
+      where: { createdAt: { gte: sevenDaysAgo } },
       take: 3,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     const activities = [];
-
-    // Add low stock alerts
     if (lowStockBooks.length > 0) {
       activities.push({
         type: 'inventory_alert',
@@ -183,8 +160,6 @@ export class AdminService {
         severity: 'critical',
       });
     }
-
-    // Add new users
     newUsers.forEach((user) => {
       activities.push({
         type: 'new_user',
@@ -194,8 +169,6 @@ export class AdminService {
         severity: 'info',
       });
     });
-
-    // Add recent orders
     recentOrders.forEach((order) => {
       activities.push({
         type: 'new_order',
@@ -205,10 +178,112 @@ export class AdminService {
         severity: 'info',
       });
     });
-
-    // Sort by timestamp and limit
     return activities
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
+  }
+
+  // ── User Management ────────────────────────────────────────────────────────
+
+  async getUsers({
+    page = 1,
+    limit = 10,
+    search,
+    role,
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: Role;
+  }) {
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+    if (role) where.role = role;
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: { select: { orders: true } },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    return {
+      data: users.map((u) => ({ ...u, orderCount: u._count.orders })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: { select: { orders: true } },
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return { ...user, orderCount: user._count.orders };
+  }
+
+  async updateUserRole(id: string, dto: UpdateUserRoleDto) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: { role: dto.role },
+      select: {
+        id: true, email: true, firstName: true,
+        lastName: true, role: true, createdAt: true, updatedAt: true,
+      },
+    });
+    return updated;
+  }
+
+  async deleteUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { _count: { select: { orders: true } } },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    if (user._count.orders > 0) {
+      throw new BadRequestException(
+        'Cannot delete a user who has placed orders.',
+      );
+    }
+    await this.prisma.user.delete({ where: { id } });
+    return { message: 'User deleted successfully' };
   }
 }
