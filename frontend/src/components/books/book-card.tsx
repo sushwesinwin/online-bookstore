@@ -28,7 +28,7 @@ export function BookCard({ book }: BookCardProps) {
   const { mutate: removeFavorite, isPending: isRemovingFavorite } =
     useRemoveFavorite();
 
-  const isFavorite = favorites?.some((fav) => fav.id === book.id);
+  const isFavorite = favorites?.some(fav => fav.id === book.id);
   const isFavoritePending = isAddingFavorite || isRemovingFavorite;
 
   const handleAddToCart = () => {
@@ -69,11 +69,14 @@ export function BookCard({ book }: BookCardProps) {
                 onClick={toggleFavorite}
                 disabled={isFavoritePending}
                 className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white shadow-sm transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 sm:opacity-100"
-                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label={
+                  isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                }
               >
                 <Heart
-                  className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                    }`}
+                  className={`h-5 w-5 ${
+                    isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                  }`}
                 />
               </button>
             )}
@@ -94,7 +97,9 @@ export function BookCard({ book }: BookCardProps) {
           <p className="text-sm text-gray-600">{book.author}</p>
 
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold">{formatPrice(Number(book.price))}</span>
+            <span className="text-lg font-bold">
+              {formatPrice(Number(book.price))}
+            </span>
             {book.inventory > 0 ? (
               <span className="text-xs text-gray-600">
                 {book.inventory} in stock

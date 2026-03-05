@@ -1,5 +1,11 @@
 import { apiClient } from './client';
-import type { AdminUser, DashboardStats, RecentOrder, RecentActivity, PaginatedResponse } from './types';
+import type {
+  AdminUser,
+  DashboardStats,
+  RecentOrder,
+  RecentActivity,
+  PaginatedResponse,
+} from './types';
 
 export const adminApi = {
   // Dashboard
@@ -9,12 +15,16 @@ export const adminApi = {
   },
 
   getRecentOrders: async (limit = 10): Promise<RecentOrder[]> => {
-    const response = await apiClient.get('/admin/dashboard/recent-orders', { params: { limit } });
+    const response = await apiClient.get('/admin/dashboard/recent-orders', {
+      params: { limit },
+    });
     return response.data;
   },
 
   getRecentActivities: async (limit = 10): Promise<RecentActivity[]> => {
-    const response = await apiClient.get('/admin/dashboard/activities', { params: { limit } });
+    const response = await apiClient.get('/admin/dashboard/activities', {
+      params: { limit },
+    });
     return response.data;
   },
 
@@ -29,7 +39,10 @@ export const adminApi = {
     return response.data;
   },
 
-  updateUserRole: async (id: string, role: 'USER' | 'ADMIN'): Promise<AdminUser> => {
+  updateUserRole: async (
+    id: string,
+    role: 'USER' | 'ADMIN'
+  ): Promise<AdminUser> => {
     const response = await apiClient.patch(`/admin/users/${id}/role`, { role });
     return response.data;
   },

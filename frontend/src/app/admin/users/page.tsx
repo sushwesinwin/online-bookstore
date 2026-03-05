@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api/admin';
 import { formatDate } from '@/lib/utils';
@@ -28,7 +28,8 @@ const ROLE_OPTIONS = [
 ];
 
 function UserAvatar({ user }: { user: AdminUser }) {
-  const initials = `${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.toUpperCase();
+  const initials =
+    `${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.toUpperCase();
   const isAdmin = user.role === 'ADMIN';
   return (
     <div
@@ -44,7 +45,11 @@ function RoleBadge({ role }: { role: 'USER' | 'ADMIN' }) {
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${role === 'ADMIN' ? 'bg-[#FFF4ED] text-[#FF6320] border border-[#FF6320]/20' : 'bg-[#E4FFFB] text-[#0B7C6B] border border-[#0B7C6B]/20'}`}
     >
-      {role === 'ADMIN' ? <ShieldCheck className="h-3 w-3" /> : <UserCircle2 className="h-3 w-3" />}
+      {role === 'ADMIN' ? (
+        <ShieldCheck className="h-3 w-3" />
+      ) : (
+        <UserCircle2 className="h-3 w-3" />
+      )}
       {role === 'ADMIN' ? 'Admin' : 'User'}
     </span>
   );
@@ -57,7 +62,10 @@ export default function AdminUsersPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'' | 'USER' | 'ADMIN'>('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [confirmRole, setConfirmRole] = useState<{ id: string; newRole: 'USER' | 'ADMIN' } | null>(null);
+  const [confirmRole, setConfirmRole] = useState<{
+    id: string;
+    newRole: 'USER' | 'ADMIN';
+  } | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -138,11 +146,16 @@ export default function AdminUsersPage() {
           <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
           <select
             value={roleFilter}
-            onChange={e => { setRoleFilter(e.target.value as any); setPage(1); }}
+            onChange={e => {
+              setRoleFilter(e.target.value as any);
+              setPage(1);
+            }}
             className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
           >
             {ROLE_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
@@ -154,11 +167,21 @@ export default function AdminUsersPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">User</th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">Role</th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">Orders</th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">Joined</th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785] text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  User
+                </th>
+                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  Role
+                </th>
+                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  Orders
+                </th>
+                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  Joined
+                </th>
+                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785] text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E9E8]">
@@ -174,10 +197,18 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4"><div className="h-6 w-16 bg-[#F3F5F5] animate-pulse rounded-full" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-8 bg-[#F3F5F5] animate-pulse rounded" /></td>
-                    <td className="px-6 py-4"><div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-8 w-20 bg-[#F3F5F5] animate-pulse rounded-xl ml-auto" /></td>
+                    <td className="px-6 py-4">
+                      <div className="h-6 w-16 bg-[#F3F5F5] animate-pulse rounded-full" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 w-8 bg-[#F3F5F5] animate-pulse rounded" />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="h-8 w-20 bg-[#F3F5F5] animate-pulse rounded-xl ml-auto" />
+                    </td>
                   </tr>
                 ))
               ) : users.length === 0 ? (
@@ -188,7 +219,10 @@ export default function AdminUsersPage() {
                       <p className="font-semibold">No users found</p>
                       {(debouncedSearch || roleFilter) && (
                         <button
-                          onClick={() => { setSearch(''); setRoleFilter(''); }}
+                          onClick={() => {
+                            setSearch('');
+                            setRoleFilter('');
+                          }}
                           className="text-sm text-[#0B7C6B] hover:underline"
                         >
                           Clear filters
@@ -199,7 +233,10 @@ export default function AdminUsersPage() {
                 </tr>
               ) : (
                 users.map(user => (
-                  <tr key={user.id} className="group hover:bg-[#F8FAFB]/50 transition-colors">
+                  <tr
+                    key={user.id}
+                    className="group hover:bg-[#F8FAFB]/50 transition-colors"
+                  >
                     {/* User info */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -208,7 +245,9 @@ export default function AdminUsersPage() {
                           <p className="font-bold text-[#101313] truncate group-hover:text-[#0B7C6B] transition-colors">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-sm text-[#848785] truncate">{user.email}</p>
+                          <p className="text-sm text-[#848785] truncate">
+                            {user.email}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -222,7 +261,9 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5 text-sm text-[#848785]">
                         <ShoppingBag className="h-3.5 w-3.5" />
-                        <span className="font-semibold text-[#101313]">{user.orderCount}</span>
+                        <span className="font-semibold text-[#101313]">
+                          {user.orderCount}
+                        </span>
                       </div>
                     </td>
 
@@ -240,16 +281,25 @@ export default function AdminUsersPage() {
                         {/* Toggle role */}
                         <button
                           onClick={() => handleRoleToggle(user)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${user.role === 'ADMIN'
-                            ? 'border-[#E4E9E8] text-[#848785] hover:border-[#0B7C6B]/40 hover:text-[#0B7C6B] hover:bg-[#E4FFFB]'
-                            : 'border-[#E4E9E8] text-[#848785] hover:border-[#FF6320]/40 hover:text-[#FF6320] hover:bg-[#FFF4ED]'
-                            }`}
-                          title={user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin'}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                            user.role === 'ADMIN'
+                              ? 'border-[#E4E9E8] text-[#848785] hover:border-[#0B7C6B]/40 hover:text-[#0B7C6B] hover:bg-[#E4FFFB]'
+                              : 'border-[#E4E9E8] text-[#848785] hover:border-[#FF6320]/40 hover:text-[#FF6320] hover:bg-[#FFF4ED]'
+                          }`}
+                          title={
+                            user.role === 'ADMIN'
+                              ? 'Demote to User'
+                              : 'Promote to Admin'
+                          }
                         >
                           {user.role === 'ADMIN' ? (
-                            <><UserCircle2 className="h-3.5 w-3.5" /> Make User</>
+                            <>
+                              <UserCircle2 className="h-3.5 w-3.5" /> Make User
+                            </>
                           ) : (
-                            <><ShieldCheck className="h-3.5 w-3.5" /> Make Admin</>
+                            <>
+                              <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
+                            </>
                           )}
                         </button>
 
@@ -258,7 +308,11 @@ export default function AdminUsersPage() {
                           onClick={() => setConfirmDelete(user.id)}
                           disabled={user.orderCount > 0}
                           className="p-2 rounded-xl text-[#848785] hover:text-[#FF4E3E] hover:bg-[#FFECEB] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={user.orderCount > 0 ? 'Cannot delete: user has orders' : 'Delete user'}
+                          title={
+                            user.orderCount > 0
+                              ? 'Cannot delete: user has orders'
+                              : 'Delete user'
+                          }
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -275,7 +329,8 @@ export default function AdminUsersPage() {
         {meta && meta.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-[#E4E9E8] bg-[#F8FAFB]">
             <p className="text-sm text-[#848785]">
-              Showing {(meta.page - 1) * meta.limit + 1}–{Math.min(meta.page * meta.limit, meta.total)} of {meta.total}
+              Showing {(meta.page - 1) * meta.limit + 1}–
+              {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -321,7 +376,9 @@ export default function AdminUsersPage() {
                 <ShieldCheck className="h-6 w-6 text-[#FF6320]" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101313] text-lg">Change Role</h3>
+                <h3 className="font-bold text-[#101313] text-lg">
+                  Change Role
+                </h3>
                 <p className="text-sm text-[#848785]">
                   Set role to <strong>{confirmRole.newRole}</strong>?
                 </p>
@@ -339,7 +396,12 @@ export default function AdminUsersPage() {
               <Button
                 className="flex-1 bg-[#0B7C6B] hover:bg-[#096B5B]"
                 disabled={updateRoleMutation.isPending}
-                onClick={() => updateRoleMutation.mutate({ id: confirmRole.id, role: confirmRole.newRole })}
+                onClick={() =>
+                  updateRoleMutation.mutate({
+                    id: confirmRole.id,
+                    role: confirmRole.newRole,
+                  })
+                }
               >
                 {updateRoleMutation.isPending ? 'Saving...' : 'Confirm'}
               </Button>
@@ -357,20 +419,28 @@ export default function AdminUsersPage() {
                 <AlertCircle className="h-6 w-6 text-[#FF4E3E]" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101313] text-lg">Delete User</h3>
-                <p className="text-sm text-[#848785]">This action cannot be undone.</p>
+                <h3 className="font-bold text-[#101313] text-lg">
+                  Delete User
+                </h3>
+                <p className="text-sm text-[#848785]">
+                  This action cannot be undone.
+                </p>
               </div>
             </div>
             {deleteMutation.isError && (
               <p className="text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-xl p-3">
-                {(deleteMutation.error as any)?.response?.data?.message ?? 'Failed to delete user.'}
+                {(deleteMutation.error as any)?.response?.data?.message ??
+                  'Failed to delete user.'}
               </p>
             )}
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => { setConfirmDelete(null); deleteMutation.reset(); }}
+                onClick={() => {
+                  setConfirmDelete(null);
+                  deleteMutation.reset();
+                }}
                 disabled={deleteMutation.isPending}
               >
                 Cancel

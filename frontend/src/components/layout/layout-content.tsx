@@ -15,8 +15,9 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={`flex-1 w-full transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
-        }`}
+      className={`flex-1 w-full transition-all duration-300 ${
+        isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
+      }`}
     >
       {children}
     </div>

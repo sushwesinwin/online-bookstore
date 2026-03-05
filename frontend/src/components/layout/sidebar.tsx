@@ -26,7 +26,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
   const { itemCount } = useCartStore();
-  const { isCollapsed: persistedIsCollapsed, toggleSidebar } = useSidebarStore();
+  const { isCollapsed: persistedIsCollapsed, toggleSidebar } =
+    useSidebarStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -37,8 +38,14 @@ export function Sidebar() {
   const isCollapsed = mounted ? persistedIsCollapsed : false;
 
   // Hide sidebar on admin and auth routes
-  const hiddenRoutes = ['/admin', '/login', '/register', '/forgot-password', '/reset-password'];
-  if (hiddenRoutes.some((route) => pathname?.startsWith(route))) {
+  const hiddenRoutes = [
+    '/admin',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+  ];
+  if (hiddenRoutes.some(route => pathname?.startsWith(route))) {
     return null;
   }
 
@@ -96,14 +103,16 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 title={isCollapsed ? item.name : ''}
-                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive
-                  ? 'bg-[#F4F8F8] text-[#0B7C6B]'
-                  : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
-                  } ${isCollapsed ? 'justify-center' : ''}`}
+                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-[#F4F8F8] text-[#0B7C6B]'
+                    : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
+                } ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <item.icon
-                  className={`h-5 w-5 flex-shrink-0 ${isActive ? 'text-[#0B7C6B]' : 'text-[#848785]'
-                    } ${isCollapsed ? '' : 'mr-3'}`}
+                  className={`h-5 w-5 flex-shrink-0 ${
+                    isActive ? 'text-[#0B7C6B]' : 'text-[#848785]'
+                  } ${isCollapsed ? '' : 'mr-3'}`}
                 />
                 {!isCollapsed && item.name}
               </Link>
@@ -118,10 +127,11 @@ export function Sidebar() {
               <Link
                 href="/cart"
                 title={isCollapsed ? 'Cart' : ''}
-                className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname === '/cart'
-                  ? 'bg-[#F4F8F8] text-[#0B7C6B]'
-                  : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
-                  }`}
+                className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname === '/cart'
+                    ? 'bg-[#F4F8F8] text-[#0B7C6B]'
+                    : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
+                }`}
               >
                 <div
                   className={`flex items-center ${isCollapsed ? 'relative' : ''}`}
@@ -146,10 +156,11 @@ export function Sidebar() {
               <Link
                 href="/orders"
                 title={isCollapsed ? 'My Orders' : ''}
-                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname === '/orders'
-                  ? 'bg-[#F4F8F8] text-[#0B7C6B]'
-                  : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
-                  } ${isCollapsed ? 'justify-center' : ''}`}
+                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname === '/orders'
+                    ? 'bg-[#F4F8F8] text-[#0B7C6B]'
+                    : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
+                } ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <BookOpen
                   className={`h-5 w-5 flex-shrink-0 ${isCollapsed ? '' : 'mr-3'}`}
@@ -160,10 +171,11 @@ export function Sidebar() {
               <Link
                 href="/profile"
                 title={isCollapsed ? 'Profile' : ''}
-                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname === '/profile'
-                  ? 'bg-[#F4F8F8] text-[#0B7C6B]'
-                  : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
-                  } ${isCollapsed ? 'justify-center' : ''}`}
+                className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname === '/profile'
+                    ? 'bg-[#F4F8F8] text-[#0B7C6B]'
+                    : 'text-[#848785] hover:bg-[#F9FCFB] hover:text-[#101313]'
+                } ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <User
                   className={`h-5 w-5 flex-shrink-0 ${isCollapsed ? '' : 'mr-3'}`}

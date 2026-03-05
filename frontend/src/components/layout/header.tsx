@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import {
-  ShoppingCart,
-  User,
-  LogOut,
-  Search,
-  Bell,
-  PenLine,
-  Heart,
-} from 'lucide-react';
+import { Search, ShoppingCart, Bell, PenLine, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/hooks/use-auth';
@@ -19,15 +11,21 @@ import { useState, useEffect } from 'react';
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { itemCount } = useCartStore();
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const pathname = usePathname();
 
   // Hide on admin and auth pages
-  const hiddenRoutes = ['/admin', '/login', '/register', '/forgot-password', '/reset-password'];
-  const isHiddenRoute = hiddenRoutes.some((route) => pathname?.startsWith(route));
+  const hiddenRoutes = [
+    '/admin',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+  ];
+  const isHiddenRoute = hiddenRoutes.some(route => pathname?.startsWith(route));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

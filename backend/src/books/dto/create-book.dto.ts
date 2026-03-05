@@ -42,6 +42,6 @@ export class CreateBookDto {
   })
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => value === '' ? undefined : value)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   imageUrl?: string;
 }

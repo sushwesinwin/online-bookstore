@@ -1,18 +1,26 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderStatus, Role } from '@prisma/client';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async getDashboardStats() {
     // Get total revenue from completed orders
     const revenueData = await this.prisma.order.aggregate({
       where: {
         status: {
-          in: [OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.DELIVERED],
+          in: [
+            OrderStatus.CONFIRMED,
+            OrderStatus.SHIPPED,
+            OrderStatus.DELIVERED,
+          ],
         },
       },
       _sum: {
@@ -42,7 +50,11 @@ export class AdminService {
     const previousRevenueData = await this.prisma.order.aggregate({
       where: {
         status: {
-          in: [OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.DELIVERED],
+          in: [
+            OrderStatus.CONFIRMED,
+            OrderStatus.SHIPPED,
+            OrderStatus.DELIVERED,
+          ],
         },
         createdAt: {
           lt: thirtyDaysAgo,
@@ -116,7 +128,7 @@ export class AdminService {
       },
     });
 
-    return orders.map((order) => ({
+    return orders.map(order => ({
       id: order.orderNumber,
       customer: `${order.user.firstName} ${order.user.lastName}`,
       customerEmail: order.user.email,
@@ -160,7 +172,7 @@ export class AdminService {
         severity: 'critical',
       });
     }
-    newUsers.forEach((user) => {
+    newUsers.forEach(user => {
       activities.push({
         type: 'new_user',
         title: 'New Customer',
@@ -169,7 +181,7 @@ export class AdminService {
         severity: 'info',
       });
     });
-    recentOrders.forEach((order) => {
+    recentOrders.forEach(order => {
       activities.push({
         type: 'new_order',
         title: 'New Order',
@@ -228,7 +240,7 @@ export class AdminService {
 
     const totalPages = Math.ceil(total / limit);
     return {
-      data: users.map((u) => ({ ...u, orderCount: u._count.orders })),
+      data: users.map(u => ({ ...u, orderCount: u._count.orders })),
       meta: {
         total,
         page,
@@ -265,8 +277,13 @@ export class AdminService {
       where: { id },
       data: { role: dto.role },
       select: {
-        id: true, email: true, firstName: true,
-        lastName: true, role: true, createdAt: true, updatedAt: true,
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     return updated;

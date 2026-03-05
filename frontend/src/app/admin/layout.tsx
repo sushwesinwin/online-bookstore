@@ -64,10 +64,13 @@ export default function AdminLayout({
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             <aside
               className="fixed left-0 top-0 h-screen w-72 bg-white shadow-xl"
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <div className="flex h-full flex-col pt-20">
                 <div className="flex-1 px-4 space-y-8">
@@ -92,7 +95,9 @@ export default function AdminLayout({
                             <div className="flex items-center">
                               <item.icon
                                 className={`mr-3 h-5 w-5 transition-colors ${
-                                  isActive ? 'text-white' : 'text-[#848785] group-hover:text-[#101313]'
+                                  isActive
+                                    ? 'text-white'
+                                    : 'text-[#848785] group-hover:text-[#101313]'
                                 }`}
                               />
                               {item.name}
@@ -117,7 +122,9 @@ export default function AdminLayout({
                         <p className="text-sm font-bold text-[#101313] truncate">
                           {user?.firstName} {user?.lastName}
                         </p>
-                        <p className="text-[10px] text-[#848785] truncate">{user?.email}</p>
+                        <p className="text-[10px] text-[#848785] truncate">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -165,10 +172,11 @@ export default function AdminLayout({
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
+                        className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
+                          isActive
                             ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
                             : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                          }`}
+                        }`}
                       >
                         <div className="flex items-center">
                           <item.icon
@@ -193,8 +201,12 @@ export default function AdminLayout({
                     {user?.firstName?.charAt(0) || 'A'}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <p className="text-sm font-bold text-[#101313] truncate">{user?.firstName} {user?.lastName}</p>
-                    <p className="text-[10px] text-[#848785] truncate">{user?.email}</p>
+                    <p className="text-sm font-bold text-[#101313] truncate">
+                      {user?.firstName} {user?.lastName}
+                    </p>
+                    <p className="text-[10px] text-[#848785] truncate">
+                      {user?.email}
+                    </p>
                   </div>
                 </div>
               </div>

@@ -13,6 +13,9 @@ import {
   Clock,
   XCircle,
   BookOpen,
+  ShoppingCart,
+  ChevronDown,
+  Filter,
 } from 'lucide-react';
 import { useOrders, useUpdateOrderStatus } from '@/lib/hooks/use-orders';
 import { Button } from '@/components/ui/button';
@@ -27,16 +30,20 @@ export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    const handleClickOutside = () => setOpenDropdownId(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const { data, isLoading } = useOrders({
     page,
     limit: 10,
-    search,
-    status: statusFilter as any,
+    search: search || undefined,
+    status: (statusFilter || undefined) as any,
   });
 
   const updateStatus = useUpdateOrderStatus();
@@ -125,26 +132,23 @@ export default function AdminOrders() {
           />
         </div>
         <div className="flex items-center space-x-3">
-          <div className="flex items-center rounded-2xl border border-[#E4E9E8] bg-white p-1 shadow-sm">
-            {[
-              '',
-              'PENDING',
-              'CONFIRMED',
-              'SHIPPED',
-              'DELIVERED',
-              'CANCELLED',
-            ].map(status => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${statusFilter === status
-                    ? 'bg-[#0B7C6B] text-white shadow-md'
-                    : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                  }`}
-              >
-                {status || 'ALL'}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 rounded-2xl border border-[#E4E9E8] bg-white px-4 h-14 shadow-sm">
+            <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
+            <select
+              value={statusFilter}
+              onChange={e => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
+            >
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="SHIPPED">Shipped</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
           </div>
         </div>
       </div>
@@ -186,61 +190,118 @@ export default function AdminOrders() {
                       </td>
                     </tr>
                   ))
-                : data?.data.map(order => (
-                  <tr
-                    key={order.id}
-                    className="group transition-colors hover:bg-[#F8FAFB]/50"
-                  >
-                    <td className="px-6 py-5">
-                      <div className="font-bold text-[#101313]">
-                        {order.orderNumber}
+                : data?.data && data.data.length > 0 ? (
+                  data.data.map(order => (
+                    <tr
+                      key={order.id}
+                      className="group transition-colors hover:bg-[#F8FAFB]/50"
+                    >
+                      <td className="px-6 py-5">
+                        <div className="font-bold text-[#101313]">
+                          {order.orderNumber}
+                        </div>
+                        <div className="mt-1 text-xs text-[#848785]">
+                          {new Date(order.createdAt).toLocaleDateString()} at{' '}
+                          {new Date(order.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="font-medium text-[#101313]">
+                          {order.user?.firstName} {order.user?.lastName}
+                        </div>
+                        <div className="text-xs text-[#848785]">
+                          {order.user?.email}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <Badge
+                          variant="outline"
+                          className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
+                        >
+                          {order.items.length}{' '}
+                          {order.items.length === 1 ? 'book' : 'books'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-5 font-bold text-[#101313]">
+                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-5">
+                        <div
+                          className="relative"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={() =>
+                              setOpenDropdownId(
+                                openDropdownId === order.id ? null : order.id
+                              )
+                            }
+                            className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
+                          >
+                            {getStatusIcon(order.status)}
+                            {order.status}
+                            <ChevronDown className="ml-1.5 h-3 w-3" />
+                          </button>
+
+                          {openDropdownId === order.id && (
+                            <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                              {[
+                                'PENDING',
+                                'CONFIRMED',
+                                'SHIPPED',
+                                'DELIVERED',
+                                'CANCELLED',
+                              ].map(s => (
+                                <button
+                                  key={s}
+                                  onClick={() => {
+                                    handleUpdateStatus(order.id, s);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  disabled={
+                                    updateStatus.isPending || order.status === s
+                                  }
+                                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${order.status === s
+                                    ? 'bg-[#F8FAFB] text-[#101313]'
+                                    : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                  {s}
+                                  {order.status === s && (
+                                    <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-5 text-right">
+                        <button
+                          onClick={() => handleViewOrder(order)}
+                          className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-12 text-center text-[#848785] font-medium bg-[#F8FAFB]/30"
+                    >
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <ShoppingCart className="h-8 w-8 text-[#E4E9E8]" />
+                        <p>No orders found matching your criteria</p>
                       </div>
-                      <div className="mt-1 text-xs text-[#848785]">
-                        {new Date(order.createdAt).toLocaleDateString()} at{' '}
-                        {new Date(order.createdAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="font-medium text-[#101313]">
-                        {order.user?.firstName} {order.user?.lastName}
-                      </div>
-                      <div className="text-xs text-[#848785]">
-                        {order.user?.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <Badge
-                        variant="outline"
-                        className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
-                      >
-                        {order.items.length}{' '}
-                        {order.items.length === 1 ? 'book' : 'books'}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-5 font-bold text-[#101313]">
-                      ${parseFloat(order.totalAmount.toString()).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-5">
-                      <div
-                        className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${getStatusColor(order.status)}`}
-                      >
-                        {getStatusIcon(order.status)}
-                        {order.status}
-                      </div>
-                    </td>
-                    <td className="px-4 py-5 text-right">
-                      <button
-                        onClick={() => handleViewOrder(order)}
-                        className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
-                      >
-                        <Eye className="h-5 w-5" />
-                      </button>
                     </td>
                   </tr>
-                ))}
+                )}
             </tbody>
           </table>
         </div>
@@ -365,8 +426,8 @@ export default function AdminOrders() {
                         selectedOrder.status === s ? 'default' : 'outline'
                       }
                       className={`h-11 rounded-xl text-xs font-bold ${selectedOrder.status === s
-                          ? 'bg-[#0B7C6B] text-white shadow-lg'
-                          : 'border-[#E4E9E8]'
+                        ? 'bg-[#0B7C6B] text-white shadow-lg'
+                        : 'border-[#E4E9E8]'
                         }`}
                       onClick={() => handleUpdateStatus(selectedOrder.id, s)}
                       disabled={

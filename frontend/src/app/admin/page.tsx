@@ -9,15 +9,12 @@ import {
   Users,
   ArrowUpRight,
   ArrowDownRight,
-  Clock,
   MoreHorizontal,
   Plus,
   ArrowRight,
   AlertCircle as AlertCircleIcon,
   UserPlus as UserPlusIcon,
-  Star as StarIcon,
   CheckCircle as CheckCircleIcon,
-  Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -46,11 +43,13 @@ export default function AdminDashboard() {
     enabled: mounted,
   });
 
-  const { data: recentActivitiesData, isLoading: activitiesLoading } = useQuery({
-    queryKey: ['admin', 'dashboard', 'activities'],
-    queryFn: () => adminApi.getRecentActivities(4),
-    enabled: mounted,
-  });
+  const { data: recentActivitiesData, isLoading: activitiesLoading } = useQuery(
+    {
+      queryKey: ['admin', 'dashboard', 'activities'],
+      queryFn: () => adminApi.getRecentActivities(4),
+      enabled: mounted,
+    }
+  );
 
   if (!mounted) return null;
 
@@ -96,9 +95,24 @@ export default function AdminDashboard() {
     : [];
 
   const quickActions = [
-    { name: 'Add New Book', icon: Plus, href: '/admin/books/new', color: '#0B7C6B' },
-    { name: 'Manage Orders', icon: ShoppingCart, href: '/admin/orders', color: '#F9B959' },
-    { name: 'View Customers', icon: Users, href: '/admin/users', color: '#101313' },
+    {
+      name: 'Add New Book',
+      icon: Plus,
+      href: '/admin/books/new',
+      color: '#0B7C6B',
+    },
+    {
+      name: 'Manage Orders',
+      icon: ShoppingCart,
+      href: '/admin/orders',
+      color: '#F9B959',
+    },
+    {
+      name: 'View Customers',
+      icon: Users,
+      href: '/admin/users',
+      color: '#101313',
+    },
   ];
 
   // Format relative time
@@ -134,9 +148,14 @@ export default function AdminDashboard() {
                 variant="outline"
                 className="rounded-xl border-[#E4E9E8] hover:bg-[#F3F5F5] font-semibold gap-2"
               >
-                <action.icon className="h-4 w-4" style={{ color: action.color }} />
+                <action.icon
+                  className="h-4 w-4"
+                  style={{ color: action.color }}
+                />
                 <span className="hidden sm:inline">{action.name}</span>
-                <span className="sm:hidden">{action.name.split(' ').slice(-1)}</span>
+                <span className="sm:hidden">
+                  {action.name.split(' ').slice(-1)}
+                </span>
               </Button>
             </Link>
           ))}
@@ -145,72 +164,71 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {statsLoading ? (
-          // Loading skeleton
-          Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-14 w-14 rounded-2xl bg-[#F3F5F5] animate-pulse" />
-                <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
-              </div>
-              <div className="mt-6 space-y-2">
-                <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
-                <div className="h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
-              </div>
-            </div>
-          ))
-        ) : (
-          stats.map(stat => (
-            <div
-              key={stat.name}
-              className="group relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
-                  style={{
-                    backgroundColor: `${stat.color}10`,
-                    color: stat.color,
-                  }}
-                >
-                  <stat.icon className="h-7 w-7" />
-                </div>
-                <div
-                  className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${stat.trend === 'up'
-                    ? 'bg-[#DFFEF5] text-[#17BD8D]'
-                    : 'bg-[#FFECEB] text-[#FF4E3E]'
-                    }`}
-                >
-                  {stat.change}
-                  {stat.trend === 'up' ? (
-                    <ArrowUpRight className="ml-0.5 h-3 w-3" />
-                  ) : (
-                    <ArrowDownRight className="ml-0.5 h-3 w-3" />
-                  )}
-                </div>
-              </div>
-              <div className="mt-6">
-                <p className="text-sm font-bold text-[#848785] uppercase tracking-wider">
-                  {stat.name}
-                </p>
-                <h3 className="text-3xl font-black text-[#101313] mt-1">
-                  {stat.value}
-                </h3>
-              </div>
-
-              {/* Subtle background pattern element */}
+        {statsLoading
+          ? // Loading skeleton
+            Array.from({ length: 4 }).map((_, i) => (
               <div
-                className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
-                style={{ color: stat.color }}
+                key={i}
+                className="relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm"
               >
-                <stat.icon className="h-full w-full" />
+                <div className="flex items-center justify-between">
+                  <div className="h-14 w-14 rounded-2xl bg-[#F3F5F5] animate-pulse" />
+                  <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
+                </div>
+                <div className="mt-6 space-y-2">
+                  <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
+                  <div className="h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          : stats.map(stat => (
+              <div
+                key={stat.name}
+                className="group relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
+                    style={{
+                      backgroundColor: `${stat.color}10`,
+                      color: stat.color,
+                    }}
+                  >
+                    <stat.icon className="h-7 w-7" />
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${
+                      stat.trend === 'up'
+                        ? 'bg-[#DFFEF5] text-[#17BD8D]'
+                        : 'bg-[#FFECEB] text-[#FF4E3E]'
+                    }`}
+                  >
+                    {stat.change}
+                    {stat.trend === 'up' ? (
+                      <ArrowUpRight className="ml-0.5 h-3 w-3" />
+                    ) : (
+                      <ArrowDownRight className="ml-0.5 h-3 w-3" />
+                    )}
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <p className="text-sm font-bold text-[#848785] uppercase tracking-wider">
+                    {stat.name}
+                  </p>
+                  <h3 className="text-3xl font-black text-[#101313] mt-1">
+                    {stat.value}
+                  </h3>
+                </div>
+
+                {/* Subtle background pattern element */}
+                <div
+                  className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
+                  style={{ color: stat.color }}
+                >
+                  <stat.icon className="h-full w-full" />
+                </div>
+              </div>
+            ))}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -221,7 +239,10 @@ export default function AdminDashboard() {
               <ShoppingCart className="h-6 w-6 text-[#F9B959]" />
               Recent Orders
             </h2>
-            <Link href="/admin/orders" className="group flex items-center gap-1.5 text-sm font-bold text-[#0B7C6B] hover:text-[#096355]">
+            <Link
+              href="/admin/orders"
+              className="group flex items-center gap-1.5 text-sm font-bold text-[#0B7C6B] hover:text-[#096355]"
+            >
               View all orders
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -239,9 +260,7 @@ export default function AdminDashboard() {
                   <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#848785]">
                     Status
                   </th>
-                  <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#848785]">
-
-                  </th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#848785]"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E4E9E8]">
@@ -315,7 +334,10 @@ export default function AdminDashboard() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-8 py-12 text-center text-[#848785]">
+                    <td
+                      colSpan={4}
+                      className="px-8 py-12 text-center text-[#848785]"
+                    >
                       No recent orders
                     </td>
                   </tr>
@@ -347,7 +369,10 @@ export default function AdminDashboard() {
               ))
             ) : recentActivitiesData && recentActivitiesData.length > 0 ? (
               recentActivitiesData.map((activity, i) => {
-                const iconMap: Record<RecentActivity['type'], typeof AlertCircleIcon> = {
+                const iconMap: Record<
+                  RecentActivity['type'],
+                  typeof AlertCircleIcon
+                > = {
                   inventory_alert: AlertCircleIcon,
                   new_user: UserPlusIcon,
                   new_order: ShoppingCart,
@@ -395,7 +420,10 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-          <Button variant="ghost" className="w-full rounded-2xl border-[#E4E9E8] border h-12 text-[#848785] hover:text-[#101313] font-bold">
+          <Button
+            variant="ghost"
+            className="w-full rounded-2xl border-[#E4E9E8] border h-12 text-[#848785] hover:text-[#101313] font-bold"
+          >
             View All Activity
           </Button>
         </div>
@@ -424,4 +452,3 @@ function BellIcon(props: any) {
     </svg>
   );
 }
-

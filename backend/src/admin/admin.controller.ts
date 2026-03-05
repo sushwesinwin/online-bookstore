@@ -28,7 +28,7 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 @Roles(Role.ADMIN)
 @ApiBearerAuth()
 export class AdminController {
-  constructor(private readonly adminService: AdminService) { }
+  constructor(private readonly adminService: AdminService) {}
 
   // ── Dashboard ────────────────────────────────────────────────────────────────
 
@@ -50,7 +50,9 @@ export class AdminController {
   @ApiOperation({ summary: 'Get recent activities for dashboard (Admin only)' })
   @ApiResponse({ status: 200, description: 'Recent activities retrieved' })
   getRecentActivities(@Query('limit') limit?: string) {
-    return this.adminService.getRecentActivities(limit ? parseInt(limit, 10) : 10);
+    return this.adminService.getRecentActivities(
+      limit ? parseInt(limit, 10) : 10,
+    );
   }
 
   // ── User Management ───────────────────────────────────────────────────────────
@@ -101,4 +103,3 @@ export class AdminController {
     return this.adminService.deleteUser(id);
   }
 }
-

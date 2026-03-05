@@ -7,7 +7,8 @@ import { LoginCredentials, RegisterData } from '../api/types';
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, setAuth, clearAuth, updateUser } = useAuthStore();
+  const { user, isAuthenticated, setAuth, clearAuth, updateUser } =
+    useAuthStore();
 
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),

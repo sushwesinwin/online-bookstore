@@ -15,7 +15,15 @@ export const metadata: Metadata = {
   },
   description:
     'Discover, browse, and purchase books online. Thousands of titles across every genre, delivered to your door.',
-  keywords: ['bookstore', 'books', 'buy books', 'online bookstore', 'ebooks', 'fiction', 'non-fiction'],
+  keywords: [
+    'bookstore',
+    'books',
+    'buy books',
+    'online bookstore',
+    'ebooks',
+    'fiction',
+    'non-fiction',
+  ],
   icons: {
     icon: '/favicon.png',
     shortcut: '/favicon.png',

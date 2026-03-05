@@ -345,9 +345,9 @@ describe('BooksService', () => {
             mockPrismaService.book.findMany.mockResolvedValue(mockBooks);
             mockPrismaService.book.count.mockResolvedValue(1);
 
-import { SortOrder } from './dto/query-books.dto';
+            import { SortOrder } from './dto/query-books.dto';
 
-// ... (inside the test)
+            // ... (inside the test)
             const result = await service.findAll({
               ...filters,
               page: 1,
