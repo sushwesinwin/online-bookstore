@@ -26,6 +26,14 @@ export interface Book {
   updatedAt: string;
 }
 
+export interface Favorite {
+  id: string;
+  userId: string;
+  bookId: string;
+  createdAt: string;
+  book: Book;
+}
+
 export interface CartItem {
   id: string;
   userId: string;

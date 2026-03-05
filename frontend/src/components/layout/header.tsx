@@ -9,6 +9,7 @@ import {
   Search,
   Bell,
   PenLine,
+  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -107,6 +108,17 @@ export function Header() {
                       {itemCount}
                     </span>
                   )}
+                </Button>
+              </Link>
+
+              {/* Favorites */}
+              <Link href="/favorites">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative h-9 w-9 text-[#848785] hover:text-[#101313]"
+                >
+                  <Heart className="h-5 w-5" />
                 </Button>
               </Link>
 

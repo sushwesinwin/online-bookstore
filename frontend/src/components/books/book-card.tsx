@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,11 @@ import { Book } from '@/lib/api/types';
 import { formatPrice } from '@/lib/utils';
 import { useAddToCart } from '@/lib/hooks/use-cart';
 import { useAuth } from '@/lib/hooks/use-auth';
+import {
+  useFavorites,
+  useAddFavorite,
+  useRemoveFavorite,
+} from '@/lib/hooks/use-favorites';
 
 interface BookCardProps {
   book: Book;
@@ -18,9 +23,29 @@ export function BookCard({ book }: BookCardProps) {
   const { mutate: addToCart, isPending } = useAddToCart();
   const { isAuthenticated } = useAuth();
 
+  const { data: favorites } = useFavorites(isAuthenticated);
+  const { mutate: addFavorite, isPending: isAddingFavorite } = useAddFavorite();
+  const { mutate: removeFavorite, isPending: isRemovingFavorite } =
+    useRemoveFavorite();
+
+  const isFavorite = favorites?.some((fav) => fav.id === book.id);
+  const isFavoritePending = isAddingFavorite || isRemovingFavorite;
+
   const handleAddToCart = () => {
     if (isAuthenticated) {
       addToCart({ bookId: book.id, quantity: 1 });
+    }
+  };
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) return;
+
+    if (isFavorite) {
+      removeFavorite(book.id);
+    } else {
+      addFavorite(book.id);
     }
   };
 
@@ -28,7 +53,7 @@ export function BookCard({ book }: BookCardProps) {
     <Card className="h-full flex flex-col">
       <CardContent className="p-4 flex-1">
         <Link href={`/books/${book.id}`}>
-          <div className="aspect-[3/4] bg-gray-100 rounded-md mb-4 flex items-center justify-center">
+          <div className="aspect-[3/4] bg-gray-100 rounded-md mb-4 flex items-center justify-center relative group">
             {book.imageUrl ? (
               <img
                 src={book.imageUrl}
@@ -37,6 +62,20 @@ export function BookCard({ book }: BookCardProps) {
               />
             ) : (
               <span className="text-gray-500">No image</span>
+            )}
+
+            {isAuthenticated && (
+              <button
+                onClick={toggleFavorite}
+                disabled={isFavoritePending}
+                className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white shadow-sm transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 sm:opacity-100"
+                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart
+                  className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                    }`}
+                />
+              </button>
             )}
           </div>
         </Link>
@@ -55,7 +94,7 @@ export function BookCard({ book }: BookCardProps) {
           <p className="text-sm text-gray-600">{book.author}</p>
 
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold">{formatPrice(book.price)}</span>
+            <span className="text-lg font-bold">{formatPrice(Number(book.price))}</span>
             {book.inventory > 0 ? (
               <span className="text-xs text-gray-600">
                 {book.inventory} in stock
