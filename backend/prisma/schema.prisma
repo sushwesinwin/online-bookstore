@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime   @updatedAt
   cart      CartItem[]
   orders    Order[]
+  favorites Favorite[]
 
   @@map("users")
 }
@@ -35,6 +36,7 @@ model Book {
   updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
   orderItems  OrderItem[]
+  favorites   Favorite[]
 
   @@map("books")
 }
@@ -109,4 +111,17 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@unique([userId, bookId])
+  @@map("favorites")
 }

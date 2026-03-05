@@ -1,0 +1,95 @@
+prisma/seed.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'PrismaClient'.
+prisma/seed.ts(2,24): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/admin/admin.controller.ts(12,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/admin/admin.service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'OrderStatus'.
+src/admin/admin.service.ts(11,43): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(23,42): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(26,43): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(29,52): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(41,51): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(55,51): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(102,38): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(130,44): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(146,45): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/admin/admin.service.ts(162,40): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(14,10): error TS2305: Module '"@prisma/client"' has no exported member 'User'.
+src/auth/auth.service.ts(43,44): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(55,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(81,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(122,38): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(171,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(214,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(226,23): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(241,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/auth.service.ts(253,36): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/auth/decorators/roles.decorator.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/auth/guards/roles.guard.spec.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/auth/guards/roles.guard.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/books/books.controller.ts(25,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/books/books.service.spec.ts(8,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/books/books.service.spec.ts(348,1): error TS1232: An import declaration can only be used at the top level of a namespace or module.
+src/books/books.service.spec.ts(351,50): error TS2345: Argument of type '{ page: number; limit: number; sortOrder: SortOrder; category: any; author: any; minPrice: any; maxPrice: any; sortBy: string; }' is not assignable to parameter of type 'QueryBooksDto'.
+  Types of property 'sortBy' are incompatible.
+    Type 'string' is not assignable to type 'BookSortField'.
+src/books/books.service.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'Book'.
+src/books/books.service.ts(7,16): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/books/books.service.ts(19,32): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(81,19): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(87,19): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(106,36): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(119,32): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(138,25): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(153,32): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/books/books.service.ts(168,42): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/cart/cart-persistence.property.spec.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/cart/cart.service.spec.ts(8,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/cart/cart.service.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'CartItem'.
+src/cart/cart.service.ts(16,41): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(38,36): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(53,44): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(72,32): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(85,30): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(103,40): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(122,30): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(130,40): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(141,23): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(147,23): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/cart/cart.service.ts(155,41): error TS2339: Property 'cartItem' does not exist on type 'PrismaService'.
+src/main.ts(9,31): error TS2307: Cannot find module '../prisma/prisma.service' or its corresponding type declarations.
+src/main.ts(10,39): error TS2307: Cannot find module './dto' or its corresponding type declarations.
+src/orders/dto/query-orders.dto.ts(4,10): error TS2305: Module '"@prisma/client"' has no exported member 'OrderStatus'.
+src/orders/dto/update-order-status.dto.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'OrderStatus'.
+src/orders/orders-checkout.property.spec.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/orders/orders-checkout.property.spec.ts(5,18): error TS2305: Module '"@prisma/client"' has no exported member 'OrderStatus'.
+src/orders/orders.controller.ts(29,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+src/orders/orders.service.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'Order'.
+src/orders/orders.service.ts(7,17): error TS2305: Module '"@prisma/client"' has no exported member 'OrderStatus'.
+src/orders/orders.service.ts(7,30): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/orders/orders.service.ts(43,38): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(74,47): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(89,30): error TS2339: Property '$transaction' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(175,19): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(197,19): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(218,37): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(255,32): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/orders.service.ts(296,30): error TS2339: Property '$transaction' does not exist on type 'PrismaService'.
+src/orders/payment.service.spec.ts(8,10): error TS2305: Module '"@prisma/client"' has no exported member 'PaymentStatus'.
+src/orders/payment.service.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'PaymentStatus'.
+src/orders/payment.service.ts(50,25): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(112,41): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(134,25): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(140,25): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(194,41): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(205,25): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(303,30): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(323,38): error TS2339: Property 'user' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(422,47): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(444,39): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(474,49): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(501,49): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(520,39): error TS2339: Property 'order' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(549,25): error TS2339: Property 'payment' does not exist on type 'PrismaService'.
+src/orders/payment.service.ts(562,27): error TS2339: Property 'book' does not exist on type 'PrismaService'.
+src/prisma/prisma.service.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'PrismaClient'.
+src/prisma/prisma.service.ts(18,16): error TS2339: Property '$connect' does not exist on type 'PrismaService'.
+src/prisma/prisma.service.ts(22,16): error TS2339: Property '$disconnect' does not exist on type 'PrismaService'.
