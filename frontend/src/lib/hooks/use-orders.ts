@@ -38,6 +38,25 @@ export function useCreateOrder() {
   });
 }
 
+export function useCreateAdminOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      items,
+    }: {
+      userId: string;
+      items: { bookId: string; quantity: number }[];
+    }) => ordersApi.createAdminOrder(userId, items),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-recent-orders'] });
+    },
+  });
+}
+
 export function useCancelOrder() {
   const queryClient = useQueryClient();
 

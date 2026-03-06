@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Delete,
   Param,
@@ -16,11 +17,13 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { OrdersService } from '../orders/orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { CreateOrderDto } from '../orders/dto/create-order.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -28,7 +31,20 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 @Roles(Role.ADMIN)
 @ApiBearerAuth()
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly ordersService: OrdersService,
+  ) { }
+
+  @Post('orders')
+  @ApiOperation({ summary: 'Create a new order for a user (Admin only)' })
+  @ApiResponse({ status: 201, description: 'Order successfully created' })
+  createOrder(
+    @Query('userId') userId: string,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.ordersService.create(userId, createOrderDto);
+  }
 
   // ── Dashboard ────────────────────────────────────────────────────────────────
 

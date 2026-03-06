@@ -15,6 +15,7 @@ import {
   BookMarked,
   Menu,
   X,
+  ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
@@ -31,6 +32,7 @@ export default function AdminLayout({
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { name: 'Books Catalog', icon: BookOpen, href: '/admin/books' },
     { name: 'Order Management', icon: ShoppingCart, href: '/admin/orders' },
+    { name: 'New Purchase', icon: ShoppingBag, href: '/admin/purchases' },
     { name: 'User Management', icon: Users, href: '/admin/users' },
     { name: 'Store Settings', icon: Settings, href: '/admin/settings' },
   ];
@@ -86,19 +88,17 @@ export default function AdminLayout({
                             key={item.href}
                             href={item.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
-                              isActive
+                            className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
                                 ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
                                 : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center">
                               <item.icon
-                                className={`mr-3 h-5 w-5 transition-colors ${
-                                  isActive
+                                className={`mr-3 h-5 w-5 transition-colors ${isActive
                                     ? 'text-white'
                                     : 'text-[#848785] group-hover:text-[#101313]'
-                                }`}
+                                  }`}
                               />
                               {item.name}
                             </div>
@@ -172,11 +172,10 @@ export default function AdminLayout({
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
-                          isActive
+                        className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
                             ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
                             : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center">
                           <item.icon

@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
-
+import Link from 'next/link';
 export default function AdminOrders() {
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(1);
@@ -103,13 +103,14 @@ export default function AdminOrders() {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <Button
-            variant="outline"
-            className="h-12 rounded-xl border-[#E4E9E8]"
-          >
-            <Printer className="mr-2 h-4 w-4" />
-            Print Export
-          </Button>
+          <Link href="/admin/purchases">
+            <Button
+              className="h-12 bg-[#0B7C6B] hover:bg-[#096B5B] text-white rounded-xl shadow-lg"
+            >
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Create Purchase
+            </Button>
+          </Link>
           <Button
             variant="outline"
             className="h-12 rounded-xl border-[#E4E9E8]"

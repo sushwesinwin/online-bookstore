@@ -9,6 +9,14 @@ export const ordersApi = {
     return response.data;
   },
 
+  createAdminOrder: async (
+    userId: string,
+    items: { bookId: string; quantity: number }[]
+  ): Promise<Order> => {
+    const response = await apiClient.post(`/admin/orders?userId=${userId}`, { items });
+    return response.data;
+  },
+
   getOrders: async (
     params?: OrderQueryParams
   ): Promise<PaginatedResponse<Order>> => {
