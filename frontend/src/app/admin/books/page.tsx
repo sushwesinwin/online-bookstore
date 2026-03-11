@@ -111,7 +111,7 @@ export default function AdminBooks() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#101313]">
-            Books Catalog
+            Books
           </h1>
           <p className="mt-1 text-[#848785]">
             Manage your bookstore library and inventory.
@@ -128,17 +128,109 @@ export default function AdminBooks() {
 
       {/* Filters */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#848785]" />
+        <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
         <Input
           placeholder="Search by title, author, or ISBN..."
-          className="h-14 rounded-2xl border-[#E4E9E8] bg-white pl-12 pr-4 text-base focus:ring-2 focus:ring-[#0B7C6B]/20"
+          className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base focus:ring-2 focus:ring-[#0B7C6B]/20"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white shadow-sm">
+      {/* Mobile Cards */}
+      <div className="block lg:hidden space-y-3">
+        {isLoading
+          ? Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
+              >
+                <div className="flex gap-3">
+                  <div className="h-24 w-16 rounded-lg bg-[#F3F5F5]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-32 bg-[#F3F5F5] rounded" />
+                    <div className="h-3 w-24 bg-[#F3F5F5] rounded" />
+                    <div className="h-4 w-20 bg-[#F3F5F5] rounded" />
+                  </div>
+                </div>
+              </div>
+            ))
+          : data?.data.map(book => (
+            <div
+              key={book.id}
+              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
+            >
+              <div className="flex gap-3">
+                <div className="relative h-24 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-[#F3F5F5] shadow-sm">
+                  {book.imageUrl ? (
+                    <img
+                      src={book.imageUrl}
+                      alt={book.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[#A6AAA9]">
+                      <ImageIcon className="h-6 w-6" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div>
+                    <h3 className="font-bold text-[#101313] line-clamp-2 text-sm">
+                      {book.title}
+                    </h3>
+                    <p className="text-sm text-[#848785] truncate">
+                      {book.author}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-[#E4E9E8] bg-[#F8FAFB]"
+                    >
+                      {book.category}
+                    </Badge>
+                    <div className="flex items-center text-xs">
+                      <div
+                        className={`mr-1.5 h-2 w-2 rounded-full ${book.inventory > 10
+                          ? 'bg-[#17BD8D]'
+                          : book.inventory > 0
+                            ? 'bg-[#F9B959]'
+                            : 'bg-[#FF4E3E]'
+                          }`}
+                      />
+                      {book.inventory} in stock
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-lg font-black text-[#101313]">
+                      ${parseFloat(book.price.toString()).toFixed(2)}
+                    </span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleOpenModal(book)}
+                        className="p-2 rounded-lg text-[#848785] active:bg-[#F3F5F5] active:text-[#0B7C6B]"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(book.id)}
+                        className="p-2 rounded-lg text-[#848785] active:bg-[#FFECEB] active:text-[#FF4E3E]"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden lg:block overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -163,104 +255,103 @@ export default function AdminBooks() {
             <tbody className="divide-y divide-[#E4E9E8]">
               {isLoading
                 ? Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="h-12 w-9 rounded bg-[#F3F5F5]"></div>
-                            <div className="space-y-2">
-                              <div className="h-4 w-32 rounded bg-[#F3F5F5]"></div>
-                              <div className="h-3 w-24 rounded bg-[#F3F5F5]"></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td colSpan={4} className="px-6 py-4">
-                          <div className="h-4 w-full rounded bg-[#F3F5F5]"></div>
-                        </td>
-                      </tr>
-                    ))
-                : data?.data.map(book => (
-                    <tr
-                      key={book.id}
-                      className="group transition-colors hover:bg-[#F8FAFB]/50"
-                    >
+                  .fill(0)
+                  .map((_, i) => (
+                    <tr key={i} className="animate-pulse">
                       <td className="px-6 py-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-[#F3F5F5] shadow-sm">
-                            {book.imageUrl ? (
-                              <img
-                                src={book.imageUrl}
-                                alt={book.title}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[#A6AAA9]">
-                                <ImageIcon className="h-5 w-5" />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-bold text-[#101313] line-clamp-1">
-                              {book.title}
-                            </div>
-                            <div className="text-xs text-[#848785]">
-                              {book.author}
-                            </div>
-                            <div className="mt-1 text-[10px] text-[#A6AAA9]">
-                              {book.isbn}
-                            </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="h-12 w-9 rounded bg-[#F3F5F5]"></div>
+                          <div className="space-y-2">
+                            <div className="h-4 w-32 rounded bg-[#F3F5F5]"></div>
+                            <div className="h-3 w-24 rounded bg-[#F3F5F5]"></div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <Badge
-                          variant="outline"
-                          className="border-[#E4E9E8] bg-[#F8FAFB] px-3 font-medium text-[#101313]"
-                        >
-                          {book.category}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div
-                            className={`mr-2 h-2 w-2 rounded-full ${
-                              book.inventory > 10
-                                ? 'bg-[#17BD8D]'
-                                : book.inventory > 0
-                                  ? 'bg-[#F9B959]'
-                                  : 'bg-[#FF4E3E]'
-                            }`}
-                          />
-                          <span className="font-semibold text-[#101313]">
-                            {book.inventory}
-                          </span>
-                          <span className="ml-1 text-xs text-[#848785]">
-                            in stock
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-[#101313]">
-                        ${parseFloat(book.price.toString()).toFixed(2)}
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-1">
-                          <button
-                            onClick={() => handleOpenModal(book)}
-                            className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#F3F5F5] hover:text-[#0B7C6B]"
-                          >
-                            <Edit2 className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(book.id)}
-                            className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </div>
+                      <td colSpan={4} className="px-6 py-4">
+                        <div className="h-4 w-full rounded bg-[#F3F5F5]"></div>
                       </td>
                     </tr>
-                  ))}
+                  ))
+                : data?.data.map(book => (
+                  <tr
+                    key={book.id}
+                    className="group transition-colors hover:bg-[#F8FAFB]/50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-[#F3F5F5] shadow-sm">
+                          {book.imageUrl ? (
+                            <img
+                              src={book.imageUrl}
+                              alt={book.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[#A6AAA9]">
+                              <ImageIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-bold text-[#101313] line-clamp-1">
+                            {book.title}
+                          </div>
+                          <div className="text-xs text-[#848785]">
+                            {book.author}
+                          </div>
+                          <div className="mt-1 text-[10px] text-[#A6AAA9]">
+                            {book.isbn}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge
+                        variant="outline"
+                        className="border-[#E4E9E8] bg-[#F8FAFB] px-3 font-medium text-[#101313]"
+                      >
+                        {book.category}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <div
+                          className={`mr-2 h-2 w-2 rounded-full ${book.inventory > 10
+                            ? 'bg-[#17BD8D]'
+                            : book.inventory > 0
+                              ? 'bg-[#F9B959]'
+                              : 'bg-[#FF4E3E]'
+                            }`}
+                        />
+                        <span className="font-semibold text-[#101313]">
+                          {book.inventory}
+                        </span>
+                        <span className="ml-1 text-xs text-[#848785]">
+                          in stock
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-[#101313]">
+                      ${parseFloat(book.price.toString()).toFixed(2)}
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-1">
+                        <button
+                          onClick={() => handleOpenModal(book)}
+                          className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#F3F5F5] hover:text-[#0B7C6B]"
+                        >
+                          <Edit2 className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(book.id)}
+                          className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -317,7 +408,7 @@ export default function AdminBooks() {
         title={editingBook ? 'Edit Book Details' : 'Add New Book to Catalog'}
       >
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <label className="text-sm font-bold text-[#101313]">
                 Book Title
@@ -329,7 +420,7 @@ export default function AdminBooks() {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 placeholder="e.g. The Great Gatsby"
-                className="h-12 rounded-xl"
+                className="h-11 md:h-12 rounded-xl"
               />
             </div>
             <div className="space-y-2">
@@ -343,7 +434,7 @@ export default function AdminBooks() {
                   setFormData({ ...formData, author: e.target.value })
                 }
                 placeholder="e.g. F. Scott Fitzgerald"
-                className="h-12 rounded-xl"
+                className="h-11 md:h-12 rounded-xl"
               />
             </div>
             <div className="space-y-2">
@@ -356,7 +447,7 @@ export default function AdminBooks() {
                 onChange={e =>
                   setFormData({ ...formData, category: e.target.value })
                 }
-                className="flex h-12 w-full rounded-xl border border-[#E4E9E8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+                className="flex h-11 md:h-12 w-full rounded-xl border border-[#E4E9E8] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
               >
                 <option value="">Select a category</option>
                 {categories?.map(c => (
@@ -381,7 +472,7 @@ export default function AdminBooks() {
                   setFormData({ ...formData, isbn: e.target.value })
                 }
                 placeholder="978-0-XXXX-XXXX"
-                className="h-12 rounded-xl"
+                className="h-11 md:h-12 rounded-xl"
               />
             </div>
             <div className="space-y-2">
@@ -397,7 +488,7 @@ export default function AdminBooks() {
                   setFormData({ ...formData, price: e.target.value })
                 }
                 placeholder="0.00"
-                className="h-12 rounded-xl"
+                className="h-11 md:h-12 rounded-xl"
               />
             </div>
             <div className="space-y-2">
@@ -412,7 +503,7 @@ export default function AdminBooks() {
                   setFormData({ ...formData, inventory: e.target.value })
                 }
                 placeholder="0"
-                className="h-12 rounded-xl"
+                className="h-11 md:h-12 rounded-xl"
               />
             </div>
           </div>
@@ -427,7 +518,7 @@ export default function AdminBooks() {
                 setFormData({ ...formData, imageUrl: e.target.value })
               }
               placeholder="https://example.com/cover.jpg (optional)"
-              className="h-12 rounded-xl"
+              className="h-11 md:h-12 rounded-xl"
             />
           </div>
 
@@ -440,23 +531,23 @@ export default function AdminBooks() {
               onChange={e =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="min-h-[120px] w-full rounded-2xl border border-[#E4E9E8] p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+              className="min-h-[100px] md:min-h-[120px] w-full rounded-xl md:rounded-2xl border border-[#E4E9E8] p-3 md:p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
               placeholder="Describe the book..."
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsModalOpen(false)}
-              className="h-12 rounded-xl"
+              className="h-11 md:h-12 rounded-xl w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="h-12 rounded-xl bg-[#0B7C6B] hover:bg-[#096658] px-8"
+              className="h-11 md:h-12 rounded-xl bg-[#0B7C6B] hover:bg-[#096658] px-6 md:px-8 w-full sm:w-auto"
               disabled={createBook.isPending || updateBook.isPending}
             >
               {(createBook.isPending || updateBook.isPending) && (

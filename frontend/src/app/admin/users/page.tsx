@@ -139,10 +139,10 @@ export default function AdminUsersPage() {
             placeholder="Search by name or email..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="pl-10 h-11 bg-white"
+            className="pl-10 h-11 md:h-12 bg-white rounded-xl"
           />
         </div>
-        <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11">
+        <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
           <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
           <select
             value={roleFilter}
@@ -161,8 +161,105 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-3xl border border-[#E4E9E8] shadow-sm overflow-hidden">
+      {/* Mobile Cards */}
+      <div className="block lg:hidden space-y-3">
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-[#F3F5F5]" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-[#F3F5F5] rounded" />
+                  <div className="h-3 w-44 bg-[#F3F5F5] rounded" />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : users.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-[#E4E9E8] p-12 text-center">
+            <Users className="h-12 w-12 opacity-20 mx-auto mb-3 text-[#848785]" />
+            <p className="font-semibold text-[#848785]">No users found</p>
+            {(debouncedSearch || roleFilter) && (
+              <button
+                onClick={() => {
+                  setSearch('');
+                  setRoleFilter('');
+                }}
+                className="text-sm text-[#0B7C6B] hover:underline mt-2"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        ) : (
+          users.map(user => (
+            <div
+              key={user.id}
+              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
+            >
+              <div className="flex items-start gap-3">
+                <UserAvatar user={user} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-[#101313] truncate">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p className="text-sm text-[#848785] truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <RoleBadge role={user.role} />
+                  </div>
+                  <div className="flex gap-4 text-xs text-[#848785] mb-3">
+                    <div className="flex items-center gap-1">
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      {user.orderCount} orders
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {formatDate(user.createdAt)}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t border-[#E4E9E8]">
+                    <button
+                      onClick={() => handleRoleToggle(user)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                        user.role === 'ADMIN'
+                          ? 'border-[#E4E9E8] text-[#848785] active:border-[#0B7C6B]/40 active:text-[#0B7C6B] active:bg-[#E4FFFB]'
+                          : 'border-[#E4E9E8] text-[#848785] active:border-[#FF6320]/40 active:text-[#FF6320] active:bg-[#FFF4ED]'
+                      }`}
+                    >
+                      {user.role === 'ADMIN' ? (
+                        <>
+                          <UserCircle2 className="h-3.5 w-3.5" /> Make User
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(user.id)}
+                      disabled={user.orderCount > 0}
+                      className="p-2 rounded-xl text-[#848785] active:text-[#FF4E3E] active:bg-[#FFECEB] transition-all disabled:opacity-30"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden lg:block bg-white rounded-3xl border border-[#E4E9E8] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>

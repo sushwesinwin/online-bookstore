@@ -122,40 +122,159 @@ export default function AdminOrders() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#848785]" />
+          <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
           <Input
             placeholder="Search by order number or customer..."
-            className="h-14 rounded-2xl border-[#E4E9E8] bg-white pl-12 pr-4 text-base"
+            className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center gap-2 rounded-2xl border border-[#E4E9E8] bg-white px-4 h-14 shadow-sm">
-            <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
-            <select
-              value={statusFilter}
-              onChange={e => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
-            >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="SHIPPED">Shipped</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </div>
+        <div className="flex items-center gap-2 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-3 md:px-4 h-12 md:h-14 shadow-sm">
+          <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
+          <select
+            value={statusFilter}
+            onChange={e => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
+          >
+            <option value="">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white shadow-sm">
+      {/* Mobile Cards */}
+      <div className="block lg:hidden space-y-3">
+        {isLoading
+          ? Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
+                >
+                  <div className="flex justify-between mb-3">
+                    <div className="h-5 w-32 bg-[#F3F5F5] rounded" />
+                    <div className="h-6 w-20 bg-[#F3F5F5] rounded-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-[#F3F5F5] rounded" />
+                    <div className="h-4 w-3/4 bg-[#F3F5F5] rounded" />
+                  </div>
+                </div>
+              ))
+          : data?.data && data.data.length > 0 ? (
+              data.data.map(order => (
+                <div
+                  key={order.id}
+                  className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                      <div className="font-bold text-[#101313]">
+                        {order.orderNumber}
+                      </div>
+                      <div className="text-xs text-[#848785] mt-0.5">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setOpenDropdownId(
+                          openDropdownId === order.id ? null : order.id
+                        );
+                      }}
+                      className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold ${getStatusColor(order.status)}`}
+                    >
+                      {getStatusIcon(order.status)}
+                      {order.status}
+                      <ChevronDown className="ml-1 h-3 w-3" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 text-sm mb-3">
+                    <div className="flex justify-between">
+                      <span className="text-[#848785]">Customer</span>
+                      <span className="font-medium text-[#101313] truncate max-w-[60%] text-right">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#848785]">Items</span>
+                      <Badge
+                        variant="outline"
+                        className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
+                      >
+                        {order.items.length}{' '}
+                        {order.items.length === 1 ? 'book' : 'books'}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#848785]">Total</span>
+                      <span className="font-bold text-[#101313]">
+                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {openDropdownId === order.id && (
+                    <div className="mb-3 space-y-2 p-3 bg-[#F8FAFB] rounded-xl">
+                      {[
+                        'PENDING',
+                        'CONFIRMED',
+                        'SHIPPED',
+                        'DELIVERED',
+                        'CANCELLED',
+                      ].map(s => (
+                        <button
+                          key={s}
+                          onClick={() => {
+                            handleUpdateStatus(order.id, s);
+                            setOpenDropdownId(null);
+                          }}
+                          disabled={updateStatus.isPending || order.status === s}
+                          className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-colors ${
+                            order.status === s
+                              ? 'bg-white text-[#101313] border-2 border-[#0B7C6B]'
+                              : 'text-[#848785] hover:bg-white'
+                          } disabled:opacity-50`}
+                        >
+                          {s}
+                          {order.status === s && (
+                            <CheckCircle2 className="h-4 w-4 text-[#0B7C6B]" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => handleViewOrder(order)}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#F3F5F5] px-4 py-2.5 text-sm font-bold text-[#101313] transition-colors hover:bg-[#E4E9E8]"
+                  >
+                    <Eye className="h-4 w-4" /> View Details
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="bg-white rounded-2xl border border-[#E4E9E8] p-8 text-center">
+                <ShoppingCart className="h-12 w-12 text-[#E4E9E8] mx-auto mb-2" />
+                <p className="text-[#848785]">No orders found</p>
+              </div>
+            )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden lg:block overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -309,21 +428,23 @@ export default function AdminOrders() {
 
         {/* Pagination */}
         {data && data.meta.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[#E4E9E8] bg-[#F8FAFB] px-6 py-4">
-            <p className="text-sm text-[#848785]">
-              Showing{' '}
+          <div className="flex items-center justify-between border-t border-[#E4E9E8] bg-[#F8FAFB] px-4 md:px-6 py-3 md:py-4">
+            <p className="text-xs md:text-sm text-[#848785]">
+              <span className="hidden sm:inline">Showing </span>
               <span className="font-semibold text-[#101313]">
                 {(page - 1) * 10 + 1}
               </span>{' '}
-              to{' '}
+              -
               <span className="font-semibold text-[#101313]">
                 {Math.min(page * 10, data.meta.total)}
-              </span>{' '}
-              of{' '}
-              <span className="font-semibold text-[#101313]">
-                {data.meta.total}
-              </span>{' '}
-              orders
+              </span>
+              <span className="hidden sm:inline">
+                {' '}
+                of{' '}
+                <span className="font-semibold text-[#101313]">
+                  {data.meta.total}
+                </span>
+              </span>
             </p>
             <div className="flex items-center space-x-2">
               <Button
@@ -351,6 +472,33 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
+
+      {/* Mobile Pagination */}
+      {data && data.meta.totalPages > 1 && (
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-[#E4E9E8]">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={!data.meta.hasPreviousPage}
+            className="h-10 rounded-xl"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+          </Button>
+          <span className="text-sm text-[#848785]">
+            Page {page} of {data.meta.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => p + 1)}
+            disabled={!data.meta.hasNextPage}
+            className="h-10 rounded-xl"
+          >
+            Next <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+      )}
 
       {/* Order Details Modal */}
       <Modal
@@ -382,7 +530,7 @@ export default function AdminOrders() {
               </div>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-6 md:gap-8 md:grid-cols-2">
               <div>
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#101313]">
                   Customer Details
@@ -413,7 +561,7 @@ export default function AdminOrders() {
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#101313]">
                   Change Status
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     'PENDING',
                     'CONFIRMED',

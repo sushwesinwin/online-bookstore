@@ -56,42 +56,42 @@ export default function AdminDashboard() {
   // Transform stats data for UI
   const stats = dashboardStats
     ? [
-        {
-          name: 'Total Revenue',
-          value: `$${dashboardStats.totalRevenue.value.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`,
-          change: `${dashboardStats.totalRevenue.change >= 0 ? '+' : ''}${dashboardStats.totalRevenue.change.toFixed(1)}%`,
-          trend: dashboardStats.totalRevenue.trend,
-          icon: TrendingUp,
-          color: '#17BD8D',
-        },
-        {
-          name: 'Books in Catalog',
-          value: dashboardStats.booksInCatalog.value.toLocaleString(),
-          change: `${dashboardStats.booksInCatalog.value} total`,
-          trend: dashboardStats.booksInCatalog.trend,
-          icon: BookOpen,
-          color: '#0B7C6B',
-        },
-        {
-          name: 'Total Orders',
-          value: dashboardStats.totalOrders.value.toLocaleString(),
-          change: `${dashboardStats.totalOrders.change >= 0 ? '+' : ''}${dashboardStats.totalOrders.change.toFixed(1)}%`,
-          trend: dashboardStats.totalOrders.trend,
-          icon: ShoppingCart,
-          color: '#F9B959',
-        },
-        {
-          name: 'Active Customers',
-          value: dashboardStats.activeCustomers.value.toLocaleString(),
-          change: `${dashboardStats.activeCustomers.value} total`,
-          trend: dashboardStats.activeCustomers.trend,
-          icon: Users,
-          color: '#101313',
-        },
-      ]
+      {
+        name: 'Total Revenue',
+        value: `$${dashboardStats.totalRevenue.value.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        change: `${dashboardStats.totalRevenue.change >= 0 ? '+' : ''}${dashboardStats.totalRevenue.change.toFixed(1)}%`,
+        trend: dashboardStats.totalRevenue.trend,
+        icon: TrendingUp,
+        color: '#17BD8D',
+      },
+      {
+        name: 'Books in Catalog',
+        value: dashboardStats.booksInCatalog.value.toLocaleString(),
+        change: `${dashboardStats.booksInCatalog.value} total`,
+        trend: dashboardStats.booksInCatalog.trend,
+        icon: BookOpen,
+        color: '#0B7C6B',
+      },
+      {
+        name: 'Total Orders',
+        value: dashboardStats.totalOrders.value.toLocaleString(),
+        change: `${dashboardStats.totalOrders.change >= 0 ? '+' : ''}${dashboardStats.totalOrders.change.toFixed(1)}%`,
+        trend: dashboardStats.totalOrders.trend,
+        icon: ShoppingCart,
+        color: '#F9B959',
+      },
+      {
+        name: 'Active Customers',
+        value: dashboardStats.activeCustomers.value.toLocaleString(),
+        change: `${dashboardStats.activeCustomers.value} total`,
+        trend: dashboardStats.activeCustomers.trend,
+        icon: Users,
+        color: '#101313',
+      },
+    ]
     : [];
 
   const quickActions = [
@@ -130,32 +130,29 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 w-[100%]">
       {/* Header with Greeting and Quick Actions */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-[#101313]">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#101313]">
             Welcome back, {user?.firstName || 'Admin'}
           </h1>
-          <p className="mt-2 text-lg text-[#848785] font-medium">
+          <p className="mt-1 md:mt-2 text-base md:text-lg text-[#848785] font-medium">
             Here&apos;s a quick overview of your bookstore performance today.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 md:gap-3">
           {quickActions.map(action => (
             <Link key={action.name} href={action.href}>
               <Button
                 variant="outline"
-                className="rounded-xl border-[#E4E9E8] hover:bg-[#F3F5F5] font-semibold gap-2"
+                className="h-11 rounded-xl border-[#E4E9E8] hover:bg-[#F3F5F5] font-semibold gap-2"
               >
                 <action.icon
                   className="h-4 w-4"
                   style={{ color: action.color }}
                 />
                 <span className="hidden sm:inline">{action.name}</span>
-                <span className="sm:hidden">
-                  {action.name.split(' ').slice(-1)}
-                </span>
               </Button>
             </Link>
           ))}
@@ -163,91 +160,90 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statsLoading
           ? // Loading skeleton
-            Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="h-14 w-14 rounded-2xl bg-[#F3F5F5] animate-pulse" />
-                  <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
-                </div>
-                <div className="mt-6 space-y-2">
-                  <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
-                  <div className="h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
-                </div>
+          Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-[#F3F5F5] animate-pulse" />
+                <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
               </div>
-            ))
+              <div className="mt-4 md:mt-6 space-y-2">
+                <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
+                <div className="h-8 md:h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
+              </div>
+            </div>
+          ))
           : stats.map(stat => (
-              <div
-                key={stat.name}
-                className="group relative overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-              >
-                <div className="flex items-center justify-between">
-                  <div
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
-                    style={{
-                      backgroundColor: `${stat.color}10`,
-                      color: stat.color,
-                    }}
-                  >
-                    <stat.icon className="h-7 w-7" />
-                  </div>
-                  <div
-                    className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${
-                      stat.trend === 'up'
-                        ? 'bg-[#DFFEF5] text-[#17BD8D]'
-                        : 'bg-[#FFECEB] text-[#FF4E3E]'
-                    }`}
-                  >
-                    {stat.change}
-                    {stat.trend === 'up' ? (
-                      <ArrowUpRight className="ml-0.5 h-3 w-3" />
-                    ) : (
-                      <ArrowDownRight className="ml-0.5 h-3 w-3" />
-                    )}
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <p className="text-sm font-bold text-[#848785] uppercase tracking-wider">
-                    {stat.name}
-                  </p>
-                  <h3 className="text-3xl font-black text-[#101313] mt-1">
-                    {stat.value}
-                  </h3>
-                </div>
-
-                {/* Subtle background pattern element */}
+            <div
+              key={stat.name}
+              className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+            >
+              <div className="flex items-center justify-between">
                 <div
-                  className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
-                  style={{ color: stat.color }}
+                  className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl transition-transform group-hover:scale-110"
+                  style={{
+                    backgroundColor: `${stat.color}10`,
+                    color: stat.color,
+                  }}
                 >
-                  <stat.icon className="h-full w-full" />
+                  <stat.icon className="h-6 w-6 md:h-7 md:w-7" />
+                </div>
+                <div
+                  className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${stat.trend === 'up'
+                    ? 'bg-[#DFFEF5] text-[#17BD8D]'
+                    : 'bg-[#FFECEB] text-[#FF4E3E]'
+                    }`}
+                >
+                  {stat.change}
+                  {stat.trend === 'up' ? (
+                    <ArrowUpRight className="ml-0.5 h-3 w-3" />
+                  ) : (
+                    <ArrowDownRight className="ml-0.5 h-3 w-3" />
+                  )}
                 </div>
               </div>
-            ))}
+              <div className="mt-4 md:mt-6">
+                <p className="text-xs md:text-sm font-bold text-[#848785] uppercase tracking-wider">
+                  {stat.name}
+                </p>
+                <h3 className="text-2xl md:text-3xl font-black text-[#101313] mt-1">
+                  {stat.value}
+                </h3>
+              </div>
+
+              {/* Subtle background pattern element */}
+              <div
+                className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
+                style={{ color: stat.color }}
+              >
+                <stat.icon className="h-full w-full" />
+              </div>
+            </div>
+          ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
         {/* Recent Orders */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#101313] flex items-center gap-2">
-              <ShoppingCart className="h-6 w-6 text-[#F9B959]" />
+            <h2 className="text-xl md:text-2xl font-bold text-[#101313] flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 text-[#F9B959]" />
               Recent Orders
             </h2>
             <Link
               href="/admin/orders"
               className="group flex items-center gap-1.5 text-sm font-bold text-[#0B7C6B] hover:text-[#096355]"
             >
-              View all orders
+              View all <span className="hidden sm:inline">orders</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-[#E4E9E8] bg-white shadow-sm overflow-x-auto">
+          <div className="overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white shadow-sm overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
@@ -307,17 +303,16 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-8 py-6">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-                            order.status === 'DELIVERED'
-                              ? 'bg-[#DFFEF5] text-[#17BD8D]'
-                              : order.status === 'SHIPPED'
-                                ? 'bg-[#E4F4FF] text-[#0066FF]'
-                                : order.status === 'CONFIRMED'
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${order.status === 'DELIVERED'
+                            ? 'bg-[#DFFEF5] text-[#17BD8D]'
+                            : order.status === 'SHIPPED'
+                              ? 'bg-[#E4F4FF] text-[#0066FF]'
+                              : order.status === 'CONFIRMED'
+                                ? 'bg-[#FFF5E6] text-[#F9B959]'
+                                : order.status === 'PENDING'
                                   ? 'bg-[#FFF5E6] text-[#F9B959]'
-                                  : order.status === 'PENDING'
-                                    ? 'bg-[#FFF5E6] text-[#F9B959]'
-                                    : 'bg-[#FFECEB] text-[#FF4E3E]'
-                          }`}
+                                  : 'bg-[#FFECEB] text-[#FF4E3E]'
+                            }`}
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-current" />
                           {order.status}
@@ -348,9 +343,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* Notifications/Recent Activities */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#101313] flex items-center gap-2">
-            <BellIcon className="h-6 w-6 text-[#FF4E3E]" />
+        <div className="space-y-4 md:space-y-6">
+          <h2 className="text-xl md:text-2xl font-bold text-[#101313] flex items-center gap-2">
+            <BellIcon className="h-5 w-5 md:h-6 md:w-6 text-[#FF4E3E]" />
             Recent Activity
           </h2>
           <div className="space-y-4">
