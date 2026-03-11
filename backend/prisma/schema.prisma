@@ -18,6 +18,7 @@ model User {
   cart      CartItem[]
   favorites Favorite[]
   orders    Order[]
+  blogPosts BlogPost[]
 
   @@map("users")
 }
@@ -122,4 +123,16 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_posts")
 }

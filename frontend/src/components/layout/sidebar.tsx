@@ -15,6 +15,7 @@ import {
   BookMarked,
   ChevronLeft,
   ChevronRight,
+  FileText,
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useCartStore } from '@/lib/stores/cart-store';
@@ -55,6 +56,7 @@ export function Sidebar() {
     { name: 'Trending', icon: TrendingUp, href: '/books/trending' },
     { name: 'Bestsellers', icon: Award, href: '/books/bestsellers' },
     { name: 'Authors', icon: PenTool, href: '/authors' },
+    { name: 'Blogs', icon: FileText, href: '/blogs' },
   ];
 
   return (

@@ -30,11 +30,11 @@ export default function AdminLayout({
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
-    { name: 'Books Catalog', icon: BookOpen, href: '/admin/books' },
-    { name: 'Order Management', icon: ShoppingCart, href: '/admin/orders' },
-    { name: 'New Purchase', icon: ShoppingBag, href: '/admin/purchases' },
-    { name: 'User Management', icon: Users, href: '/admin/users' },
-    { name: 'Store Settings', icon: Settings, href: '/admin/settings' },
+    { name: 'Books', icon: BookOpen, href: '/admin/books' },
+    { name: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
+    { name: 'Purchases', icon: ShoppingBag, href: '/admin/purchases' },
+    { name: 'Users', icon: Users, href: '/admin/users' },
+    { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
   return (
