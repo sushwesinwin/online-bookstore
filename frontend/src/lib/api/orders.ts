@@ -13,7 +13,9 @@ export const ordersApi = {
     userId: string,
     items: { bookId: string; quantity: number }[]
   ): Promise<Order> => {
-    const response = await apiClient.post(`/admin/orders?userId=${userId}`, { items });
+    const response = await apiClient.post(`/admin/orders?userId=${userId}`, {
+      items,
+    });
     return response.data;
   },
 

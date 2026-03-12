@@ -56,42 +56,42 @@ export default function AdminDashboard() {
   // Transform stats data for UI
   const stats = dashboardStats
     ? [
-      {
-        name: 'Total Revenue',
-        value: `$${dashboardStats.totalRevenue.value.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`,
-        change: `${dashboardStats.totalRevenue.change >= 0 ? '+' : ''}${dashboardStats.totalRevenue.change.toFixed(1)}%`,
-        trend: dashboardStats.totalRevenue.trend,
-        icon: TrendingUp,
-        color: '#17BD8D',
-      },
-      {
-        name: 'Books in Catalog',
-        value: dashboardStats.booksInCatalog.value.toLocaleString(),
-        change: `${dashboardStats.booksInCatalog.value} total`,
-        trend: dashboardStats.booksInCatalog.trend,
-        icon: BookOpen,
-        color: '#0B7C6B',
-      },
-      {
-        name: 'Total Orders',
-        value: dashboardStats.totalOrders.value.toLocaleString(),
-        change: `${dashboardStats.totalOrders.change >= 0 ? '+' : ''}${dashboardStats.totalOrders.change.toFixed(1)}%`,
-        trend: dashboardStats.totalOrders.trend,
-        icon: ShoppingCart,
-        color: '#F9B959',
-      },
-      {
-        name: 'Active Customers',
-        value: dashboardStats.activeCustomers.value.toLocaleString(),
-        change: `${dashboardStats.activeCustomers.value} total`,
-        trend: dashboardStats.activeCustomers.trend,
-        icon: Users,
-        color: '#101313',
-      },
-    ]
+        {
+          name: 'Total Revenue',
+          value: `$${dashboardStats.totalRevenue.value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+          change: `${dashboardStats.totalRevenue.change >= 0 ? '+' : ''}${dashboardStats.totalRevenue.change.toFixed(1)}%`,
+          trend: dashboardStats.totalRevenue.trend,
+          icon: TrendingUp,
+          color: '#17BD8D',
+        },
+        {
+          name: 'Books in Catalog',
+          value: dashboardStats.booksInCatalog.value.toLocaleString(),
+          change: `${dashboardStats.booksInCatalog.value} total`,
+          trend: dashboardStats.booksInCatalog.trend,
+          icon: BookOpen,
+          color: '#0B7C6B',
+        },
+        {
+          name: 'Total Orders',
+          value: dashboardStats.totalOrders.value.toLocaleString(),
+          change: `${dashboardStats.totalOrders.change >= 0 ? '+' : ''}${dashboardStats.totalOrders.change.toFixed(1)}%`,
+          trend: dashboardStats.totalOrders.trend,
+          icon: ShoppingCart,
+          color: '#F9B959',
+        },
+        {
+          name: 'Active Customers',
+          value: dashboardStats.activeCustomers.value.toLocaleString(),
+          change: `${dashboardStats.activeCustomers.value} total`,
+          trend: dashboardStats.activeCustomers.trend,
+          icon: Users,
+          color: '#101313',
+        },
+      ]
     : [];
 
   const quickActions = [
@@ -163,68 +163,69 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statsLoading
           ? // Loading skeleton
-          Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-[#F3F5F5] animate-pulse" />
-                <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
-              </div>
-              <div className="mt-4 md:mt-6 space-y-2">
-                <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
-                <div className="h-8 md:h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
-              </div>
-            </div>
-          ))
-          : stats.map(stat => (
-            <div
-              key={stat.name}
-              className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl transition-transform group-hover:scale-110"
-                  style={{
-                    backgroundColor: `${stat.color}10`,
-                    color: stat.color,
-                  }}
-                >
-                  <stat.icon className="h-6 w-6 md:h-7 md:w-7" />
-                </div>
-                <div
-                  className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${stat.trend === 'up'
-                    ? 'bg-[#DFFEF5] text-[#17BD8D]'
-                    : 'bg-[#FFECEB] text-[#FF4E3E]'
-                    }`}
-                >
-                  {stat.change}
-                  {stat.trend === 'up' ? (
-                    <ArrowUpRight className="ml-0.5 h-3 w-3" />
-                  ) : (
-                    <ArrowDownRight className="ml-0.5 h-3 w-3" />
-                  )}
-                </div>
-              </div>
-              <div className="mt-4 md:mt-6">
-                <p className="text-xs md:text-sm font-bold text-[#848785] uppercase tracking-wider">
-                  {stat.name}
-                </p>
-                <h3 className="text-2xl md:text-3xl font-black text-[#101313] mt-1">
-                  {stat.value}
-                </h3>
-              </div>
-
-              {/* Subtle background pattern element */}
+            Array.from({ length: 4 }).map((_, i) => (
               <div
-                className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
-                style={{ color: stat.color }}
+                key={i}
+                className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm"
               >
-                <stat.icon className="h-full w-full" />
+                <div className="flex items-center justify-between">
+                  <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-[#F3F5F5] animate-pulse" />
+                  <div className="h-6 w-16 rounded-full bg-[#F3F5F5] animate-pulse" />
+                </div>
+                <div className="mt-4 md:mt-6 space-y-2">
+                  <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
+                  <div className="h-8 md:h-9 w-32 bg-[#F3F5F5] animate-pulse rounded" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          : stats.map(stat => (
+              <div
+                key={stat.name}
+                className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#E4E9E8] bg-white p-6 md:p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl transition-transform group-hover:scale-110"
+                    style={{
+                      backgroundColor: `${stat.color}10`,
+                      color: stat.color,
+                    }}
+                  >
+                    <stat.icon className="h-6 w-6 md:h-7 md:w-7" />
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 rounded-full text-xs font-bold ${
+                      stat.trend === 'up'
+                        ? 'bg-[#DFFEF5] text-[#17BD8D]'
+                        : 'bg-[#FFECEB] text-[#FF4E3E]'
+                    }`}
+                  >
+                    {stat.change}
+                    {stat.trend === 'up' ? (
+                      <ArrowUpRight className="ml-0.5 h-3 w-3" />
+                    ) : (
+                      <ArrowDownRight className="ml-0.5 h-3 w-3" />
+                    )}
+                  </div>
+                </div>
+                <div className="mt-4 md:mt-6">
+                  <p className="text-xs md:text-sm font-bold text-[#848785] uppercase tracking-wider">
+                    {stat.name}
+                  </p>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#101313] mt-1">
+                    {stat.value}
+                  </h3>
+                </div>
+
+                {/* Subtle background pattern element */}
+                <div
+                  className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
+                  style={{ color: stat.color }}
+                >
+                  <stat.icon className="h-full w-full" />
+                </div>
+              </div>
+            ))}
       </div>
 
       <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
@@ -303,16 +304,17 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-8 py-6">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${order.status === 'DELIVERED'
-                            ? 'bg-[#DFFEF5] text-[#17BD8D]'
-                            : order.status === 'SHIPPED'
-                              ? 'bg-[#E4F4FF] text-[#0066FF]'
-                              : order.status === 'CONFIRMED'
-                                ? 'bg-[#FFF5E6] text-[#F9B959]'
-                                : order.status === 'PENDING'
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+                            order.status === 'DELIVERED'
+                              ? 'bg-[#DFFEF5] text-[#17BD8D]'
+                              : order.status === 'SHIPPED'
+                                ? 'bg-[#E4F4FF] text-[#0066FF]'
+                                : order.status === 'CONFIRMED'
                                   ? 'bg-[#FFF5E6] text-[#F9B959]'
-                                  : 'bg-[#FFECEB] text-[#FF4E3E]'
-                            }`}
+                                  : order.status === 'PENDING'
+                                    ? 'bg-[#FFF5E6] text-[#F9B959]'
+                                    : 'bg-[#FFECEB] text-[#FF4E3E]'
+                          }`}
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-current" />
                           {order.status}

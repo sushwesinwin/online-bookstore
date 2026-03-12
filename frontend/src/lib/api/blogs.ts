@@ -25,7 +25,10 @@ export const blogsApi = {
     return response.data;
   },
 
-  createBlog: async (data: { title: string; content: string }): Promise<BlogPost> => {
+  createBlog: async (data: {
+    title: string;
+    content: string;
+  }): Promise<BlogPost> => {
     const response = await apiClient.post('/blogs', data);
     return response.data;
   },

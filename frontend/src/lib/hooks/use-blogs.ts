@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { blogsApi, BlogPost } from '../api/blogs';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { blogsApi } from '@/lib/api/blogs';
 
 export function useBlogs() {
   return useQuery({

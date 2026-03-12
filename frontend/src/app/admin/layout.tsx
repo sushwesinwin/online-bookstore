@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   ShoppingBag,
+  Archive,
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
@@ -33,16 +34,18 @@ export default function AdminLayout({
     { name: 'Books', icon: BookOpen, href: '/admin/books' },
     { name: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
     { name: 'Purchases', icon: ShoppingBag, href: '/admin/purchases' },
+    { name: 'Inventory', icon: Archive, href: '/admin/inventory' },
     { name: 'Users', icon: Users, href: '/admin/users' },
     { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
   return (
     <RoleGuard allowedRoles={['ADMIN']}>
-      <div className='w-full'>
-        <div className='flex min-h-screen w-full m-0 p-0'>
-          <div className='w-72'>
-            <div className="w-full z-50 bg-white border-b border-[#E4E9E8] lg:hidden position-fixed left-0 top-0">
+      <div className="w-full">
+        <div className="flex min-h-screen w-full m-0 p-0">
+          {/* Sidebar Container */}
+          <div className="w-72 lg:fixed lg:left-0 lg:top-0 lg:h-screen">
+            <div className="w-full z-50 bg-white border-b border-[#E4E9E8] lg:hidden fixed left-0 top-0">
               <div className="flex items-center justify-between p-4">
                 <Link href="/" className="flex items-center space-x-2">
                   <div className="p-2 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg">
@@ -88,17 +91,19 @@ export default function AdminLayout({
                                 key={item.href}
                                 href={item.href}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
-                                  ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
-                                  : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                                  }`}
+                                className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
+                                  isActive
+                                    ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
+                                    : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
+                                }`}
                               >
                                 <div className="flex items-center">
                                   <item.icon
-                                    className={`mr-3 h-5 w-5 transition-colors ${isActive
-                                      ? 'text-white'
-                                      : 'text-[#848785] group-hover:text-[#101313]'
-                                      }`}
+                                    className={`mr-3 h-5 w-5 transition-colors ${
+                                      isActive
+                                        ? 'text-white'
+                                        : 'text-[#848785] group-hover:text-[#101313]'
+                                    }`}
                                   />
                                   {item.name}
                                 </div>
@@ -141,8 +146,8 @@ export default function AdminLayout({
               </div>
             )}
 
-            <aside className="hidden h-screen border-r border-[#E4E9E8] lg:block shadow-sm">
-              <div className="flex h-full flex-col">
+            <aside className="hidden h-screen border-r border-[#E4E9E8] lg:block shadow-sm bg-white">
+              <div className="flex h-full flex-col overflow-y-auto">
                 <div className="p-8">
                   <Link href="/" className="flex items-center space-x-3 group">
                     <div className="p-2.5 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-xl group-hover:rotate-6 transition-transform shadow-lg shadow-[#0B7C6B]/20">
@@ -171,10 +176,11 @@ export default function AdminLayout({
                           <Link
                             key={item.href}
                             href={item.href}
-                            className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${isActive
-                              ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
-                              : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
-                              }`}
+                            className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
+                              isActive
+                                ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
+                                : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
+                            }`}
                           >
                             <div className="flex items-center">
                               <item.icon
@@ -219,7 +225,10 @@ export default function AdminLayout({
               </div>
             </aside>
           </div>
-          <div className='flex-1 p-10 w-full h-full'>{children}</div>
+          {/* Main Content with left margin to account for fixed sidebar */}
+          <div className="flex-1 p-4 lg:p-10 w-full h-full lg:ml-72">
+            {children}
+          </div>
         </div>
       </div>
     </RoleGuard>

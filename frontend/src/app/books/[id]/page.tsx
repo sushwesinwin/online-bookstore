@@ -198,10 +198,11 @@ export default function BookDetailPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${i < Math.floor(rating)
+                      className={`h-5 w-5 ${
+                        i < Math.floor(rating)
                           ? 'fill-yellow-400 text-yellow-400'
                           : 'text-gray-300'
-                        }`}
+                      }`}
                     />
                   ))}
                 </div>
@@ -341,10 +342,11 @@ export default function BookDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id as any)}
-                  className={`pb-4 px-2 font-semibold transition-colors relative ${selectedTab === tab.id
+                  className={`pb-4 px-2 font-semibold transition-colors relative ${
+                    selectedTab === tab.id
                       ? 'text-indigo-600'
                       : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                  }`}
                 >
                   {tab.label}
                   {selectedTab === tab.id && (
@@ -427,26 +429,35 @@ export default function BookDetailPage() {
                 <div className="space-y-6">
                   {isAuthenticated && (
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">Write a Review</h3>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">
+                        Write a Review
+                      </h3>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Rating
+                        </label>
                         <div className="flex gap-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
+                          {[1, 2, 3, 4, 5].map(star => (
                             <button
                               key={star}
                               onClick={() => setReviewRating(star)}
                               className="focus:outline-none"
                             >
                               <Star
-                                className={`h-6 w-6 ${star <= reviewRating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                                  }`}
+                                className={`h-6 w-6 ${
+                                  star <= reviewRating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-gray-300'
+                                }`}
                               />
                             </button>
                           ))}
                         </div>
                       </div>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Review
+                        </label>
                         <WysiwygEditor
                           value={reviewContent}
                           onChange={setReviewContent}
@@ -538,10 +549,11 @@ export default function BookDetailPage() {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${i < review.rating
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
                                       ? 'fill-yellow-400 text-yellow-400'
                                       : 'text-gray-300'
-                                    }`}
+                                  }`}
                                 />
                               ))}
                             </div>

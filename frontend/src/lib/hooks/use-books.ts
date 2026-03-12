@@ -58,3 +58,16 @@ export function useDeleteBook() {
     },
   });
 }
+
+export function useUpdateInventory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
+      booksApi.updateInventory(id, quantity),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['book', variables.id] });
+    },
+  });
+}

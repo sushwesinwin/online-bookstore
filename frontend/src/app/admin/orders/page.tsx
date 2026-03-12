@@ -104,9 +104,7 @@ export default function AdminOrders() {
         </div>
         <div className="flex items-center space-x-3">
           <Link href="/admin/purchases">
-            <Button
-              className="h-12 bg-[#0B7C6B] hover:bg-[#096B5B] text-white rounded-xl shadow-lg"
-            >
+            <Button className="h-12 bg-[#0B7C6B] hover:bg-[#096B5B] text-white rounded-xl shadow-lg">
               <ShoppingCart className="mr-2 h-4 w-4" />
               Create Purchase
             </Button>
@@ -154,123 +152,123 @@ export default function AdminOrders() {
 
       {/* Mobile Cards */}
       <div className="block lg:hidden space-y-3">
-        {isLoading
-          ? Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
-                >
-                  <div className="flex justify-between mb-3">
-                    <div className="h-5 w-32 bg-[#F3F5F5] rounded" />
-                    <div className="h-6 w-20 bg-[#F3F5F5] rounded-full" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-full bg-[#F3F5F5] rounded" />
-                    <div className="h-4 w-3/4 bg-[#F3F5F5] rounded" />
-                  </div>
+        {isLoading ? (
+          Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
+              >
+                <div className="flex justify-between mb-3">
+                  <div className="h-5 w-32 bg-[#F3F5F5] rounded" />
+                  <div className="h-6 w-20 bg-[#F3F5F5] rounded-full" />
                 </div>
-              ))
-          : data?.data && data.data.length > 0 ? (
-              data.data.map(order => (
-                <div
-                  key={order.id}
-                  className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div>
-                      <div className="font-bold text-[#101313]">
-                        {order.orderNumber}
-                      </div>
-                      <div className="text-xs text-[#848785] mt-0.5">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setOpenDropdownId(
-                          openDropdownId === order.id ? null : order.id
-                        );
-                      }}
-                      className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold ${getStatusColor(order.status)}`}
-                    >
-                      {getStatusIcon(order.status)}
-                      {order.status}
-                      <ChevronDown className="ml-1 h-3 w-3" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2 text-sm mb-3">
-                    <div className="flex justify-between">
-                      <span className="text-[#848785]">Customer</span>
-                      <span className="font-medium text-[#101313] truncate max-w-[60%] text-right">
-                        {order.user?.firstName} {order.user?.lastName}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#848785]">Items</span>
-                      <Badge
-                        variant="outline"
-                        className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
-                      >
-                        {order.items.length}{' '}
-                        {order.items.length === 1 ? 'book' : 'books'}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#848785]">Total</span>
-                      <span className="font-bold text-[#101313]">
-                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {openDropdownId === order.id && (
-                    <div className="mb-3 space-y-2 p-3 bg-[#F8FAFB] rounded-xl">
-                      {[
-                        'PENDING',
-                        'CONFIRMED',
-                        'SHIPPED',
-                        'DELIVERED',
-                        'CANCELLED',
-                      ].map(s => (
-                        <button
-                          key={s}
-                          onClick={() => {
-                            handleUpdateStatus(order.id, s);
-                            setOpenDropdownId(null);
-                          }}
-                          disabled={updateStatus.isPending || order.status === s}
-                          className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-colors ${
-                            order.status === s
-                              ? 'bg-white text-[#101313] border-2 border-[#0B7C6B]'
-                              : 'text-[#848785] hover:bg-white'
-                          } disabled:opacity-50`}
-                        >
-                          {s}
-                          {order.status === s && (
-                            <CheckCircle2 className="h-4 w-4 text-[#0B7C6B]" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => handleViewOrder(order)}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#F3F5F5] px-4 py-2.5 text-sm font-bold text-[#101313] transition-colors hover:bg-[#E4E9E8]"
-                  >
-                    <Eye className="h-4 w-4" /> View Details
-                  </button>
+                <div className="space-y-2">
+                  <div className="h-4 w-full bg-[#F3F5F5] rounded" />
+                  <div className="h-4 w-3/4 bg-[#F3F5F5] rounded" />
                 </div>
-              ))
-            ) : (
-              <div className="bg-white rounded-2xl border border-[#E4E9E8] p-8 text-center">
-                <ShoppingCart className="h-12 w-12 text-[#E4E9E8] mx-auto mb-2" />
-                <p className="text-[#848785]">No orders found</p>
               </div>
-            )}
+            ))
+        ) : data?.data && data.data.length > 0 ? (
+          data.data.map(order => (
+            <div
+              key={order.id}
+              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div>
+                  <div className="font-bold text-[#101313]">
+                    {order.orderNumber}
+                  </div>
+                  <div className="text-xs text-[#848785] mt-0.5">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setOpenDropdownId(
+                      openDropdownId === order.id ? null : order.id
+                    );
+                  }}
+                  className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold ${getStatusColor(order.status)}`}
+                >
+                  {getStatusIcon(order.status)}
+                  {order.status}
+                  <ChevronDown className="ml-1 h-3 w-3" />
+                </button>
+              </div>
+
+              <div className="space-y-2 text-sm mb-3">
+                <div className="flex justify-between">
+                  <span className="text-[#848785]">Customer</span>
+                  <span className="font-medium text-[#101313] truncate max-w-[60%] text-right">
+                    {order.user?.firstName} {order.user?.lastName}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#848785]">Items</span>
+                  <Badge
+                    variant="outline"
+                    className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
+                  >
+                    {order.items.length}{' '}
+                    {order.items.length === 1 ? 'book' : 'books'}
+                  </Badge>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#848785]">Total</span>
+                  <span className="font-bold text-[#101313]">
+                    ${parseFloat(order.totalAmount.toString()).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {openDropdownId === order.id && (
+                <div className="mb-3 space-y-2 p-3 bg-[#F8FAFB] rounded-xl">
+                  {[
+                    'PENDING',
+                    'CONFIRMED',
+                    'SHIPPED',
+                    'DELIVERED',
+                    'CANCELLED',
+                  ].map(s => (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        handleUpdateStatus(order.id, s);
+                        setOpenDropdownId(null);
+                      }}
+                      disabled={updateStatus.isPending || order.status === s}
+                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-colors ${
+                        order.status === s
+                          ? 'bg-white text-[#101313] border-2 border-[#0B7C6B]'
+                          : 'text-[#848785] hover:bg-white'
+                      } disabled:opacity-50`}
+                    >
+                      {s}
+                      {order.status === s && (
+                        <CheckCircle2 className="h-4 w-4 text-[#0B7C6B]" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => handleViewOrder(order)}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#F3F5F5] px-4 py-2.5 text-sm font-bold text-[#101313] transition-colors hover:bg-[#E4E9E8]"
+              >
+                <Eye className="h-4 w-4" /> View Details
+              </button>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-2xl border border-[#E4E9E8] p-8 text-center">
+            <ShoppingCart className="h-12 w-12 text-[#E4E9E8] mx-auto mb-2" />
+            <p className="text-[#848785]">No orders found</p>
+          </div>
+        )}
       </div>
 
       {/* Desktop Table */}
@@ -300,8 +298,8 @@ export default function AdminOrders() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E9E8]">
-              {isLoading
-                ? Array(5)
+              {isLoading ? (
+                Array(5)
                   .fill(0)
                   .map((_, i) => (
                     <tr key={i} className="animate-pulse">
@@ -310,118 +308,119 @@ export default function AdminOrders() {
                       </td>
                     </tr>
                   ))
-                : data?.data && data.data.length > 0 ? (
-                  data.data.map(order => (
-                    <tr
-                      key={order.id}
-                      className="group transition-colors hover:bg-[#F8FAFB]/50"
-                    >
-                      <td className="px-6 py-5">
-                        <div className="font-bold text-[#101313]">
-                          {order.orderNumber}
-                        </div>
-                        <div className="mt-1 text-xs text-[#848785]">
-                          {new Date(order.createdAt).toLocaleDateString()} at{' '}
-                          {new Date(order.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="font-medium text-[#101313]">
-                          {order.user?.firstName} {order.user?.lastName}
-                        </div>
-                        <div className="text-xs text-[#848785]">
-                          {order.user?.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <Badge
-                          variant="outline"
-                          className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
-                        >
-                          {order.items.length}{' '}
-                          {order.items.length === 1 ? 'book' : 'books'}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-5 font-bold text-[#101313]">
-                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-5">
-                        <div
-                          className="relative"
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <button
-                            onClick={() =>
-                              setOpenDropdownId(
-                                openDropdownId === order.id ? null : order.id
-                              )
-                            }
-                            className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
-                          >
-                            {getStatusIcon(order.status)}
-                            {order.status}
-                            <ChevronDown className="ml-1.5 h-3 w-3" />
-                          </button>
-
-                          {openDropdownId === order.id && (
-                            <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                              {[
-                                'PENDING',
-                                'CONFIRMED',
-                                'SHIPPED',
-                                'DELIVERED',
-                                'CANCELLED',
-                              ].map(s => (
-                                <button
-                                  key={s}
-                                  onClick={() => {
-                                    handleUpdateStatus(order.id, s);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  disabled={
-                                    updateStatus.isPending || order.status === s
-                                  }
-                                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${order.status === s
-                                    ? 'bg-[#F8FAFB] text-[#101313]'
-                                    : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
-                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                                >
-                                  {s}
-                                  {order.status === s && (
-                                    <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
-                                  )}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-5 text-right">
-                        <button
-                          onClick={() => handleViewOrder(order)}
-                          className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
-                        >
-                          <Eye className="h-5 w-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-12 text-center text-[#848785] font-medium bg-[#F8FAFB]/30"
-                    >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <ShoppingCart className="h-8 w-8 text-[#E4E9E8]" />
-                        <p>No orders found matching your criteria</p>
+              ) : data?.data && data.data.length > 0 ? (
+                data.data.map(order => (
+                  <tr
+                    key={order.id}
+                    className="group transition-colors hover:bg-[#F8FAFB]/50"
+                  >
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-[#101313]">
+                        {order.orderNumber}
+                      </div>
+                      <div className="mt-1 text-xs text-[#848785]">
+                        {new Date(order.createdAt).toLocaleDateString()} at{' '}
+                        {new Date(order.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
                       </div>
                     </td>
+                    <td className="px-6 py-5">
+                      <div className="font-medium text-[#101313]">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </div>
+                      <div className="text-xs text-[#848785]">
+                        {order.user?.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <Badge
+                        variant="outline"
+                        className="border-[#E4E9E8] bg-[#F8FAFB] font-medium text-[#101313]"
+                      >
+                        {order.items.length}{' '}
+                        {order.items.length === 1 ? 'book' : 'books'}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-5 font-bold text-[#101313]">
+                      ${parseFloat(order.totalAmount.toString()).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-5">
+                      <div
+                        className="relative"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === order.id ? null : order.id
+                            )
+                          }
+                          className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
+                        >
+                          {getStatusIcon(order.status)}
+                          {order.status}
+                          <ChevronDown className="ml-1.5 h-3 w-3" />
+                        </button>
+
+                        {openDropdownId === order.id && (
+                          <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                            {[
+                              'PENDING',
+                              'CONFIRMED',
+                              'SHIPPED',
+                              'DELIVERED',
+                              'CANCELLED',
+                            ].map(s => (
+                              <button
+                                key={s}
+                                onClick={() => {
+                                  handleUpdateStatus(order.id, s);
+                                  setOpenDropdownId(null);
+                                }}
+                                disabled={
+                                  updateStatus.isPending || order.status === s
+                                }
+                                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                                  order.status === s
+                                    ? 'bg-[#F8FAFB] text-[#101313]'
+                                    : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                              >
+                                {s}
+                                {order.status === s && (
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5 text-right">
+                      <button
+                        onClick={() => handleViewOrder(order)}
+                        className="rounded-lg bg-[#F3F5F5] p-2 text-[#848785] transition-colors hover:text-[#0B7C6B]"
+                      >
+                        <Eye className="h-5 w-5" />
+                      </button>
+                    </td>
                   </tr>
-                )}
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-6 py-12 text-center text-[#848785] font-medium bg-[#F8FAFB]/30"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <ShoppingCart className="h-8 w-8 text-[#E4E9E8]" />
+                      <p>No orders found matching your criteria</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -574,10 +573,11 @@ export default function AdminOrders() {
                       variant={
                         selectedOrder.status === s ? 'default' : 'outline'
                       }
-                      className={`h-11 rounded-xl text-xs font-bold ${selectedOrder.status === s
-                        ? 'bg-[#0B7C6B] text-white shadow-lg'
-                        : 'border-[#E4E9E8]'
-                        }`}
+                      className={`h-11 rounded-xl text-xs font-bold ${
+                        selectedOrder.status === s
+                          ? 'bg-[#0B7C6B] text-white shadow-lg'
+                          : 'border-[#E4E9E8]'
+                      }`}
                       onClick={() => handleUpdateStatus(selectedOrder.id, s)}
                       disabled={
                         updateStatus.isPending || selectedOrder.status === s
