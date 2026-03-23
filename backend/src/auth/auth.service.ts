@@ -79,6 +79,10 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<AuthResult> {
     const { email, password } = loginDto;
 
+    if (!email || !password) {
+      throw new UnauthorizedException('Email and password are required');
+    }
+
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email },

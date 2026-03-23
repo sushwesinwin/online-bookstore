@@ -15,6 +15,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   AlertCircle,
   ShoppingBag,
   Calendar,
@@ -58,9 +59,22 @@ function RoleBadge({ role }: { role: 'USER' | 'ADMIN' }) {
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'' | 'USER' | 'ADMIN'>('');
+  const [sortBy, setSortBy] = useState<'name' | 'role' | 'orders' | 'joined'>(
+    'joined'
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isColumnsOpen, setIsColumnsOpen] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    user: true,
+    role: true,
+    orders: true,
+    joined: true,
+    actions: true,
+  });
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [confirmRole, setConfirmRole] = useState<{
     id: string;
@@ -76,14 +90,14 @@ export default function AdminUsersPage() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const queryKey = ['admin', 'users', page, debouncedSearch, roleFilter];
+  const queryKey = ['admin', 'users', page, limit, debouncedSearch, roleFilter];
 
   const { data, isLoading } = useQuery({
     queryKey,
     queryFn: () =>
       adminApi.getUsers({
         page,
-        limit: 10,
+        limit,
         search: debouncedSearch || undefined,
         role: roleFilter || undefined,
       }),
@@ -108,6 +122,24 @@ export default function AdminUsersPage() {
 
   const users = data?.data ?? [];
   const meta = data?.meta;
+  const pageSize = meta?.limit ?? limit;
+  const sortedUsers = [...users].sort((a, b) => {
+    const dir = sortOrder === 'asc' ? 1 : -1;
+    if (sortBy === 'name') {
+      const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+      const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+      return nameA.localeCompare(nameB) * dir;
+    }
+    if (sortBy === 'role') {
+      return a.role.localeCompare(b.role) * dir;
+    }
+    if (sortBy === 'orders') {
+      return (a.orderCount - b.orderCount) * dir;
+    }
+    return (
+      (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * dir
+    );
+  });
 
   const handleRoleToggle = (user: AdminUser) => {
     const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
@@ -132,7 +164,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Filters Row */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#848785]" />
           <Input
@@ -142,22 +174,85 @@ export default function AdminUsersPage() {
             className="pl-10 h-11 md:h-12 bg-white rounded-xl"
           />
         </div>
-        <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
-          <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
-          <select
-            value={roleFilter}
-            onChange={e => {
-              setRoleFilter(e.target.value as any);
-              setPage(1);
-            }}
-            className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
-          >
-            {ROLE_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
+            <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
+            <select
+              value={roleFilter}
+              onChange={e => {
+                setRoleFilter(e.target.value as any);
+                setPage(1);
+              }}
+              className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
+            >
+              {ROLE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
+            <span className="text-xs font-semibold text-[#848785]">Sort</span>
+            <select
+              value={`${sortBy}:${sortOrder}`}
+              onChange={e => {
+                const [by, order] = e.target.value.split(':');
+                setSortBy(by as any);
+                setSortOrder(order as any);
+              }}
+              className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
+            >
+              <option value="joined:desc">Newest first</option>
+              <option value="joined:asc">Oldest first</option>
+              <option value="name:asc">Name A → Z</option>
+              <option value="name:desc">Name Z → A</option>
+              <option value="orders:desc">Orders high → low</option>
+              <option value="orders:asc">Orders low → high</option>
+              <option value="role:asc">Role A → Z</option>
+              <option value="role:desc">Role Z → A</option>
+            </select>
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsColumnsOpen(o => !o)}
+              className="h-11 md:h-12 rounded-xl border border-[#E4E9E8] bg-white px-4 text-sm font-semibold text-[#101313] shadow-sm"
+            >
+              Columns
+            </button>
+            {isColumnsOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-[#E4E9E8] bg-white shadow-lg p-2">
+                {[
+                  { key: 'user', label: 'User' },
+                  { key: 'role', label: 'Role' },
+                  { key: 'orders', label: 'Orders' },
+                  { key: 'joined', label: 'Joined' },
+                  { key: 'actions', label: 'Actions' },
+                ].map(col => (
+                  <label
+                    key={col.key}
+                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-[#101313] cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(visibleColumns as any)[col.key]}
+                      onChange={() =>
+                        setVisibleColumns(prev => ({
+                          ...prev,
+                          [col.key]: !(prev as any)[col.key],
+                        }))
+                      }
+                      className="h-4 w-4 rounded border-[#E4E9E8] text-[#0B7C6B] focus:ring-[#0B7C6B]/30"
+                    />
+                    {col.label}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -264,21 +359,31 @@ export default function AdminUsersPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
-                  User
-                </th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
-                  Role
-                </th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
-                  Orders
-                </th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
-                  Joined
-                </th>
-                <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785] text-right">
-                  Actions
-                </th>
+                {visibleColumns.user && (
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                    User
+                  </th>
+                )}
+                {visibleColumns.role && (
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                    Role
+                  </th>
+                )}
+                {visibleColumns.orders && (
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                    Orders
+                  </th>
+                )}
+                {visibleColumns.joined && (
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                    Joined
+                  </th>
+                )}
+                {visibleColumns.actions && (
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785] text-right">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E9E8]">
@@ -329,92 +434,102 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ) : (
-                users.map(user => (
+                sortedUsers.map(user => (
                   <tr
                     key={user.id}
                     className="group hover:bg-[#F8FAFB]/50 transition-colors"
                   >
                     {/* User info */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar user={user} />
-                        <div className="min-w-0">
-                          <p className="font-bold text-[#101313] truncate group-hover:text-[#0B7C6B] transition-colors">
-                            {user.firstName} {user.lastName}
-                          </p>
-                          <p className="text-sm text-[#848785] truncate">
-                            {user.email}
-                          </p>
+                    {visibleColumns.user && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <UserAvatar user={user} />
+                          <div className="min-w-0">
+                            <p className="font-bold text-[#101313] truncate group-hover:text-[#0B7C6B] transition-colors">
+                              {user.firstName} {user.lastName}
+                            </p>
+                            <p className="text-sm text-[#848785] truncate">
+                              {user.email}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                    )}
 
                     {/* Role */}
-                    <td className="px-6 py-4">
-                      <RoleBadge role={user.role} />
-                    </td>
+                    {visibleColumns.role && (
+                      <td className="px-6 py-4">
+                        <RoleBadge role={user.role} />
+                      </td>
+                    )}
 
                     {/* Orders */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-sm text-[#848785]">
-                        <ShoppingBag className="h-3.5 w-3.5" />
-                        <span className="font-semibold text-[#101313]">
-                          {user.orderCount}
-                        </span>
-                      </div>
-                    </td>
+                    {visibleColumns.orders && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5 text-sm text-[#848785]">
+                          <ShoppingBag className="h-3.5 w-3.5" />
+                          <span className="font-semibold text-[#101313]">
+                            {user.orderCount}
+                          </span>
+                        </div>
+                      </td>
+                    )}
 
                     {/* Joined */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-sm text-[#848785]">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {formatDate(user.createdAt)}
-                      </div>
-                    </td>
+                    {visibleColumns.joined && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5 text-sm text-[#848785]">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {formatDate(user.createdAt)}
+                        </div>
+                      </td>
+                    )}
 
                     {/* Actions */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Toggle role */}
-                        <button
-                          onClick={() => handleRoleToggle(user)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                            user.role === 'ADMIN'
-                              ? 'border-[#E4E9E8] text-[#848785] hover:border-[#0B7C6B]/40 hover:text-[#0B7C6B] hover:bg-[#E4FFFB]'
-                              : 'border-[#E4E9E8] text-[#848785] hover:border-[#FF6320]/40 hover:text-[#FF6320] hover:bg-[#FFF4ED]'
-                          }`}
-                          title={
-                            user.role === 'ADMIN'
-                              ? 'Demote to User'
-                              : 'Promote to Admin'
-                          }
-                        >
-                          {user.role === 'ADMIN' ? (
-                            <>
-                              <UserCircle2 className="h-3.5 w-3.5" /> Make User
-                            </>
-                          ) : (
-                            <>
-                              <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
-                            </>
-                          )}
-                        </button>
+                    {visibleColumns.actions && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Toggle role */}
+                          <button
+                            onClick={() => handleRoleToggle(user)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                              user.role === 'ADMIN'
+                                ? 'border-[#E4E9E8] text-[#848785] hover:border-[#0B7C6B]/40 hover:text-[#0B7C6B] hover:bg-[#E4FFFB]'
+                                : 'border-[#E4E9E8] text-[#848785] hover:border-[#FF6320]/40 hover:text-[#FF6320] hover:bg-[#FFF4ED]'
+                            }`}
+                            title={
+                              user.role === 'ADMIN'
+                                ? 'Demote to User'
+                                : 'Promote to Admin'
+                            }
+                          >
+                            {user.role === 'ADMIN' ? (
+                              <>
+                                <UserCircle2 className="h-3.5 w-3.5" /> Make User
+                              </>
+                            ) : (
+                              <>
+                                <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
+                              </>
+                            )}
+                          </button>
 
-                        {/* Delete */}
-                        <button
-                          onClick={() => setConfirmDelete(user.id)}
-                          disabled={user.orderCount > 0}
-                          className="p-2 rounded-xl text-[#848785] hover:text-[#FF4E3E] hover:bg-[#FFECEB] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={
-                            user.orderCount > 0
-                              ? 'Cannot delete: user has orders'
-                              : 'Delete user'
-                          }
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
+                          {/* Delete */}
+                          <button
+                            onClick={() => setConfirmDelete(user.id)}
+                            disabled={user.orderCount > 0}
+                            className="p-2 rounded-xl text-[#848785] hover:text-[#FF4E3E] hover:bg-[#FFECEB] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={
+                              user.orderCount > 0
+                                ? 'Cannot delete: user has orders'
+                                : 'Delete user'
+                            }
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -423,39 +538,53 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Pagination */}
-        {meta && meta.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-[#E4E9E8] bg-[#F8FAFB]">
-            <p className="text-sm text-[#848785]">
-              Showing {(meta.page - 1) * meta.limit + 1}–
-              {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}
-            </p>
+        {meta && (
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-6 py-4 border-t border-[#E4E9E8] bg-[#F8FAFB]">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <select
+                  className="h-10 w-32 appearance-none rounded-lg border border-[#E4E9E8] bg-white px-3 pr-9 text-sm text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+                  value={limit}
+                  onChange={e => {
+                    setLimit(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {[10, 20, 50, 100].map(size => (
+                    <option key={size} value={size}>
+                      {size} / page
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6AAA9]" />
+              </div>
+              <p className="text-sm text-[#848785]">
+                Showing{' '}
+                <span className="font-semibold text-[#101313]">
+                  {meta.total === 0 ? 0 : (meta.page - 1) * pageSize + 1}
+                </span>
+                –{Math.min(meta.page * pageSize, meta.total)} of {meta.total}
+              </p>
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 disabled={!meta.hasPreviousPage}
-                onClick={() => setPage(p => p - 1)}
-                className="h-9 w-9 p-0 rounded-xl"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="h-9 w-9 rounded-lg border-[#E4E9E8]"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              {Array.from({ length: meta.totalPages }).map((_, i) => (
-                <Button
-                  key={i}
-                  variant={meta.page === i + 1 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPage(i + 1)}
-                  className={`h-9 w-9 p-0 rounded-xl ${meta.page === i + 1 ? 'bg-[#0B7C6B]' : ''}`}
-                >
-                  {i + 1}
-                </Button>
-              ))}
+              <div className="flex h-9 min-w-[36px] items-center justify-center rounded-lg bg-white px-3 text-sm font-bold text-[#101313] shadow-sm">
+                {meta.page}
+              </div>
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 disabled={!meta.hasNextPage}
                 onClick={() => setPage(p => p + 1)}
-                className="h-9 w-9 p-0 rounded-xl"
+                className="h-9 w-9 rounded-lg border-[#E4E9E8]"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

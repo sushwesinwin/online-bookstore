@@ -48,7 +48,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FCFB]">
+    <div className="min-h-screen bg-[#F9FCFB] font-light">
       <main>
         {/* Hero Section - Enhanced with Animations */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#0B7C6B] via-[#0D8F7A] to-[#17BD8D] py-20 px-4">
@@ -100,15 +100,15 @@ export default function HomePage() {
               <div className="text-white space-y-6 animate-fade-in">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
                   <Sparkles className="h-4 w-4 text-[#FFD700] animate-pulse" />
-                  <span className="text-sm font-semibold tracking-wide">
+                  <span className="text-sm font-black tracking-wide">
                     LIMITED TIME OFFER
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-[#FF6320] text-xs font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-[#FF6320] text-xs font-black">
                     20% OFF
                   </span>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+                <h1 className="text-5xl md:text-7xl font-black leading-tight">
                   Discover Your
                   <br />
                   <span className="relative inline-block">
@@ -128,7 +128,7 @@ export default function HomePage() {
                   <Link href="/books">
                     <Button
                       size="lg"
-                      className="bg-white text-[#0B7C6B] hover:bg-white/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105 font-semibold px-8"
+                      className="bg-white text-[#0B7C6B] hover:bg-white/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105 font-black px-8"
                     >
                       Explore Books
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -138,7 +138,7 @@ export default function HomePage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#0B7C6B] font-semibold px-8"
+                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#0B7C6B] font-black px-8"
                     >
                       Browse Authors
                       <BookOpen className="ml-2 h-5 w-5" />
@@ -149,15 +149,15 @@ export default function HomePage() {
                 {/* Stats */}
                 <div className="flex gap-8 pt-8">
                   <div>
-                    <div className="text-3xl font-bold text-white">10,000+</div>
+                    <div className="text-3xl font-black text-white">10,000+</div>
                     <div className="text-sm text-white/70">Books Available</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">5,000+</div>
+                    <div className="text-3xl font-black text-white">5,000+</div>
                     <div className="text-sm text-white/70">Happy Readers</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">4.9★</div>
+                    <div className="text-3xl font-black text-white">4.9★</div>
                     <div className="text-sm text-white/70">Customer Rating</div>
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export default function HomePage() {
                       {/* Book 1 - Bottom */}
                       <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 h-64 bg-gradient-to-br from-[#FF6320] to-[#FFA118] rounded-lg shadow-2xl transform -rotate-6 hover:rotate-0 transition-transform duration-300">
                         <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                          <div className="text-white font-bold text-lg">
+                          <div className="text-white font-black text-lg">
                             The Great Novel
                           </div>
                           <div className="w-full h-1 bg-white/30 rounded"></div>
@@ -186,7 +186,7 @@ export default function HomePage() {
                         style={{ zIndex: 2 }}
                       >
                         <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                          <div className="text-white font-bold text-lg">
+                          <div className="text-white font-black text-lg">
                             Adventure Tales
                           </div>
                           <div className="w-full h-1 bg-white/30 rounded"></div>
@@ -199,7 +199,7 @@ export default function HomePage() {
                         style={{ zIndex: 3 }}
                       >
                         <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                          <div className="text-[#0B7C6B] font-bold text-lg">
+                          <div className="text-[#0B7C6B] font-black text-lg">
                             Mystery Series
                           </div>
                           <div className="w-full h-1 bg-[#0B7C6B]/30 rounded"></div>
@@ -277,7 +277,7 @@ export default function HomePage() {
                     <feature.icon className="h-6 w-6 text-[#0B7C6B]" />
                   </div>
                   <div>
-                    <div className="font-semibold text-[#101313]">
+                    <div className="font-black text-[#101313]">
                       {feature.text}
                     </div>
                     <div className="text-sm text-[#848785]">
@@ -297,7 +297,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-6 w-6 text-[#FF6320]" />
-                  <h2 className="text-3xl font-bold text-[#101313]">
+                  <h2 className="text-3xl font-black text-[#101313]">
                     Trending Books
                   </h2>
                 </div>
@@ -345,14 +345,14 @@ export default function HomePage() {
                           </Badge>
                         </div>
                       </div>
-                      <h3 className="font-medium text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
+                      <h3 className="font-black text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
                         {book.title}
                       </h3>
                       <p className="text-xs text-[#848785] mb-1">
                         {book.author}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-[#0B7C6B]">
+                        <span className="text-sm font-black text-[#0B7C6B]">
                           {formatPrice(Number(book.price))}
                         </span>
                         <div className="flex items-center gap-1">
@@ -372,7 +372,7 @@ export default function HomePage() {
         <section className="py-16 px-4 bg-[#F9FCFB]">
           <div className="container mx-auto">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold text-[#101313] mb-2">
+              <h2 className="text-3xl font-black text-[#101313] mb-2">
                 Explore by Category
               </h2>
               <p className="text-[#848785]">Find your favorite genre</p>
@@ -389,7 +389,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Award className="h-6 w-6 text-[#FFA118]" />
-                  <h2 className="text-3xl font-bold text-[#101313]">
+                  <h2 className="text-3xl font-black text-[#101313]">
                     Bestsellers
                   </h2>
                 </div>
@@ -431,18 +431,18 @@ export default function HomePage() {
                           alt={book.title}
                           className="w-full aspect-3/4 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute top-2 left-2 bg-[#FFA118] text-white font-bold text-xs w-8 h-8 rounded-full flex items-center justify-center">
+                        <div className="absolute top-2 left-2 bg-[#FFA118] text-white font-black text-xs w-8 h-8 rounded-full flex items-center justify-center">
                           #{index + 1}
                         </div>
                       </div>
-                      <h3 className="font-medium text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
+                      <h3 className="font-black text-sm text-[#101313] mb-1 line-clamp-2 group-hover:text-[#0B7C6B] transition-colors">
                         {book.title}
                       </h3>
                       <p className="text-xs text-[#848785] mb-1">
                         {book.author}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-[#0B7C6B]">
+                        <span className="text-sm font-black text-[#0B7C6B]">
                           {formatPrice(Number(book.price))}
                         </span>
                         <div className="flex items-center gap-1">
@@ -463,7 +463,7 @@ export default function HomePage() {
           <div className="container mx-auto">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-3xl font-bold text-[#101313] mb-2">
+                <h2 className="text-3xl font-black text-[#101313] mb-2">
                   Featured Authors
                 </h2>
                 <p className="text-[#848785]">
@@ -533,12 +533,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="text-center space-y-2">
-                    <h3 className="text-lg font-bold text-[#101313] group-hover:text-[#0B7C6B] transition-colors">
+                    <h3 className="text-lg font-black text-[#101313] group-hover:text-[#0B7C6B] transition-colors">
                       {author.name}
                     </h3>
                     <p className="text-sm text-[#848785]">{author.books}</p>
                     <div
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-linear-to-r ${author.color} text-white`}
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-black bg-linear-to-r ${author.color} text-white`}
                     >
                       {author.genre}
                     </div>
@@ -561,7 +561,7 @@ export default function HomePage() {
         <section className="py-16 px-4 bg-linear-to-br from-[#0B7C6B] to-[#17BD8D]">
           <div className="container mx-auto text-center">
             <div className="max-w-2xl mx-auto space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">
+              <h2 className="text-3xl md:text-4xl font-black text-white">
                 Subscribe to Our Newsletter
               </h2>
               <p className="text-lg text-white/90">
@@ -599,7 +599,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen className="h-6 w-6 text-[#0B7C6B]" />
-                <span className="font-bold text-dark text-xl">Bookstore</span>
+                <span className="font-black text-dark text-xl">Bookstore</span>
               </div>
               <p className="text-sm">
                 Your trusted source for books. Discover, read, and grow with us.
@@ -607,7 +607,7 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-xl text-dark mb-4">Shop</h3>
+              <h3 className="font-black text-xl text-dark mb-4">Shop</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
@@ -645,7 +645,7 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-xl text-dark mb-4">Support</h3>
+              <h3 className="font-black text-xl text-dark mb-4">Support</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a
@@ -683,7 +683,7 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-xl text-dark mb-4">Company</h3>
+              <h3 className="font-black text-xl text-dark mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Search,
   Eye,
@@ -9,103 +9,102 @@ import {
   Printer,
   Download,
   CheckCircle2,
-  Truck,
-  Clock,
-  XCircle,
+  TrendingUp,
   BookOpen,
-  ShoppingCart,
   ChevronDown,
-  Filter,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
-import { useOrders, useUpdateOrderStatus } from '@/lib/hooks/use-orders';
+import { useOrders } from '@/lib/hooks/use-orders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
-import Link from 'next/link';
-export default function AdminOrders() {
+
+export default function AdminSales() {
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [status, setStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'>(
+    'DELIVERED'
+  );
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'>(
     'createdAt'
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
-    orderInfo: true,
+    saleRefDate: true,
     customer: true,
     items: true,
-    amount: true,
     status: true,
+    amount: true,
     action: true,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    const handleClickOutside = () => setOpenDropdownId(null);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Fetch only DELIVERED orders for the sales page
   const { data, isLoading } = useOrders({
     page,
     limit,
     search: search || undefined,
-    status: (statusFilter || undefined) as any,
+    status: status === 'ALL' ? undefined : status,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined,
     sortBy,
     sortOrder,
   });
 
-  const updateStatus = useUpdateOrderStatus();
+  const pageSize = useMemo(() => data?.meta?.limit ?? limit, [data?.meta?.limit, limit]);
 
   if (!mounted) return null;
-
-  const pageSize = data?.meta?.limit ?? limit;
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'DELIVERED':
-        return <CheckCircle2 className="mr-1 h-3 w-3" />;
-      case 'SHIPPED':
-        return <Truck className="mr-1 h-3 w-3" />;
-      case 'PENDING':
-        return <Clock className="mr-1 h-3 w-3" />;
-      case 'CANCELLED':
-        return <XCircle className="mr-1 h-3 w-3" />;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'DELIVERED':
-        return 'bg-[#DFFEF5] text-[#17BD8D] border-[#17BD8D]/20';
-      case 'SHIPPED':
-        return 'bg-[#E4F4FF] text-[#0066FF] border-[#0066FF]/20';
-      case 'PENDING':
-        return 'bg-[#FFF5E6] text-[#F9B959] border-[#F9B959]/20';
-      case 'CANCELLED':
-        return 'bg-[#FFECEB] text-[#FF4E3E] border-[#FF4E3E]/20';
-      default:
-        return 'bg-[#F3F5F5] text-[#848785] border-[#E4E9E8]';
-    }
-  };
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
 
-  const handleUpdateStatus = async (id: string, status: string) => {
-    await updateStatus.mutateAsync({ id, status });
-    setIsModalOpen(false);
+  // Extract totals for summary metrics
+  const totalSalesCount = data?.meta?.total || 0;
+
+  const handleSort = (
+    column: 'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'
+  ) => {
+    if (sortBy === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+    setPage(1);
+  };
+
+  const renderSortIcon = (column: typeof sortBy) => {
+    if (sortBy !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-[#A6AAA9]" />;
+    return sortOrder === 'asc' ? (
+      <ArrowUp className="h-3.5 w-3.5 text-[#0B7C6B]" />
+    ) : (
+      <ArrowDown className="h-3.5 w-3.5 text-[#0B7C6B]" />
+    );
+  };
+
+  const resetFilters = () => {
+    setStatus('DELIVERED');
+    setStartDate('');
+    setEndDate('');
+    setSortBy('createdAt');
+    setSortOrder('desc');
+    setLimit(10);
+    setPage(1);
   };
 
   return (
@@ -113,121 +112,174 @@ export default function AdminOrders() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#101313]">
-            Orders Management
+          <h1 className="text-3xl font-bold tracking-tight text-[#101313] flex items-center gap-3">
+            <div className="p-2.5 bg-[#E4FFFB] rounded-xl">
+              <TrendingUp className="h-7 w-7 text-[#0B7C6B]" />
+            </div>
+            Completed Sales
           </h1>
-          <p className="mt-1 text-[#848785]">
-            Track, process, and manage customer orders.
+          <p className="mt-2 text-[#848785]">
+            View and manage all delivered orders and completed sales.
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <Link href="/admin/purchases">
-            <Button className="h-12 bg-[#0B7C6B] hover:bg-[#096B5B] text-white rounded-xl shadow-lg">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Create Purchase
-            </Button>
-          </Link>
           <Button
             variant="outline"
             className="h-12 rounded-xl border-[#E4E9E8]"
           >
             <Download className="mr-2 h-4 w-4" />
-            Download CSV
+            Export Sales
           </Button>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
-          <Input
-            placeholder="Search by order number or customer..."
-            className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-3 md:px-4 h-12 md:h-14 shadow-sm">
-            <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
-            <select
-              value={statusFilter}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
+            <Input
+              placeholder="Search sales by order number or customer..."
+              className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base"
+              value={search}
               onChange={e => {
-                setStatusFilter(e.target.value);
+                setSearch(e.target.value);
                 setPage(1);
               }}
-              className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
+            />
+          </div>
+          <div className="flex items-center justify-center rounded-xl md:rounded-2xl bg-[#DFFEF5] border-2 border-[#17BD8D]/20 px-6 h-12 md:h-14 shadow-sm text-[#17BD8D] font-bold text-sm">
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            {totalSalesCount} {status === 'DELIVERED' ? 'Delivered ' : ''}
+            {totalSalesCount === 1 ? 'Order' : 'Orders'}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold text-[#848785]">Status</span>
+            <select
+              className="h-12 rounded-xl border border-[#E4E9E8] bg-white px-3 text-sm text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+              value={status}
+              onChange={e => {
+                setStatus(e.target.value as any);
+                setPage(1);
+              }}
             >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="SHIPPED">Shipped</option>
+              <option value="ALL">All</option>
               <option value="DELIVERED">Delivered</option>
+              <option value="SHIPPED">Shipped</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="PENDING">Pending</option>
               <option value="CANCELLED">Cancelled</option>
             </select>
           </div>
 
-          <div className="flex items-center gap-2 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-3 md:px-4 h-12 md:h-14 shadow-sm">
+          <div className="flex flex-col gap-1">
             <span className="text-xs font-semibold text-[#848785]">Sort</span>
-            <select
-              value={`${sortBy}:${sortOrder}`}
-              onChange={e => {
-                const [by, order] = e.target.value.split(':');
-                setSortBy(by as any);
-                setSortOrder(order as any);
-                setPage(1);
-              }}
-              className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
-            >
-              <option value="createdAt:desc">Newest first</option>
-              <option value="createdAt:asc">Oldest first</option>
-              <option value="totalAmount:desc">Amount high → low</option>
-              <option value="totalAmount:asc">Amount low → high</option>
-              <option value="orderNumber:asc">Order # A → Z</option>
-              <option value="orderNumber:desc">Order # Z → A</option>
-            </select>
+            <div className="relative">
+              <select
+                className="h-12 w-full appearance-none rounded-xl border border-[#E4E9E8] bg-white px-3 pr-10 text-sm text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+                value={`${sortBy}:${sortOrder}`}
+                onChange={e => {
+                  const [by, order] = e.target.value.split(':');
+                  setSortBy(by as any);
+                  setSortOrder(order as any);
+                  setPage(1);
+                }}
+              >
+                <option value="createdAt:desc">Newest first</option>
+                <option value="createdAt:asc">Oldest first</option>
+                <option value="totalAmount:desc">Amount high → low</option>
+                <option value="totalAmount:asc">Amount low → high</option>
+                <option value="orderNumber:asc">Order # A → Z</option>
+                <option value="orderNumber:desc">Order # Z → A</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6AAA9]" />
+            </div>
           </div>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsColumnsOpen(o => !o)}
-              className="h-12 md:h-14 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-4 text-sm font-bold text-[#101313] shadow-sm"
-            >
-              Columns
-            </button>
-            {isColumnsOpen && (
-              <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-[#E4E9E8] bg-white shadow-lg p-2">
-                {[
-                  { key: 'orderInfo', label: 'Order Info' },
-                  { key: 'customer', label: 'Customer' },
-                  { key: 'items', label: 'Items' },
-                  { key: 'amount', label: 'Amount' },
-                  { key: 'status', label: 'Status' },
-                  { key: 'action', label: 'Action' },
-                ].map(col => (
-                  <label
-                    key={col.key}
-                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-[#101313] cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={(visibleColumns as any)[col.key]}
-                      onChange={() =>
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          [col.key]: !(prev as any)[col.key],
-                        }))
-                      }
-                      className="h-4 w-4 rounded border-[#E4E9E8] text-[#0B7C6B] focus:ring-[#0B7C6B]/30"
-                    />
-                    {col.label}
-                  </label>
-                ))}
-              </div>
-            )}
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold text-[#848785]">From date</span>
+            <Input
+              type="date"
+              className="h-12 rounded-xl border-[#E4E9E8]"
+              value={startDate}
+              onChange={e => {
+                setStartDate(e.target.value);
+                setPage(1);
+              }}
+            />
           </div>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold text-[#848785]">To date</span>
+            <Input
+              type="date"
+              className="h-12 rounded-xl border-[#E4E9E8]"
+              value={endDate}
+              onChange={e => {
+                setEndDate(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold text-[#848785]">Columns</span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsColumnsOpen(o => !o)}
+                className="h-12 w-full rounded-xl border border-[#E4E9E8] bg-white px-3 pr-10 text-sm text-[#101313] text-left focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+              >
+                Choose columns
+              </button>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6AAA9]" />
+              {isColumnsOpen && (
+                <div className="absolute z-20 mt-2 w-full rounded-xl border border-[#E4E9E8] bg-white shadow-lg p-2">
+                  {[
+                    { key: 'saleRefDate', label: 'Sale Ref / Date' },
+                    { key: 'customer', label: 'Customer' },
+                    { key: 'items', label: 'Items' },
+                    { key: 'status', label: 'Status' },
+                    { key: 'amount', label: 'Amount' },
+                    { key: 'action', label: 'Action' },
+                  ].map(col => (
+                    <label
+                      key={col.key}
+                      className="flex items-center gap-2 px-2 py-1.5 text-sm text-[#101313] cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(visibleColumns as any)[col.key]}
+                        onChange={() =>
+                          setVisibleColumns(prev => ({
+                            ...prev,
+                            [col.key]: !(prev as any)[col.key],
+                          }))
+                        }
+                        className="h-4 w-4 rounded border-[#E4E9E8] text-[#0B7C6B] focus:ring-[#0B7C6B]/30"
+                      />
+                      {col.label}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        <div className="flex items-center gap-3 text-sm text-[#848785]">
+          <span>Custom date search filters orders server-side.</span>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="text-[#0B7C6B] font-semibold hover:underline"
+          >
+            Reset
+          </button>
         </div>
       </div>
 
@@ -243,7 +295,7 @@ export default function AdminOrders() {
               >
                 <div className="flex justify-between mb-3">
                   <div className="h-5 w-32 bg-[#F3F5F5] rounded" />
-                  <div className="h-6 w-20 bg-[#F3F5F5] rounded-full" />
+                  <div className="h-6 w-24 bg-[#F3F5F5] rounded-full" />
                 </div>
                 <div className="space-y-2">
                   <div className="h-4 w-full bg-[#F3F5F5] rounded" />
@@ -266,18 +318,10 @@ export default function AdminOrders() {
                     {new Date(order.createdAt).toLocaleDateString()}
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setOpenDropdownId(
-                      openDropdownId === order.id ? null : order.id
-                    );
-                  }}
-                  className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold ${getStatusColor(order.status)}`}
-                >
-                  {getStatusIcon(order.status)}
+                <div className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold bg-[#DFFEF5] text-[#17BD8D] border-[#17BD8D]/20">
+                  <CheckCircle2 className="mr-1 h-3 w-3" />
                   {order.status}
-                  <ChevronDown className="ml-1 h-3 w-3" />
-                </button>
+                </div>
               </div>
 
               <div className="space-y-2 text-sm mb-3">
@@ -297,57 +341,29 @@ export default function AdminOrders() {
                     {order.items.length === 1 ? 'book' : 'books'}
                   </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[#848785]">Total</span>
-                  <span className="font-bold text-[#101313]">
+                <div className="flex justify-between items-center rounded-lg bg-[#F8FAFB] p-2 mt-2">
+                  <span className="text-[#848785] font-medium">Sale Total</span>
+                  <span className="font-black text-lg text-[#0B7C6B]">
                     ${parseFloat(order.totalAmount.toString()).toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              {openDropdownId === order.id && (
-                <div className="mb-3 space-y-2 p-3 bg-[#F8FAFB] rounded-xl">
-                  {[
-                    'PENDING',
-                    'CONFIRMED',
-                    'SHIPPED',
-                    'DELIVERED',
-                    'CANCELLED',
-                  ].map(s => (
-                    <button
-                      key={s}
-                      onClick={() => {
-                        handleUpdateStatus(order.id, s);
-                        setOpenDropdownId(null);
-                      }}
-                      disabled={updateStatus.isPending || order.status === s}
-                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-colors ${
-                        order.status === s
-                          ? 'bg-white text-[#101313] border-2 border-[#0B7C6B]'
-                          : 'text-[#848785] hover:bg-white'
-                      } disabled:opacity-50`}
-                    >
-                      {s}
-                      {order.status === s && (
-                        <CheckCircle2 className="h-4 w-4 text-[#0B7C6B]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-
               <button
                 onClick={() => handleViewOrder(order)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#F3F5F5] px-4 py-2.5 text-sm font-bold text-[#101313] transition-colors hover:bg-[#E4E9E8]"
+                className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#F3F5F5] px-4 py-2.5 text-sm font-bold text-[#101313] transition-colors hover:bg-[#E4E9E8]"
               >
                 <Eye className="h-4 w-4" /> View Details
               </button>
             </div>
           ))
         ) : (
-          <div className="bg-white rounded-2xl border border-[#E4E9E8] p-8 text-center">
-            <ShoppingCart className="h-12 w-12 text-[#E4E9E8] mx-auto mb-2" />
-            <p className="text-[#848785]">No orders found</p>
+          <div className="bg-white rounded-2xl border border-[#E4E9E8] p-8 text-center flex flex-col items-center">
+            <TrendingUp className="h-12 w-12 text-[#E4E9E8] mb-3" />
+            <p className="font-bold text-[#101313]">No sales found</p>
+            <p className="text-[#848785] text-sm mt-1">
+              There are no delivered orders matching your criteria.
+            </p>
           </div>
         )}
       </div>
@@ -358,9 +374,16 @@ export default function AdminOrders() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
-                {visibleColumns.orderInfo && (
+                {visibleColumns.saleRefDate && (
                   <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                    Order Info
+                    <button
+                      type="button"
+                      onClick={() => handleSort('createdAt')}
+                      className="inline-flex items-center gap-2 font-semibold text-[#848785] hover:text-[#0B7C6B]"
+                    >
+                      Sale Ref / Date
+                      {renderSortIcon('createdAt')}
+                    </button>
                   </th>
                 )}
                 {visibleColumns.customer && (
@@ -373,14 +396,21 @@ export default function AdminOrders() {
                     Items
                   </th>
                 )}
-                {visibleColumns.amount && (
-                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                    Amount
-                  </th>
-                )}
                 {visibleColumns.status && (
                   <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
                     Status
+                  </th>
+                )}
+                {visibleColumns.amount && (
+                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    <button
+                      type="button"
+                      onClick={() => handleSort('totalAmount')}
+                      className="inline-flex items-center gap-2 font-semibold text-[#848785] hover:text-[#0B7C6B]"
+                    >
+                      Amount
+                      {renderSortIcon('totalAmount')}
+                    </button>
                   </th>
                 )}
                 {visibleColumns.action && (
@@ -407,7 +437,7 @@ export default function AdminOrders() {
                     key={order.id}
                     className="group transition-colors hover:bg-[#F8FAFB]/50"
                   >
-                    {visibleColumns.orderInfo && (
+                    {visibleColumns.saleRefDate && (
                       <td className="px-6 py-5">
                         <div className="font-bold text-[#101313]">
                           {order.orderNumber}
@@ -442,63 +472,17 @@ export default function AdminOrders() {
                         </Badge>
                       </td>
                     )}
-                    {visibleColumns.amount && (
-                      <td className="px-6 py-5 font-bold text-[#101313]">
-                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
-                      </td>
-                    )}
                     {visibleColumns.status && (
                       <td className="px-6 py-5">
-                      <div
-                        className="relative"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <button
-                          onClick={() =>
-                            setOpenDropdownId(
-                              openDropdownId === order.id ? null : order.id
-                            )
-                          }
-                          className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
-                        >
-                          {getStatusIcon(order.status)}
+                        <span className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold bg-[#DFFEF5] text-[#17BD8D] border-[#17BD8D]/20">
+                          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                           {order.status}
-                          <ChevronDown className="ml-1.5 h-3 w-3" />
-                        </button>
-
-                        {openDropdownId === order.id && (
-                          <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                            {[
-                              'PENDING',
-                              'CONFIRMED',
-                              'SHIPPED',
-                              'DELIVERED',
-                              'CANCELLED',
-                            ].map(s => (
-                              <button
-                                key={s}
-                                onClick={() => {
-                                  handleUpdateStatus(order.id, s);
-                                  setOpenDropdownId(null);
-                                }}
-                                disabled={
-                                  updateStatus.isPending || order.status === s
-                                }
-                                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-                                  order.status === s
-                                    ? 'bg-[#F8FAFB] text-[#101313]'
-                                    : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
-                              >
-                                {s}
-                                {order.status === s && (
-                                  <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                        </span>
+                      </td>
+                    )}
+                    {visibleColumns.amount && (
+                      <td className="px-6 py-5 font-black text-[#0B7C6B]">
+                        ${parseFloat(order.totalAmount.toString()).toFixed(2)}
                       </td>
                     )}
                     {visibleColumns.action && (
@@ -520,8 +504,8 @@ export default function AdminOrders() {
                     className="px-6 py-12 text-center text-[#848785] font-medium bg-[#F8FAFB]/30"
                   >
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <ShoppingCart className="h-8 w-8 text-[#E4E9E8]" />
-                      <p>No orders found matching your criteria</p>
+                      <TrendingUp className="h-8 w-8 text-[#E4E9E8]" />
+                      <p>No completed sales found matching your search.</p>
                     </div>
                   </td>
                 </tr>
@@ -627,27 +611,25 @@ export default function AdminOrders() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={`Order Details: ${selectedOrder?.orderNumber}`}
+        title={`Sale Details: ${selectedOrder?.orderNumber}`}
       >
         {selectedOrder && (
           <div className="space-y-8">
             <div className="flex items-center justify-between rounded-2xl bg-[#F8FAFB] p-6 border border-[#E4E9E8]">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#848785]">
-                  Order Status
+                  Status
                 </p>
-                <div
-                  className={`mt-2 inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-bold ${getStatusColor(selectedOrder.status)}`}
-                >
-                  {getStatusIcon(selectedOrder.status)}
+                <div className="mt-2 inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-bold bg-[#DFFEF5] text-[#17BD8D] border-[#17BD8D]/20">
+                  <CheckCircle2 className="mr-1 h-3 w-3" />
                   {selectedOrder.status}
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-xs font-bold uppercase tracking-wider text-[#848785]">
-                  Total Amount
+                  Total Received
                 </p>
-                <p className="mt-1 text-2xl font-bold text-[#101313]">
+                <p className="mt-1 text-2xl font-bold text-[#0B7C6B]">
                   ${parseFloat(selectedOrder.totalAmount.toString()).toFixed(2)}
                 </p>
               </div>
@@ -658,7 +640,7 @@ export default function AdminOrders() {
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#101313]">
                   Customer Details
                 </h3>
-                <div className="space-y-3 rounded-2xl border border-[#E4E9E8] p-5">
+                <div className="space-y-3 rounded-2xl border border-[#E4E9E8] p-5 h-[120px]">
                   <div className="flex justify-between">
                     <span className="text-sm text-[#848785]">Name</span>
                     <span className="text-sm font-bold text-[#101313]">
@@ -682,43 +664,41 @@ export default function AdminOrders() {
               </div>
               <div>
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#101313]">
-                  Change Status
+                  Order Context
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    'PENDING',
-                    'CONFIRMED',
-                    'SHIPPED',
-                    'DELIVERED',
-                    'CANCELLED',
-                  ].map(s => (
-                    <Button
-                      key={s}
-                      variant={
-                        selectedOrder.status === s ? 'default' : 'outline'
-                      }
-                      className={`h-11 rounded-xl text-xs font-bold ${
-                        selectedOrder.status === s
-                          ? 'bg-[#0B7C6B] text-white shadow-lg'
-                          : 'border-[#E4E9E8]'
-                      }`}
-                      onClick={() => handleUpdateStatus(selectedOrder.id, s)}
-                      disabled={
-                        updateStatus.isPending || selectedOrder.status === s
-                      }
-                    >
-                      {s}
-                    </Button>
-                  ))}
+                <div className="space-y-3 rounded-2xl border border-[#E4E9E8] p-5 h-[120px]">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#848785]">Placed On</span>
+                    <span className="text-sm font-bold text-[#101313]">
+                      {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#848785]">Total Items</span>
+                    <span className="text-sm font-bold text-[#101313]">
+                      {selectedOrder.items.reduce(
+                        (acc: number, item: any) => acc + item.quantity,
+                        0
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#848785]">
+                      Checkout Type
+                    </span>
+                    <span className="text-sm font-bold text-[#101313]">
+                      Stripe Standard
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div>
               <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[#101313]">
-                Order Items
+                Items Sold
               </h3>
-              <div className="divide-y divide-[#E4E9E8] rounded-2xl border border-[#E4E9E8] bg-white overflow-hidden">
+              <div className="divide-y divide-[#E4E9E8] rounded-2xl border border-[#E4E9E8] bg-white overflow-hidden max-h-[300px] overflow-y-auto w-full">
                 {selectedOrder.items.map((item: any) => (
                   <div
                     key={item.id}
@@ -758,13 +738,20 @@ export default function AdminOrders() {
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-between pt-4 gap-3">
+              <Button
+                onClick={() => window.print()}
+                className="h-12 rounded-xl text-[#848785] px-6 shadow-sm border border-[#E4E9E8] bg-white hover:bg-[#F8FAFB] transition-colors"
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Print Receipt
+              </Button>
               <Button
                 onClick={() => setIsModalOpen(false)}
-                className="h-12 rounded-xl border-[#E4E9E8] px-8"
+                className="h-12 rounded-xl border-[#E4E9E8] px-8 bg-[#101313] text-white hover:bg-black"
                 variant="outline"
               >
-                Close Details
+                Close View
               </Button>
             </div>
           </div>

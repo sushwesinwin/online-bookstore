@@ -9,6 +9,7 @@ import {
   Image as ImageIcon,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Loader2,
 } from 'lucide-react';
 import {
@@ -26,7 +27,20 @@ import { Badge } from '@/components/ui/badge';
 export default function AdminBooks() {
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'title' | 'author' | 'price' | 'createdAt' | 'inventory'>(
+    'createdAt'
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isColumnsOpen, setIsColumnsOpen] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    book: true,
+    category: true,
+    inventory: true,
+    price: true,
+    actions: true,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<any>(null);
 
@@ -34,7 +48,13 @@ export default function AdminBooks() {
     setMounted(true);
   }, []);
 
-  const { data, isLoading } = useBooks({ page, limit: 10, search });
+  const { data, isLoading } = useBooks({
+    page,
+    limit,
+    search,
+    sortBy,
+    sortOrder,
+  });
   const { data: categories } = useCategories();
 
   const createBook = useCreateBook();
@@ -53,6 +73,8 @@ export default function AdminBooks() {
   });
 
   if (!mounted) return null;
+
+  const pageSize = data?.meta?.limit ?? limit;
 
   const handleOpenModal = (book: any = null) => {
     if (book) {
@@ -127,14 +149,79 @@ export default function AdminBooks() {
       </div>
 
       {/* Filters */}
-      <div className="relative">
-        <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
-        <Input
-          placeholder="Search by title, author, or ISBN..."
-          className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base focus:ring-2 focus:ring-[#0B7C6B]/20"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+      <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-[#848785]" />
+          <Input
+            placeholder="Search by title, author, or ISBN..."
+            className="h-12 md:h-14 rounded-xl md:rounded-2xl border-[#E4E9E8] bg-white pl-10 md:pl-12 pr-4 text-sm md:text-base focus:ring-2 focus:ring-[#0B7C6B]/20"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-3 md:px-4 h-12 md:h-14 shadow-sm">
+            <span className="text-xs font-semibold text-[#848785]">Sort</span>
+            <select
+              value={`${sortBy}:${sortOrder}`}
+              onChange={e => {
+                const [by, order] = e.target.value.split(':');
+                setSortBy(by as any);
+                setSortOrder(order as any);
+                setPage(1);
+              }}
+              className="text-sm font-bold text-[#101313] bg-transparent outline-none cursor-pointer pr-2"
+            >
+              <option value="createdAt:desc">Newest first</option>
+              <option value="createdAt:asc">Oldest first</option>
+              <option value="title:asc">Title A → Z</option>
+              <option value="title:desc">Title Z → A</option>
+              <option value="price:asc">Price low → high</option>
+              <option value="price:desc">Price high → low</option>
+              <option value="inventory:desc">Stock high → low</option>
+              <option value="inventory:asc">Stock low → high</option>
+            </select>
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsColumnsOpen(o => !o)}
+              className="h-12 md:h-14 rounded-xl md:rounded-2xl border border-[#E4E9E8] bg-white px-4 text-sm font-bold text-[#101313] shadow-sm"
+            >
+              Columns
+            </button>
+            {isColumnsOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-[#E4E9E8] bg-white shadow-lg p-2">
+                {[
+                  { key: 'book', label: 'Book' },
+                  { key: 'category', label: 'Category' },
+                  { key: 'inventory', label: 'Inventory' },
+                  { key: 'price', label: 'Price' },
+                  { key: 'actions', label: 'Actions' },
+                ].map(col => (
+                  <label
+                    key={col.key}
+                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-[#101313] cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(visibleColumns as any)[col.key]}
+                      onChange={() =>
+                        setVisibleColumns(prev => ({
+                          ...prev,
+                          [col.key]: !(prev as any)[col.key],
+                        }))
+                      }
+                      className="h-4 w-4 rounded border-[#E4E9E8] text-[#0B7C6B] focus:ring-[#0B7C6B]/30"
+                    />
+                    {col.label}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mobile Cards */}
@@ -236,21 +323,31 @@ export default function AdminBooks() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
-                <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                  Book
-                </th>
-                <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                  Category
-                </th>
-                <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                  Inventory
-                </th>
-                <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                  Price
-                </th>
-                <th className="px-4 py-5 text-right text-xs font-semibold uppercase tracking-wider text-[#848785]">
-                  Actions
-                </th>
+                {visibleColumns.book && (
+                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    Book
+                  </th>
+                )}
+                {visibleColumns.category && (
+                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    Category
+                  </th>
+                )}
+                {visibleColumns.inventory && (
+                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    Inventory
+                  </th>
+                )}
+                {visibleColumns.price && (
+                  <th className="px-6 py-5 text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    Price
+                  </th>
+                )}
+                {visibleColumns.actions && (
+                  <th className="px-4 py-5 text-right text-xs font-semibold uppercase tracking-wider text-[#848785]">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E9E8]">
@@ -278,6 +375,7 @@ export default function AdminBooks() {
                       key={book.id}
                       className="group transition-colors hover:bg-[#F8FAFB]/50"
                     >
+                      {visibleColumns.book && (
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-4">
                           <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-[#F3F5F5] shadow-sm">
@@ -306,6 +404,8 @@ export default function AdminBooks() {
                           </div>
                         </div>
                       </td>
+                      )}
+                      {visibleColumns.category && (
                       <td className="px-6 py-4">
                         <Badge
                           variant="outline"
@@ -314,6 +414,8 @@ export default function AdminBooks() {
                           {book.category}
                         </Badge>
                       </td>
+                      )}
+                      {visibleColumns.inventory && (
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div
@@ -333,9 +435,13 @@ export default function AdminBooks() {
                           </span>
                         </div>
                       </td>
+                      )}
+                      {visibleColumns.price && (
                       <td className="px-6 py-4 font-bold text-[#101313]">
                         ${parseFloat(book.price.toString()).toFixed(2)}
                       </td>
+                      )}
+                      {visibleColumns.actions && (
                       <td className="px-4 py-4 text-right">
                         <div className="flex items-center justify-end space-x-1">
                           <button
@@ -352,6 +458,7 @@ export default function AdminBooks() {
                           </button>
                         </div>
                       </td>
+                      )}
                     </tr>
                   ))}
             </tbody>
@@ -359,23 +466,42 @@ export default function AdminBooks() {
         </div>
 
         {/* Pagination */}
-        {data && data.meta.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[#E4E9E8] bg-[#F8FAFB] px-6 py-4">
-            <p className="text-sm text-[#848785]">
-              Showing{' '}
-              <span className="font-semibold text-[#101313]">
-                {(page - 1) * 10 + 1}
-              </span>{' '}
-              to{' '}
-              <span className="font-semibold text-[#101313]">
-                {Math.min(page * 10, data.meta.total)}
-              </span>{' '}
-              of{' '}
-              <span className="font-semibold text-[#101313]">
-                {data.meta.total}
-              </span>{' '}
-              books
-            </p>
+        {data && (
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-t border-[#E4E9E8] bg-[#F8FAFB] px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <select
+                  className="h-10 w-32 appearance-none rounded-lg border border-[#E4E9E8] bg-white px-3 pr-9 text-sm text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
+                  value={limit}
+                  onChange={e => {
+                    setLimit(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {[10, 20, 50, 100].map(size => (
+                    <option key={size} value={size}>
+                      {size} / page
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6AAA9]" />
+              </div>
+              <p className="text-sm text-[#848785]">
+                Showing{' '}
+                <span className="font-semibold text-[#101313]">
+                  {data.meta.total === 0 ? 0 : (page - 1) * pageSize + 1}
+                </span>{' '}
+                to{' '}
+                <span className="font-semibold text-[#101313]">
+                  {Math.min(page * pageSize, data.meta.total)}
+                </span>{' '}
+                of{' '}
+                <span className="font-semibold text-[#101313]">
+                  {data.meta.total}
+                </span>{' '}
+                books
+              </p>
+            </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"

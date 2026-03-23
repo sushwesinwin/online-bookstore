@@ -17,6 +17,7 @@ import {
   X,
   ShoppingBag,
   Archive,
+  TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
@@ -35,6 +36,7 @@ export default function AdminLayout({
     { name: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
     { name: 'Purchases', icon: ShoppingBag, href: '/admin/purchases' },
     { name: 'Inventory', icon: Archive, href: '/admin/inventory' },
+    { name: 'Sales', icon: TrendingUp, href: '/admin/sales' },
     { name: 'Users', icon: Users, href: '/admin/users' },
     { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
