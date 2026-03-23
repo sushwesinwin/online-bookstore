@@ -7,13 +7,20 @@ import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Modal } from '@/components/ui/modal';
+import { RegisterForm } from '@/components/auth/register-form';
+import { LoginForm } from '@/components/auth/login-form';
+import { useRouter } from 'next/navigation';
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { itemCount } = useCartStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authView, setAuthView] = useState<'login' | 'register'>('register');
   const pathname = usePathname();
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const hiddenRoutes = ['/admin'];
@@ -121,15 +128,79 @@ export function Navbar() {
                   )}
                 </Button>
               </Link>
-              <Link href="/register" className="hidden sm:block">
-                <Button className="rounded-full bg-black hover:bg-gray-800 text-white text-sm font-light px-6 sm:px-8 py-5 shadow-lg shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-300">
-                  Sign up
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => {
+                  setAuthView('register');
+                  setIsAuthModalOpen(true);
+                }}
+                className="hidden sm:inline-flex rounded-full bg-black hover:bg-gray-800 text-white text-[13px] font-medium px-6 py-2.5 shadow-lg shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 transition-all duration-300 h-10"
+              >
+                Sign up
+              </Button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Auth Modal */}
+      <Modal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        title={authView === 'register' ? 'Sign up' : 'Sign in'}
+      >
+        <div className="flex flex-col gap-6">
+          {/* Auth Tabs Switch */}
+          <div className="flex p-1 bg-gray-50 rounded-2xl w-full max-w-[280px] mx-auto relative border border-gray-100 h-11">
+            <motion.div
+              className="absolute inset-y-1 bg-white rounded-xl shadow-sm border border-gray-100"
+              initial={false}
+              animate={{
+                left: authView === 'login' ? '4px' : '50%',
+                right: authView === 'login' ? '50%' : '4px',
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            />
+            <button
+              onClick={() => setAuthView('login')}
+              className={`relative z-10 flex-1 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
+                authView === 'login' ? 'text-black' : 'text-gray-400'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => setAuthView('register')}
+              className={`relative z-10 flex-1 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
+                authView === 'register' ? 'text-black' : 'text-gray-400'
+              }`}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={authView}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+            >
+              {authView === 'register' ? (
+                <RegisterForm 
+                  onSuccess={() => setIsAuthModalOpen(false)}
+                  onLoginClick={() => setAuthView('login')}
+                />
+              ) : (
+                <LoginForm 
+                  onSuccess={() => setIsAuthModalOpen(false)}
+                  onRegisterClick={() => setAuthView('register')}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </Modal>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -175,11 +246,16 @@ export function Navbar() {
                     </span>
                   )}
                 </Link>
-                <Link href="/register" className="block">
-                  <Button className="w-full rounded-2xl bg-black text-white h-14 font-bold text-lg shadow-xl shadow-black/10">
-                    Get Started
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setAuthView('register');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="w-full rounded-2xl bg-black text-white h-14 font-bold text-lg shadow-xl shadow-black/10"
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
           </motion.div>

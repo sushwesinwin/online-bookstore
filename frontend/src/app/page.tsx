@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { InfiniteScrollCategories } from '@/components/ui/infinite-scroll-categories';
 import {
   BookOpen,
@@ -428,10 +429,10 @@ export default function HomePage() {
                 </p>
 
                 <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto pt-6" onSubmit={(e) => e.preventDefault()}>
-                  <input
+                  <Input
                     type="email"
                     placeholder="you@example.com"
-                    className="flex-1 bg-white/10 border border-white/20 rounded-full px-8 py-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all font-medium h-16 text-lg"
+                    className="flex-1 bg-white/10 border-white/20 rounded-full px-8 py-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all font-medium h-16 text-lg"
                   />
                   <Button
                     size="lg"
