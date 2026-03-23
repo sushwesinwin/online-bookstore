@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { isCollapsed: persistedIsCollapsed } = useSidebarStore();
+  const { isCollapsed: persistedIsCollapsed } = useSidebarStore(); // kept for any child dependencies, though unused here
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
@@ -27,11 +27,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div
-      className={`flex-1 w-full transition-all duration-300 ${
-        isSidebarHidden ? '' : isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
-      }`}
-    >
+    <div className="flex-1 w-full transition-all duration-300">
       {children}
     </div>
   );

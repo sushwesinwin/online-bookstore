@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingCart, Bell, PenLine, Heart } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { ShoppingBag, Bell, PenLine, Heart, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useState, useEffect } from 'react';
@@ -13,11 +12,9 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { itemCount } = useCartStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Hide on admin and auth pages
   const hiddenRoutes = [
     '/admin',
     '/login',
@@ -27,123 +24,123 @@ export function Header() {
   ];
   const isHiddenRoute = hiddenRoutes.some(route => pathname?.startsWith(route));
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/books?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-    }
-  };
-
+  // Handle scroll for dynamic glassmorphism effect
   useEffect(() => {
     setMounted(true);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (isHiddenRoute) return null;
 
   if (!mounted) {
     return (
-      <header className="sticky top-0 z-40 w-full bg-white border-b border-[#E4E9E8]">
-        <div className="flex h-14 items-center justify-between px-6">
-          <div className="w-[300px]" />
-          <div className="flex items-center gap-3" />
-        </div>
-      </header>
+      <header className="sticky top-0 z-50 w-full bg-transparent h-16 sm:h-20" />
     );
   }
 
+  const navLinks = [
+    { name: 'Books', href: '/books' },
+    { name: 'Blogs', href: '/blogs' },
+    { name: 'Authors', href: '/authors' },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-white border-b border-[#E4E9E8]">
-      <div className="flex h-14 items-center justify-between px-6">
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative group/search">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-[#848785] group-focus-within/search:text-[#0B7C6B] transition-colors" />
-          </div>
-          <Input
-            type="text"
-            placeholder="What do you want to read?"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2 w-[280px] sm:w-[350px] lg:w-[420px] rounded-full bg-[#F4F8F8] border-transparent focus:bg-white focus:border-[#0B7C6B]/30 focus:ring-2 focus:ring-[#0B7C6B]/20 transition-all text-sm"
-          />
-        </form>
+    <header 
+      className={`sticky top-0 z-50 w-full transition-all duration-500 ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-2xl border-b border-black/[0.04] shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2' 
+          : 'bg-transparent border-transparent py-4'
+      }`}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-12">
+          
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="bg-black text-white p-1.5 rounded-lg group-hover:scale-105 transition-transform duration-300">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <span className="font-semibold tracking-tight text-xl">Lumora</span>
+          </Link>
 
-        {/* Right Side Actions */}
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <>
-              {/* Write / Sell a Book (for admins) */}
-              {user?.role === 'ADMIN' && (
-                <Link
-                  href="/admin/books"
-                  className="hidden sm:flex items-center gap-1.5 text-sm text-[#848785] hover:text-[#101313] transition-colors"
+          {/* Center: Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname?.startsWith(link.href);
+              return (
+                <Link 
+                  key={link.name} 
+                  href={link.href} 
+                  className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                    isActive ? 'bg-gray-100 text-black' : 'text-gray-500'
+                  }`}
                 >
-                  <PenLine className="h-4 w-4" />
-                  <span>Write</span>
+                  {link.name}
                 </Link>
-              )}
+              );
+            })}
+          </nav>
 
-              {/* Notifications placeholder */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-[#848785] hover:text-[#101313]"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
+          {/* Right: Actions / Auth */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {isAuthenticated ? (
+              <>
+                {user?.role === 'ADMIN' && (
+                  <Link href="/admin/books">
+                    <Button variant="ghost" className="hidden lg:flex items-center gap-2 text-sm font-light text-gray-500 hover:text-black hover:bg-black/5 rounded-full px-4 transition-all duration-300">
+                      <PenLine className="h-4 w-4" />
+                      Write
+                    </Button>
+                  </Link>
+                )}
 
-              {/* Cart */}
-              <Link href="/cart">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative h-9 w-9 text-[#848785] hover:text-[#101313]"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#FF6320] text-[10px] text-white flex items-center justify-center font-bold">
-                      {itemCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+                <div className="flex items-center gap-1 sm:gap-2 border-r border-gray-200 pr-2 sm:pr-4 mr-2 sm:mr-4">
+                  <Button variant="ghost" size="icon" className="group relative h-10 w-10 shrink-0 text-gray-500 hover:text-black hover:bg-black/5 rounded-full transition-all duration-300">
+                    <Bell className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                    <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                  </Button>
 
-              {/* Favorites */}
-              <Link href="/favorites">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative h-9 w-9 text-[#848785] hover:text-[#101313]"
-                >
-                  <Heart className="h-5 w-5" />
-                </Button>
-              </Link>
+                  <Link href="/favorites">
+                    <Button variant="ghost" size="icon" className="group h-10 w-10 shrink-0 text-gray-500 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all duration-300">
+                      <Heart className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                    </Button>
+                  </Link>
 
-              {/* User Avatar / Profile */}
-              <Link href="/profile">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:opacity-90 transition-opacity">
-                  {user?.firstName?.charAt(0).toUpperCase() || 'U'}
+                  <Link href="/cart">
+                    <Button variant="ghost" size="icon" className="group relative h-10 w-10 shrink-0 text-gray-500 hover:text-black hover:bg-black/5 rounded-full transition-all duration-300">
+                      <ShoppingBag className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-black text-[10px] text-white flex items-center justify-center font-black ring-2 ring-white shadow-md transform group-hover:scale-110 transition-transform duration-300">
+                          {itemCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
                 </div>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  className="text-sm font-medium text-[#848785] hover:text-[#101313]"
-                >
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button className="rounded-full bg-[#0B7C6B] hover:bg-[#096B5B] text-white text-sm font-semibold px-5 shadow-sm">
-                  Get Started
-                </Button>
-              </Link>
-            </>
-          )}
+
+                <Link href="/profile">
+                  <div className="group relative">
+                    <div className="absolute -inset-0.5 rounded-full bg-gradient-to-tr from-black to-gray-500 opacity-0 group-hover:opacity-100 blur transition duration-300"></div>
+                    <div className="relative h-10 w-10 rounded-full bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white text-sm font-bold cursor-pointer ring-2 ring-white shadow-md">
+                      {user?.firstName?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  </div>
+                </Link>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Link href="/register">
+                  <Button className="rounded-full bg-black hover:bg-gray-800 text-white text-sm font-light px-6 sm:px-8 py-5 shadow-lg shadow-black/20 hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-300">
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

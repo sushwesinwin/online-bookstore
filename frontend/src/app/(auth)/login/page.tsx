@@ -119,7 +119,7 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-white text-[#848785]">
-              New to Bookstore?
+              New to Lumora?
             </span>
           </div>
         </div>

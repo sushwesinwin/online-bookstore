@@ -1,17 +1,15 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
-import { Sidebar } from '@/components/layout/sidebar';
-import { LayoutContent } from '@/components/layout/layout-content';
-import { Header } from '@/components/layout/header';
+import { Navbar } from '@/components/layout/navbar';
 
-const inter = Inter({ subsets: ['latin'] });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'PageTurner — Online Bookstore',
-    template: '%s | PageTurner',
+    default: 'Lumora',
+    template: '%s | Lumora',
   },
   description:
     'Discover, browse, and purchase books online. Thousands of titles across every genre, delivered to your door.',
@@ -25,12 +23,12 @@ export const metadata: Metadata = {
     'non-fiction',
   ],
   icons: {
-    icon: '/favicon.png',
-    shortcut: '/favicon.png',
-    apple: '/favicon.png',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'PageTurner — Online Bookstore',
+    title: 'Lumora',
     description: 'Discover, browse, and purchase books online.',
     type: 'website',
   },
@@ -43,17 +41,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={jetbrainsMono.className}>
         <Providers>
-          <div className="flex min-h-screen bg-[#F8FAFB]">
-            {/* The Sidebar will only show on non-admin routes because admin has its own layout */}
-            <Sidebar />
-
-            {/* Main Content Area */}
-            <LayoutContent>
-              <Header />
-              {children}
-            </LayoutContent>
+          <div className="min-h-screen bg-[#F8FAFB]">
+            <Navbar />
+            {children}
           </div>
         </Providers>
       </body>

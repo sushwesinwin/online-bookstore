@@ -23,7 +23,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <span className="font-bold text-2xl bg-gradient-to-r from-[#0B7C6B] to-[#17BD8D] bg-clip-text text-transparent">
-              Bookstore
+              Lumora
             </span>
           </Link>
           <Link

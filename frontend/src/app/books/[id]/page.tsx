@@ -600,7 +600,7 @@ export default function BookDetailPage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12 px-4 mt-20">
         <div className="container mx-auto text-center">
-          <p>&copy; 2024 Online Bookstore. All rights reserved.</p>
+          <p>&copy; 2024 Online Lumora. All rights reserved.</p>
         </div>
       </footer>
     </div>

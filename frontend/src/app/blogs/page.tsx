@@ -24,7 +24,7 @@ export default function BlogsPage() {
         <div className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Bookstore Blog
+              Lumora Blog
             </h1>
             <p className="text-gray-600">
               Discover insights, reviews, and stories from our community.

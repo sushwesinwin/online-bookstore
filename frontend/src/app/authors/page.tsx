@@ -381,7 +381,7 @@ export default function AuthorsPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen className="h-6 w-6 text-[#0B7C6B]" />
-                <span className="font-bold text-white text-xl">Bookstore</span>
+                <span className="font-bold text-white text-xl">Lumora</span>
               </div>
               <p className="text-sm">
                 Your trusted source for books. Discover, read, and grow with us.
@@ -497,7 +497,7 @@ export default function AuthorsPage() {
 
           <div className="border-t border-[#383A3A] pt-8 text-center text-sm">
             <p>
-              &copy; 2024 Bookstore. All rights reserved. Made with ❤️ for book
+              &copy; 2024 Lumora. All rights reserved. Made with ❤️ for book
               lovers.
             </p>
           </div>
