@@ -58,11 +58,15 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                    isActive ? 'bg-gray-100 text-black' : 'text-gray-500'
+                  className={`group relative inline-flex h-9 w-max items-center justify-center bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:text-black focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                    isActive ? 'text-black font-semibold' : 'text-gray-500'
                   }`}
                 >
                   {link.name}
+                  {/* Animated Underline */}
+                  <span className={`absolute bottom-0 left-4 right-4 h-0.5 bg-black transform origin-left transition-transform duration-300 ${
+                    isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`} />
                 </Link>
               );
             })}
