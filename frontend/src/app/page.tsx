@@ -19,9 +19,13 @@ import { useBooks } from '@/lib/hooks/use-books';
 import { formatPrice } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { booksApi } from '@/lib/api/books';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { useAuthModalStore } from '@/lib/stores/auth-modal-store';
 
 export default function HomePage() {
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
+  const { openModal } = useAuthModalStore();
 
   // Fetch books for different sections
   const { data: trendingBooks, isLoading: trendingLoading } = useBooks({
@@ -73,7 +77,10 @@ export default function HomePage() {
                 <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-snug">
                   <strong className="text-black font-semibold">Discover</strong> books that <strong className="text-black font-semibold">inspire, comfort,</strong> and stay with you.
                 </p>
-                <Link href="/books" className="group uppercase font-black text-[10px] md:text-[11px] tracking-[0.2em] text-gray-500 border-b-2 border-transparent hover:border-black hover:text-black transition-colors mt-1 flex items-center gap-2 pb-1 relative">
+                <Link 
+                  href="/books" 
+                  className="group uppercase font-black text-[10px] md:text-[11px] tracking-[0.2em] text-gray-500 border-b-2 border-transparent hover:border-black hover:text-black transition-colors mt-1 flex items-center gap-2 pb-1 relative"
+                >
                   EXPLORE BOOKS
                   <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute bottom-0 left-0 w-8 border-b-2 border-black group-hover:w-full transition-all duration-300"></div>
@@ -125,25 +132,23 @@ export default function HomePage() {
         {/* Trending Books Section */}
         <section id="trending" className="py-16 px-4 bg-white">
           <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-orange-50 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-[#FF6320]" />
-                  </div>
-                  <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-orange-200 text-[#FF6320]">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
+              <div className="flex flex-col gap-6 md:max-w-xl">
+                <div className="flex items-center gap-4">
+                  <div className="h-[1px] w-12 bg-orange-500/30" />
+                  <Badge variant="outline" className="text-[10px] font-black tracking-[0.3em] uppercase border-orange-200 text-[#FF6320] px-3 py-1 bg-orange-50/50">
                     WEEKLY TOP 8
                   </Badge>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
-                  Trending Books
+                <h2 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter leading-[0.9]" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                  Trending <br />
+                  <span className="text-gray-300">Books.</span>
                 </h2>
-                <p className="text-gray-500 mt-2 text-lg">Our community's most-read stories this week.</p>
               </div>
               <Link href="/books/trending">
-                <Button variant="ghost" className="rounded-full hover:bg-black hover:text-white transition-all group font-medium text-base h-12 px-6">
+                <Button variant="outline" className="rounded-full border-black/10 hover:border-black hover:bg-black hover:text-white transition-all duration-500 group font-bold text-sm h-14 px-10 shadow-sm hover:shadow-xl hover:-translate-y-1">
                   View full collection
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -160,44 +165,52 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                {trendingBooks?.data.slice(0, 8).map(book => (
+                {trendingBooks?.data.slice(0, 8).map((book, index) => (
                   <Link
                     key={book.id}
                     href={`/books/${book.id}`}
                     onMouseEnter={() => prefetchBook(book.id)}
+                    className="group relative"
                   >
-                    <div className="group cursor-pointer">
-                      <div className="relative mb-5 overflow-hidden rounded-2xl bg-gray-50 aspect-3/4 shadow-xs group-hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                    {/* Rank Number Overlay */}
+                    <div className="absolute -top-6 -left-2 z-0 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 select-none">
+                      <span className="text-[8rem] font-serif font-black text-black leading-none italic italic-f">{String(index + 1).padStart(2, '0')}</span>
+                    </div>
+
+                    <div className="relative z-10 cursor-pointer">
+                      <div className="relative mb-6 overflow-hidden rounded-[2rem] bg-gray-50 aspect-[3/4.2] shadow-sm group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-all duration-700 group-hover:-translate-y-3">
                         <img
-                          src={
-                            book.imageUrl ||
-                            'https://covers.openlibrary.org/b/id/10909258-L.jpg'
-                          }
+                          src={book.imageUrl || 'https://covers.openlibrary.org/b/id/10909258-L.jpg'}
                           alt={book.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                         />
-                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Badge className="bg-white/90 backdrop-blur-sm text-black border-none font-bold shadow-sm">
-                            HOT
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                          <Badge className="bg-white/95 backdrop-blur-md text-black border-none font-black text-[10px] tracking-tighter shadow-xl px-4 py-1.5 rounded-full">
+                            TOP {index + 1}
                           </Badge>
                         </div>
-                      </div>
-                      <div className="space-y-1 px-1">
-                        <h3 className="font-bold text-base text-gray-900 line-clamp-1 group-hover:text-[#0B7C6B] transition-colors leading-tight">
-                          {book.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 font-medium">
-                          {book.author}
-                        </p>
-                        <div className="flex items-center justify-between pt-1">
-                          <span className="text-base font-bold text-[#0B7C6B]">
-                            {formatPrice(Number(book.price))}
-                          </span>
-                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-50 rounded-full border border-yellow-100">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            <span className="text-[11px] font-bold text-yellow-700">4.5</span>
+
+                        {/* Quick View / Price Glassmorphism */}
+                        <div className="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 delay-75">
+                          <div className="bg-black/80 backdrop-blur-xl rounded-2xl p-4 shadow-2xl flex items-center justify-between border border-white/10">
+                            <span className="text-white text-sm font-bold">{formatPrice(Number(book.price))}</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-white text-[11px] font-black tracking-tighter">4.8</span>
+                            </div>
                           </div>
                         </div>
+                      </div>
+
+                      <div className="space-y-1.5 text-center">
+                        <h3 className="font-bold text-base text-gray-900 line-clamp-1 group-hover:text-black transition-colors leading-tight px-2">
+                          {book.title}
+                        </h3>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+                          {book.author}
+                        </p>
                       </div>
                     </div>
                   </Link>

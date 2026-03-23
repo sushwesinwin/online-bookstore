@@ -39,7 +39,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="w-full max-w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[90vh] sm:max-h-[85vh]">
+      <div className="w-full max-w-full sm:max-w-sm bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[90vh] sm:max-h-[85vh]">
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[#E4E9E8]">
           <h2 className="text-lg sm:text-xl font-bold text-[#101313]">
             {title}

@@ -108,36 +108,6 @@ const AUTHORS_DATA: Record<
       'Persuasion',
     ],
   },
-  'Ernest Hemingway': {
-    name: 'Ernest Hemingway',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/ErnestHemingway.jpg/440px-ErnestHemingway.jpg',
-    bio: 'Ernest Miller Hemingway was an American novelist, short-story writer, and journalist. His economical and understated style—which he termed the "iceberg theory"—had a strong influence on 20th-century fiction. Many of his works are considered classics of American literature.',
-    birthYear: '1899-1961',
-    nationality: 'American',
-    genres: ['Fiction', 'Non-fiction', 'Short Stories'],
-    awards: ['Nobel Prize in Literature', 'Pulitzer Prize'],
-    famousWorks: [
-      'The Old Man and the Sea',
-      'A Farewell to Arms',
-      'For Whom the Bell Tolls',
-    ],
-  },
-  'Agatha Christie': {
-    name: 'Agatha Christie',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Agatha_Christie.png/440px-Agatha_Christie.png',
-    bio: 'Dame Agatha Mary Clarissa Christie was an English writer known for her 66 detective novels and 14 short story collections, particularly those revolving around fictional detectives Hercule Poirot and Miss Marple. She is the best-selling fiction writer of all time, with her novels having sold over two billion copies.',
-    birthYear: '1890-1976',
-    nationality: 'British',
-    genres: ['Mystery', 'Crime Fiction', 'Detective Fiction', 'Thriller'],
-    awards: ['Grand Master Award', 'Mystery Writers of America'],
-    famousWorks: [
-      'Murder on the Orient Express',
-      'And Then There Were None',
-      'The Murder of Roger Ackroyd',
-    ],
-  },
 };
 
 export default function AuthorPage({

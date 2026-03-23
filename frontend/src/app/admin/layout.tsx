@@ -12,7 +12,6 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  BookMarked,
   Menu,
   X,
   ShoppingBag,
@@ -49,12 +48,9 @@ export default function AdminLayout({
           <div className="w-72 lg:fixed lg:left-0 lg:top-0 lg:h-screen">
             <div className="w-full z-50 bg-white border-b border-[#E4E9E8] lg:hidden fixed left-0 top-0">
               <div className="flex items-center justify-between p-4">
-                <Link href="/" className="flex items-center space-x-2">
-                  <div className="p-2 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-lg">
-                    <BookMarked className="h-5 w-5 text-white" />
-                  </div>
+                <Link href="/" className="flex items-center">
                   <span className="text-lg font-black tracking-tight text-[#101313]">
-                    BookStore
+                    Lumora
                   </span>
                 </Link>
                 <button
@@ -122,7 +118,7 @@ export default function AdminLayout({
                     <div className="p-4 mt-auto">
                       <div className="bg-[#F8FAFB] rounded-3xl p-4 mb-4 border border-[#E4E9E8]">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
+                          <div className="h-10 w-10 rounded-full bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
                             {user?.firstName?.charAt(0) || 'A'}
                           </div>
                           <div className="flex flex-col min-w-0">
@@ -151,13 +147,10 @@ export default function AdminLayout({
             <aside className="hidden h-screen border-r border-[#E4E9E8] lg:block shadow-sm bg-white">
               <div className="flex h-full flex-col overflow-y-auto">
                 <div className="p-8">
-                  <Link href="/" className="flex items-center space-x-3 group">
-                    <div className="p-2.5 bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] rounded-xl group-hover:rotate-6 transition-transform shadow-lg shadow-[#0B7C6B]/20">
-                      <BookMarked className="h-6 w-6 text-white" />
-                    </div>
+                  <Link href="/" className="flex items-center group">
                     <div className="flex flex-col">
                       <span className="text-xl font-black tracking-tight text-[#101313]">
-                        BookStore
+                        Lumora
                       </span>
                       <span className="text-[10px] font-black uppercase tracking-widest text-[#17BD8D] bg-[#DFFEF5] px-2 py-0.5 rounded-full w-fit mt-0.5">
                         Admin Panel
@@ -203,7 +196,7 @@ export default function AdminLayout({
                 <div className="p-4 mt-auto">
                   <div className="bg-[#F8FAFB] rounded-3xl p-4 mb-4 border border-[#E4E9E8]">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
+                      <div className="h-10 w-10 rounded-full bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
                         {user?.firstName?.charAt(0) || 'A'}
                       </div>
                       <div className="flex flex-col min-w-0">

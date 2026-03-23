@@ -136,7 +136,7 @@ export default function AdminBooks() {
             Books
           </h1>
           <p className="mt-1 text-[#848785]">
-            Manage your bookstore library and inventory.
+            Manage your Lumora library and inventory.
           </p>
         </div>
         <Button
