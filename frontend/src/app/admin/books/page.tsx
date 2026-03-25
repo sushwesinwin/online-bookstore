@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Loader2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   useBooks,
   useCategories,
@@ -123,7 +124,15 @@ export default function AdminBooks() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this book?')) {
-      await deleteBook.mutateAsync(id);
+      try {
+        await deleteBook.mutateAsync(id);
+        toast.success('Book deleted successfully');
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message ||
+            'Failed to delete book. It might be part of an order.'
+        );
+      }
     }
   };
 

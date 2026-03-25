@@ -143,6 +143,11 @@ export class BooksService {
         if (error.code === 'P2025') {
           throw new NotFoundException('Book not found');
         }
+        if (error.code === 'P2003') {
+          throw new ConflictException(
+            'This book cannot be deleted because it is part of existing orders. Consider archiving it instead.'
+          );
+        }
       }
       throw error;
     }
