@@ -12,6 +12,7 @@ interface RoleGuardProps {
 
 export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
   const [mounted, setMounted] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -22,19 +23,27 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
   useEffect(() => {
     if (!mounted) return;
 
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    // Give a brief moment for auth state to settle after navigation
+    const timer = setTimeout(() => {
+      if (!isAuthenticated) {
+        router.push('/login');
+        return;
+      }
 
-    if (user && !allowedRoles.includes(user.role)) {
-      router.push('/');
-      return;
-    }
+      if (user && !allowedRoles.includes(user.role)) {
+        router.push('/');
+        return;
+      }
+
+      setIsChecking(false);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [mounted, isAuthenticated, user, allowedRoles, router]);
 
   if (
     !mounted ||
+    isChecking ||
     !isAuthenticated ||
     !user ||
     !allowedRoles.includes(user.role)
