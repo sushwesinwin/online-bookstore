@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { authApi } from '../api/auth';
 import { useAuthStore } from '../stores/auth-store';
 import { LoginCredentials, RegisterData } from '../api/types';
@@ -69,8 +70,8 @@ export function useAuth() {
     user,
     profile,
     isAuthenticated,
-    login: loginMutation.mutate,
-    register: registerMutation.mutate,
+    login: loginMutation.mutateAsync,
+    register: registerMutation.mutateAsync,
     logout: logoutMutation.mutate,
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,

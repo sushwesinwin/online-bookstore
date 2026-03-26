@@ -23,15 +23,6 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
-            Welcome back
-          </h2>
-          <p className="text-gray-500 mt-2 text-lg">
-            Login to access your account
-          </p>
-        </div>
-
         <LoginForm 
           onSuccess={() => router.push('/')}
           onRegisterClick={() => router.push('/register')} 

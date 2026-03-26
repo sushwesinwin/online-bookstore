@@ -169,9 +169,8 @@ export function Navbar() {
       <Modal 
         isOpen={isAuthModalOpen} 
         onClose={closeModal} 
-        title={authView === 'register' ? 'Join Lumora' : 'Welcome Back'}
       >
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {authMessage && (
             <div className="bg-orange-50 text-orange-600 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider text-center border border-orange-100 animate-in fade-in slide-in-from-top-1 duration-300">
               {authMessage}

@@ -76,14 +76,24 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="text-center sm:text-left mb-2">
+        <h3 className="text-2xl font-bold text-[#101313] tracking-tight">
+          Join Lumora
+        </h3>
+        <p className="text-[#848785] text-sm mt-1">
+          Create an account to start your journey
+        </p>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {registerError && (
             <div className="flex items-start space-x-2 p-3 text-xs text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
-                {registerError.message || 'Registration failed. Please try again.'}
+                {(registerError as any).response?.status === 409
+                  ? 'User with this email already exists.'
+                  : (registerError as any).response?.data?.message || 'Registration failed. Please try again.'}
               </span>
             </div>
           )}

@@ -55,13 +55,26 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="text-center sm:text-left mb-2">
+        <h3 className="text-2xl font-bold text-[#101313] tracking-tight">
+          Welcome Back
+        </h3>
+        <p className="text-[#848785] text-sm mt-1">
+          Access your account
+        </p>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {loginError && (
             <div className="flex items-start space-x-2 p-3 text-xs text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>{loginError.message || 'Invalid email or password'}</span>
+              <span>
+                {(loginError as any).response?.data?.message ||
+                  ((loginError as any).response?.status === 401
+                    ? 'Invalid email or password. Please try again.'
+                    : 'Login failed. Please check your credentials.')}
+              </span>
             </div>
           )}
 
