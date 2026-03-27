@@ -4,7 +4,11 @@ import './globals.css';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/layout/navbar';
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'] });
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -41,7 +45,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={jetbrainsMono.className}>
+      <body className={`${jetbrainsMono.variable} ${jetbrainsMono.className}`} suppressHydrationWarning>
         <Providers>
           <div className="min-h-screen bg-[#F8FAFB]">
             <Navbar />
