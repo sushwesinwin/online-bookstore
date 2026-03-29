@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ordersApi } from '@/lib/api/orders';
 import { useCartStore } from '@/lib/stores/cart-store';
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -222,5 +222,33 @@ export default function CheckoutSuccessPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F9FCFB]">
+        <main className="container mx-auto px-4 py-20">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border border-[#E4E9E8]">
+              <div className="mb-8 flex justify-center">
+                <div className="relative rounded-full p-8 shadow-xl bg-[#0B7C6B]">
+                  <Loader2 className="h-16 w-16 text-white animate-spin" />
+                </div>
+              </div>
+              <h1 className="text-4xl font-bold text-[#101313] mb-4">
+                Processing...
+              </h1>
+              <p className="text-lg text-[#848785]">
+                Please wait while we process your order.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    }>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }

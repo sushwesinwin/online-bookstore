@@ -55,6 +55,8 @@
   --color-destructive-foreground: #ffffff;
 
   --radius: 0.5rem;
+  --font-sans: var(--font-jetbrains-mono);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 * {

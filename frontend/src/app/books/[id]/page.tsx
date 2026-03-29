@@ -216,10 +216,10 @@ export default function BookDetailPage() {
               <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-100">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-4xl font-bold text-indigo-600">
-                    {formatPrice(book.price)}
+                    {formatPrice(Number(book.price))}
                   </span>
                   <span className="text-lg text-gray-500 line-through">
-                    {formatPrice(book.price * 1.2)}
+                    {formatPrice(Number(book.price) * 1.2)}
                   </span>
                   <Badge variant="destructive" className="text-sm">
                     Save 20%
@@ -394,7 +394,7 @@ export default function BookDetailPage() {
                     <div className="flex justify-between py-3 border-b">
                       <span className="font-semibold text-gray-700">Price</span>
                       <span className="text-gray-600">
-                        {formatPrice(book.price)}
+                        {formatPrice(Number(book.price))}
                       </span>
                     </div>
                   </div>

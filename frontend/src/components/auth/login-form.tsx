@@ -57,12 +57,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
   return (
     <div className="space-y-6">
       <div className="text-center sm:text-left mb-2">
-        <h3 className="text-2xl font-bold text-[#101313] tracking-tight">
+        <h3 className="text-2xl font-bold text-[#101313] tracking-tight mb-5">
           Welcome Back
         </h3>
-        <p className="text-[#848785] text-sm mt-1">
-          Access your account
-        </p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -227,7 +227,7 @@ export default function CartPage() {
                         {formatPrice(Number(item.book.price) * item.quantity)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {formatPrice(item.book.price)} each
+                        {formatPrice(Number(item.book.price))} each
                       </p>
                     </div>
                   </div>

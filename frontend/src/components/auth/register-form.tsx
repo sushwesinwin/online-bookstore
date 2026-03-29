@@ -67,23 +67,19 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       await register({ ...data, role: 'USER' });
-      if (!registerError) {
-        onSuccess?.();
-      }
+      // If we reach here, it succeeded. MutateAsync will throw on error.
+      onSuccess?.();
     } catch (err) {
-      // Error handled by hook
+      // Error handled by hook and display in form
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center sm:text-left mb-2">
-        <h3 className="text-2xl font-bold text-[#101313] tracking-tight">
+        <h3 className="text-2xl font-bold text-[#101313] tracking-tight mb-5">
           Join Lumora
         </h3>
-        <p className="text-[#848785] text-sm mt-1">
-          Create an account to start your journey
-        </p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -16,11 +16,9 @@ export function useAuth() {
     onSuccess: data => {
       setAuth(data.user, data.accessToken, data.refreshToken);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
-      if (data.user.role === 'ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/');
-      }
+      toast.success('Successfully logged in!', {
+        description: `Welcome back, ${data.user.firstName}!`,
+      });
     },
   });
 
@@ -29,11 +27,9 @@ export function useAuth() {
     onSuccess: data => {
       setAuth(data.user, data.accessToken, data.refreshToken);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
-      if (data.user.role === 'ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/');
-      }
+      toast.success('Account created successfully!', {
+        description: 'Welcome to Lumora!',
+      });
     },
   });
 
@@ -42,6 +38,9 @@ export function useAuth() {
     onSuccess: () => {
       clearAuth();
       queryClient.clear();
+      toast.success('Successfully logged out', {
+        description: 'Come back soon!',
+      });
       router.push('/login');
     },
   });

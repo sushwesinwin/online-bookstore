@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useState, useEffect, useRef } from 'react';
@@ -17,7 +17,7 @@ import { useAuthModalStore } from '@/lib/stores/auth-modal-store';
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { itemCount } = useCartStore();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const { 
     isOpen: isAuthModalOpen, 
     view: authView, 
@@ -154,12 +154,44 @@ export function Navbar() {
                   )}
                 </Button>
               </Link>
-              <Button 
-                onClick={() => openModal('register')}
-                className="hidden sm:inline-flex rounded-full bg-black hover:bg-gray-800 text-white text-[13px] font-medium px-6 py-2.5 shadow-lg shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 transition-all duration-300 h-10"
-              >
-                Sign up
-              </Button>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2 pl-2">
+                  <Link href="/profile" className="hidden sm:block">
+                    <Button variant="ghost" className="flex items-center gap-2 rounded-full px-3 hover:bg-black/5 transition-all duration-300 h-10 group">
+                      <div className="h-7 w-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold uppercase ring-2 ring-black/5 group-hover:ring-black/10 transition-all">
+                        {user?.firstName?.[0] || 'U'}
+                      </div>
+                      <span className="text-sm font-semibold text-black tracking-tight">
+                        {user?.firstName}
+                      </span>
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => logout()}
+                    title="Logout"
+                    className="rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <button 
+                    onClick={() => openModal('login')}
+                    className="hidden sm:block text-sm font-semibold text-gray-500 hover:text-black px-4 py-2 transition-colors"
+                  >
+                    Sign in
+                  </button>
+                  <Button 
+                    onClick={() => openModal('register')}
+                    className="rounded-full bg-black hover:bg-gray-800 text-white text-[13px] font-bold px-6 py-2.5 shadow-lg shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 h-10"
+                  >
+                    Join
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -284,15 +316,37 @@ export function Navbar() {
                     </span>
                   )}
                 </Link>
-                <Button 
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    openModal('register');
-                  }}
-                  className="w-full rounded-2xl bg-black text-white h-14 font-bold text-lg shadow-xl shadow-black/10"
-                >
-                  Get Started
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Link 
+                      href="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
+                    >
+                      <User className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                      <span className="font-bold text-gray-900 group-hover:text-white">Profile</span>
+                    </Link>
+                    <Button 
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        logout();
+                      }}
+                      className="w-full rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 h-14 font-bold text-lg transition-colors"
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      openModal('register');
+                    }}
+                    className="w-full rounded-2xl bg-black text-white h-14 font-bold text-lg shadow-xl shadow-black/10 transition-transform active:scale-95"
+                  >
+                    Get Started
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>
