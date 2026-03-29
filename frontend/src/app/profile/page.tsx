@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -12,13 +11,10 @@ import {
   Lock,
   CheckCircle2,
   AlertCircle,
-  Shield,
-  Package,
   Calendar,
-  ChevronRight,
-  LogOut,
   Edit3,
   Key,
+  Camera,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
@@ -44,7 +40,10 @@ export default function ProfilePage() {
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
+    profileImage: '',
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // Password form state
   const [passwordForm, setPasswordForm] = useState({
@@ -60,9 +59,30 @@ export default function ProfilePage() {
       setProfileForm({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
+        profileImage: user.profileImage || '',
       });
+      setImagePreview(user.profileImage || null);
     }
   }, [user]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+        setProfileForm(p => ({ ...p, profileImage: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setProfileForm(p => ({ ...p, profileImage: '' }));
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -88,6 +108,7 @@ export default function ProfilePage() {
     updateProfile({
       firstName: profileForm.firstName,
       lastName: profileForm.lastName,
+      profileImage: profileForm.profileImage,
     });
   };
 
@@ -130,9 +151,17 @@ export default function ProfilePage() {
             <div className="px-8 pb-8 -mt-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               {/* Avatar */}
               <div className="flex items-end gap-4">
-                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white text-3xl font-bold shadow-xl border-4 border-white">
-                  {initials}
-                </div>
+                {user.profileImage ? (
+                  <img
+                    src={user.profileImage}
+                    alt={`${user.firstName} ${user.lastName}`}
+                    className="h-24 w-24 rounded-2xl object-cover shadow-xl border-4 border-white"
+                  />
+                ) : (
+                  <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white text-3xl font-bold shadow-xl border-4 border-white">
+                    {initials}
+                  </div>
+                )}
                 <div className="pb-1">
                   <h1 className="text-2xl font-bold text-[#101313]">
                     {user.firstName} {user.lastName}
@@ -159,52 +188,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <Link href="/orders">
-              <div className="bg-white rounded-2xl border border-[#E4E9E8] p-5 flex items-center justify-between hover:border-[#0B7C6B]/50 hover:shadow-md transition-all cursor-pointer group">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#E4FFFB]">
-                    <Package className="h-5 w-5 text-[#0B7C6B]" />
-                  </div>
-                  <span className="font-semibold text-[#101313] text-sm">
-                    My Orders
-                  </span>
-                </div>
-                <ChevronRight className="h-4 w-4 text-[#848785] group-hover:text-[#0B7C6B] transition-colors" />
-              </div>
-            </Link>
-
-            <button
-              onClick={() => setActiveTab('security')}
-              className="bg-white rounded-2xl border border-[#E4E9E8] p-5 flex items-center justify-between hover:border-[#0B7C6B]/50 hover:shadow-md transition-all cursor-pointer group text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[#FFF4ED]">
-                  <Shield className="h-5 w-5 text-[#FF6320]" />
-                </div>
-                <span className="font-semibold text-[#101313] text-sm">
-                  Security
-                </span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-[#848785] group-hover:text-[#0B7C6B] transition-colors" />
-            </button>
-
-            <button
-              onClick={() => logout()}
-              className="bg-white rounded-2xl border border-[#E4E9E8] p-5 flex items-center justify-between hover:border-red-300 hover:shadow-md transition-all cursor-pointer group col-span-2 sm:col-span-1"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-red-50">
-                  <LogOut className="h-5 w-5 text-red-500" />
-                </div>
-                <span className="font-semibold text-[#101313] text-sm">
-                  Sign Out
-                </span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-[#848785] group-hover:text-red-400 transition-colors" />
-            </button>
-          </div>
 
           {/* Tabs */}
           <div className="bg-white rounded-3xl border border-[#E4E9E8] overflow-hidden shadow-sm">
@@ -252,6 +235,58 @@ export default function ProfilePage() {
                       'Failed to update profile.'}
                   </div>
                 )}
+
+                {/* Profile Image Upload */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-[#101313]">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-start gap-4">
+                    <div className="relative">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Profile preview"
+                          className="h-24 w-24 rounded-2xl object-cover border-2 border-[#E4E9E8]"
+                        />
+                      ) : (
+                        <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white text-2xl font-bold border-2 border-[#E4E9E8]">
+                          {initials}
+                        </div>
+                      )}
+                      <label
+                        htmlFor="profile-image"
+                        className="absolute -bottom-2 -right-2 bg-[#0B7C6B] hover:bg-[#096B5B] text-white p-2 rounded-full cursor-pointer shadow-lg transition-colors"
+                      >
+                        <Camera className="h-4 w-4" />
+                        <input
+                          id="profile-image"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-xs text-[#848785]">
+                        Upload a profile picture. Recommended size: 400x400px.
+                        JPG, PNG, or GIF.
+                      </p>
+                      {imagePreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={removeImage}
+                          className="text-xs h-8"
+                        >
+                          Remove Image
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Email (read-only) */}
                 <div className="space-y-2">

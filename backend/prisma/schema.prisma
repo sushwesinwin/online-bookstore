@@ -7,18 +7,19 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
-  password  String
-  firstName String
-  lastName  String
-  role      Role       @default(USER)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  cart      CartItem[]
-  favorites Favorite[]
-  orders    Order[]
-  blogPosts BlogPost[]
+  id           String     @id @default(cuid())
+  email        String     @unique
+  password     String
+  firstName    String
+  lastName     String
+  profileImage String?
+  role         Role       @default(USER)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  cart         CartItem[]
+  favorites    Favorite[]
+  orders       Order[]
+  blogPosts    BlogPost[]
 
   @@map("users")
 }

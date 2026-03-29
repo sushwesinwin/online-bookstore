@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Menu, X, User, LogOut } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, LogOut, Heart, Package, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useState, useEffect, useRef } from 'react';
@@ -28,9 +28,11 @@ export function Navbar() {
   } = useAuthModalStore();
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   const hiddenRoutes = ['/admin'];
   const isHiddenRoute = hiddenRoutes.some(route => pathname?.startsWith(route));
@@ -44,6 +46,9 @@ export function Navbar() {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMobileMenuOpen(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
       }
     };
 
@@ -136,42 +141,103 @@ export function Navbar() {
 
             {/* Right: Cart & Sign Up */}
             <div className="flex items-center gap-2 sm:gap-4">
-              <Link 
-                href="/cart"
-                onClick={(e) => {
-                  if (!isAuthenticated) {
-                    e.preventDefault();
-                    openModal('login', 'Please sign in to view your cart');
-                  }
-                }}
-              >
-                <Button variant="ghost" size="icon" className="group relative h-10 w-10 shrink-0 text-gray-500 hover:text-black hover:bg-black/5 rounded-full transition-all duration-300">
-                  <ShoppingBag className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                  {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-black text-[10px] text-white flex items-center justify-center font-black ring-2 ring-white shadow-md transform group-hover:scale-110 transition-transform duration-300">
-                      {itemCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+              {isAuthenticated && (
+                <Link href="/cart">
+                  <Button variant="ghost" size="icon" className="group relative h-10 w-10 shrink-0 text-gray-500 hover:text-black hover:bg-black/5 rounded-full transition-all duration-300">
+                    <ShoppingBag className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                    {itemCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-black text-[10px] text-white flex items-center justify-center font-black ring-2 ring-white shadow-md transform group-hover:scale-110 transition-transform duration-300">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              )}
               {isAuthenticated ? (
                 <div className="flex items-center gap-2 pl-2">
-                  <Link href="/profile" className="hidden sm:block">
-                    <Button variant="ghost" className="flex items-center gap-2 rounded-full px-3 hover:bg-black/5 transition-all duration-300 h-10 group">
-                      <div className="h-7 w-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold uppercase ring-2 ring-black/5 group-hover:ring-black/10 transition-all">
-                        {user?.firstName?.[0] || 'U'}
-                      </div>
+                  <div className="hidden sm:block relative" ref={profileDropdownRef}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                      className="flex items-center gap-2 rounded-full px-3 hover:bg-black/5 transition-all duration-300 h-10 group"
+                    >
+                      {user?.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.firstName}
+                          className="h-7 w-7 rounded-full object-cover ring-2 ring-black/5 group-hover:ring-black/10 transition-all"
+                        />
+                      ) : (
+                        <div className="h-7 w-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold uppercase ring-2 ring-black/5 group-hover:ring-black/10 transition-all">
+                          {user?.firstName?.[0] || 'U'}
+                        </div>
+                      )}
                       <span className="text-sm font-semibold text-black tracking-tight">
                         {user?.firstName}
                       </span>
+                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
                     </Button>
-                  </Link>
-                  <Button 
-                    variant="ghost" 
+
+                    <AnimatePresence>
+                      {isProfileDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden"
+                        >
+                          <Link
+                            href="/profile"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                          >
+                            <User className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
+                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">Profile</span>
+                          </Link>
+
+                          <Link
+                            href="/orders"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                          >
+                            <Package className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
+                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">My Orders</span>
+                          </Link>
+
+                          <Link
+                            href="/favorites"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                          >
+                            <Heart className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
+                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">Favourites</span>
+                          </Link>
+
+                          <div className="border-t border-gray-100 my-2"></div>
+
+                          <button
+                            onClick={() => {
+                              setIsProfileDropdownOpen(false);
+                              logout();
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors group w-full text-left"
+                          >
+                            <LogOut className="h-5 w-5 text-gray-500 group-hover:text-red-500 transition-colors" />
+                            <span className="text-sm font-semibold text-gray-700 group-hover:text-red-500 transition-colors">Logout</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Mobile: Show only logout icon */}
+                  <Button
+                    variant="ghost"
                     size="icon"
                     onClick={() => logout()}
                     title="Logout"
-                    className="rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
+                    className="sm:hidden rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
                   >
                     <LogOut className="h-5 w-5" />
                   </Button>
@@ -295,30 +361,26 @@ export function Navbar() {
               </div>
               
               <div className="pt-6 border-t border-gray-100 space-y-4">
-                <Link 
-                  href="/cart" 
-                  onClick={(e) => {
-                    if (!isAuthenticated) {
-                      e.preventDefault();
-                      setIsMobileMenuOpen(false);
-                      openModal('login', 'Please sign in to view your cart');
-                    }
-                  }}
-                  className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <ShoppingBag className="h-5 w-5 text-gray-500 group-hover:text-white" />
-                    <span className="font-bold text-gray-900 group-hover:text-white">Shopping Cart</span>
-                  </div>
-                  {itemCount > 0 && (
-                    <span className="bg-black text-white group-hover:bg-white group-hover:text-black text-xs font-black h-6 w-6 rounded-full flex items-center justify-center">
-                      {itemCount}
-                    </span>
-                  )}
-                </Link>
+                {isAuthenticated && (
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <ShoppingBag className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                      <span className="font-bold text-gray-900 group-hover:text-white">Shopping Cart</span>
+                    </div>
+                    {itemCount > 0 && (
+                      <span className="bg-black text-white group-hover:bg-white group-hover:text-black text-xs font-black h-6 w-6 rounded-full flex items-center justify-center">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Link>
+                )}
                 {isAuthenticated ? (
                   <>
-                    <Link 
+                    <Link
                       href="/profile"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
@@ -326,7 +388,23 @@ export function Navbar() {
                       <User className="h-5 w-5 text-gray-500 group-hover:text-white" />
                       <span className="font-bold text-gray-900 group-hover:text-white">Profile</span>
                     </Link>
-                    <Button 
+                    <Link
+                      href="/orders"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
+                    >
+                      <Package className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                      <span className="font-bold text-gray-900 group-hover:text-white">My Orders</span>
+                    </Link>
+                    <Link
+                      href="/favorites"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
+                    >
+                      <Heart className="h-5 w-5 text-gray-500 group-hover:text-white" />
+                      <span className="font-bold text-gray-900 group-hover:text-white">Favourites</span>
+                    </Link>
+                    <Button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
                         logout();

@@ -281,6 +281,7 @@ export class AuthService {
       data: {
         ...(dto.firstName !== undefined && { firstName: dto.firstName }),
         ...(dto.lastName !== undefined && { lastName: dto.lastName }),
+        ...(dto.profileImage !== undefined && { profileImage: dto.profileImage }),
       },
     });
     const { password: _, ...userWithoutPassword } = user;
