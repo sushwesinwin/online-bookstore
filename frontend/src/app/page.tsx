@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { InfiniteScrollCategories } from '@/components/ui/infinite-scroll-categories';
 import {
   BookOpen,
   Star,
@@ -17,10 +16,11 @@ import {
 } from 'lucide-react';
 import { useBooks } from '@/lib/hooks/use-books';
 import { formatPrice } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { booksApi } from '@/lib/api/books';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useAuthModalStore } from '@/lib/stores/auth-modal-store';
+import { quotesApi } from '@/lib/api/quotes';
 
 export default function HomePage() {
   const queryClient = useQueryClient();
@@ -40,6 +40,13 @@ export default function HomePage() {
     limit: 6,
     sortBy: 'price',
     sortOrder: 'desc',
+  });
+
+  // Fetch random quote
+  const { data: quote, isLoading: quoteLoading } = useQuery({
+    queryKey: ['randomQuote'],
+    queryFn: quotesApi.getRandomQuote,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Prefetch book details on hover
@@ -220,20 +227,56 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="py-16 px-4 bg-[#F9FCFB]">
-          <div className="container mx-auto">
-            <div className="flex flex-col items-center text-center mb-16">
-              <Badge variant="outline" className="mb-4 text-[10px] font-black tracking-[0.3em] uppercase border-black/10 text-gray-500">
-                DISCOVER MORE
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
-                Browse by Category
-              </h2>
-              <div className="w-24 h-1 bg-black/5 mt-6 rounded-full" />
-            </div>
+        {/* Quote Section */}
+        <section className="py-20 px-4 bg-[#F9FCFB]">
+          <div className="container mx-auto max-w-5xl">
+            {quoteLoading ? (
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-gray-200 rounded w-1/4 mx-auto" />
+                <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto" />
+                <div className="h-6 bg-gray-200 rounded w-1/3 mx-auto" />
+              </div>
+            ) : quote ? (
+              <div className="relative">
+                {/* Quote Mark Decoration */}
+                <div className="absolute -top-8 left-0 text-[10rem] md:text-[12rem] font-serif text-[#0B7C6B]/5 leading-none select-none pointer-events-none">
+                  "
+                </div>
 
-            <InfiniteScrollCategories />
+                <div className="relative z-10 text-center space-y-8 py-8">
+                  <Badge variant="outline" className="text-[10px] font-black tracking-[0.3em] uppercase border-[#0B7C6B]/20 text-[#0B7C6B]">
+                    QUOTE OF THE MOMENT
+                  </Badge>
+
+                  <blockquote className="space-y-6">
+                    <p className="text-2xl md:text-4xl lg:text-5xl font-light text-gray-900 leading-relaxed tracking-tight italic px-4 md:px-12">
+                      "{quote.text}"
+                    </p>
+
+                    <footer className="space-y-2">
+                      <cite className="not-italic text-lg md:text-xl font-bold text-[#0B7C6B]">
+                        — {quote.author}
+                      </cite>
+                      {quote.source && (
+                        <p className="text-sm text-gray-500 font-medium">
+                          {quote.source}
+                        </p>
+                      )}
+                    </footer>
+                  </blockquote>
+
+                  <div className="flex justify-center pt-4">
+                    <button
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ['randomQuote'] })}
+                      className="group text-xs uppercase tracking-[0.3em] font-black text-gray-400 hover:text-[#0B7C6B] transition-colors flex items-center gap-2 px-6 py-3 border border-gray-200 hover:border-[#0B7C6B]/20 rounded-full hover:bg-[#0B7C6B]/5"
+                    >
+                      <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+                      New Quote
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
 

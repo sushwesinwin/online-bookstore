@@ -207,8 +207,108 @@ async function main() {
     console.log(`✅ Created book: ${book.title}`);
   }
 
+  // Sample quotes data
+  const quotesData = [
+    {
+      text: 'A reader lives a thousand lives before he dies. The man who never reads lives only one.',
+      author: 'George R.R. Martin',
+      source: 'A Dance with Dragons',
+      category: 'Reading',
+    },
+    {
+      text: 'The only thing that you absolutely have to know, is the location of the library.',
+      author: 'Albert Einstein',
+      category: 'Knowledge',
+    },
+    {
+      text: 'There is no friend as loyal as a book.',
+      author: 'Ernest Hemingway',
+      category: 'Reading',
+    },
+    {
+      text: 'Books are a uniquely portable magic.',
+      author: 'Stephen King',
+      source: 'On Writing',
+      category: 'Reading',
+    },
+    {
+      text: 'I have always imagined that Paradise will be a kind of library.',
+      author: 'Jorge Luis Borges',
+      category: 'Reading',
+    },
+    {
+      text: 'A room without books is like a body without a soul.',
+      author: 'Marcus Tullius Cicero',
+      category: 'Reading',
+    },
+    {
+      text: 'So many books, so little time.',
+      author: 'Frank Zappa',
+      category: 'Reading',
+    },
+    {
+      text: 'Reading is to the mind what exercise is to the body.',
+      author: 'Joseph Addison',
+      category: 'Knowledge',
+    },
+    {
+      text: 'The more that you read, the more things you will know. The more that you learn, the more places you will go.',
+      author: 'Dr. Seuss',
+      source: 'I Can Read With My Eyes Shut!',
+      category: 'Learning',
+    },
+    {
+      text: 'A book is a dream that you hold in your hand.',
+      author: 'Neil Gaiman',
+      category: 'Reading',
+    },
+    {
+      text: 'If you don\'t like to read, you haven\'t found the right book.',
+      author: 'J.K. Rowling',
+      category: 'Reading',
+    },
+    {
+      text: 'Think before you speak. Read before you think.',
+      author: 'Fran Lebowitz',
+      category: 'Knowledge',
+    },
+    {
+      text: 'The reading of all good books is like a conversation with the finest minds of past centuries.',
+      author: 'René Descartes',
+      category: 'Reading',
+    },
+    {
+      text: 'Books are the quietest and most constant of friends; they are the most accessible and wisest of counselors.',
+      author: 'Charles William Eliot',
+      category: 'Reading',
+    },
+    {
+      text: 'You can never get a cup of tea large enough or a book long enough to suit me.',
+      author: 'C.S. Lewis',
+      category: 'Reading',
+    },
+  ];
+
+  // Create quotes
+  let quoteCount = 0;
+  for (const quoteData of quotesData) {
+    await prisma.quote.upsert({
+      where: {
+        id: `quote-${quoteCount}`
+      },
+      update: quoteData,
+      create: {
+        id: `quote-${quoteCount}`,
+        ...quoteData,
+      },
+    });
+    quoteCount++;
+  }
+  console.log(`✅ Created ${quoteCount} quotes`);
+
   console.log('🎉 Database seeding completed successfully!');
   console.log(`📚 Created ${booksData.length} books`);
+  console.log(`💭 Created ${quoteCount} quotes`);
   console.log('👤 Created admin user: admin@bookstore.com (password: admin123)');
   console.log('👤 Created test user: user@bookstore.com (password: user123)');
 }

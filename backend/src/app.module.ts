@@ -11,6 +11,7 @@ import { CartModule } from './cart/cart.module';
 import { AdminModule } from './admin/admin.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { BlogsModule } from './blogs/blogs.module';
+import { QuotesModule } from './quotes/quotes.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { BlogsModule } from './blogs/blogs.module';
     AdminModule,
     FavoritesModule,
     BlogsModule,
+    QuotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

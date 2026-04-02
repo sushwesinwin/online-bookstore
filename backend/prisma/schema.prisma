@@ -137,3 +137,16 @@ model BlogPost {
 
   @@map("blog_posts")
 }
+
+model Quote {
+  id        String   @id @default(cuid())
+  text      String
+  author    String
+  source    String?
+  category  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("quotes")
+}
