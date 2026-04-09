@@ -14,14 +14,27 @@ describe('PaymentService', () => {
   let configService: ConfigService;
 
   const mockPrismaService = {
+    book: {
+      findMany: jest.fn(),
+      updateMany: jest.fn(),
+    },
+    cartItem: {
+      deleteMany: jest.fn(),
+    },
     payment: {
       create: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
     },
     order: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
       update: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn(),
+    },
+    $transaction: jest.fn(),
   };
 
   const mockConfigService = {

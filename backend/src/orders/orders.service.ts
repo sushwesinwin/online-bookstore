@@ -8,6 +8,11 @@ import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
+type NormalizedOrderItem = {
+  bookId: string;
+  quantity: number;
+};
+
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
@@ -32,67 +37,108 @@ export class OrdersService {
     return `ORD-${year}${month}${day}-${randomStr}`;
   }
 
-  async create(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
-    const { items } = createOrderDto;
-
-    // Validate inventory and calculate total
-    let totalAmount = 0;
-    const orderItems = [];
-
-    for (const item of items) {
-      const book = await this.prisma.book.findUnique({
-        where: { id: item.bookId },
-      });
-
-      if (!book) {
-        throw new NotFoundException(`Book with ID ${item.bookId} not found`);
-      }
-
-      if (book.inventory < item.quantity) {
-        throw new BadRequestException(
-          `Insufficient inventory for book "${book.title}". Available: ${book.inventory}, Requested: ${item.quantity}`,
-        );
-      }
-
-      const itemTotal = book.price.toNumber() * item.quantity;
-      totalAmount += itemTotal;
-
-      orderItems.push({
-        bookId: item.bookId,
-        quantity: item.quantity,
-        price: book.price,
-      });
+  private normalizeOrderItems(
+    items: CreateOrderDto['items'],
+  ): NormalizedOrderItem[] {
+    if (!items.length) {
+      throw new BadRequestException('Order must contain at least one item');
     }
 
-    // Generate unique order number with retry logic
-    let orderNumber: string;
-    let attempts = 0;
+    const quantitiesByBook = new Map<string, number>();
+
+    for (const item of items) {
+      quantitiesByBook.set(
+        item.bookId,
+        (quantitiesByBook.get(item.bookId) ?? 0) + item.quantity,
+      );
+    }
+
+    return Array.from(quantitiesByBook.entries()).map(([bookId, quantity]) => ({
+      bookId,
+      quantity,
+    }));
+  }
+
+  private async generateUniqueOrderNumber(
+    tx: Prisma.TransactionClient,
+  ): Promise<string> {
     const maxAttempts = 5;
 
-    while (attempts < maxAttempts) {
-      orderNumber = this.generateOrderNumber();
-      const existingOrder = await this.prisma.order.findUnique({
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const orderNumber = this.generateOrderNumber();
+      const existingOrder = await tx.order.findUnique({
         where: { orderNumber },
       });
 
       if (!existingOrder) {
-        break;
-      }
-
-      attempts++;
-      if (attempts === maxAttempts) {
-        throw new BadRequestException('Failed to generate unique order number');
+        return orderNumber;
       }
     }
 
-    // Create order with items in a transaction
+    throw new BadRequestException('Failed to generate unique order number');
+  }
+
+  async create(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
+    const items = this.normalizeOrderItems(createOrderDto.items);
+
     return await this.prisma.$transaction(async tx => {
-      // Create the order
+      const books = await tx.book.findMany({
+        where: {
+          id: {
+            in: items.map(item => item.bookId),
+          },
+        },
+      });
+      const booksById = new Map(books.map(book => [book.id, book]));
+
+      let totalAmountInCents = 0;
+      const orderItems = items.map(item => {
+        const book = booksById.get(item.bookId);
+
+        if (!book) {
+          throw new NotFoundException(`Book with ID ${item.bookId} not found`);
+        }
+
+        totalAmountInCents +=
+          Math.round(book.price.toNumber() * 100) * item.quantity;
+
+        return {
+          bookId: item.bookId,
+          quantity: item.quantity,
+          price: book.price,
+        };
+      });
+
+      for (const item of items) {
+        const inventoryUpdated = await tx.book.updateMany({
+          where: {
+            id: item.bookId,
+            inventory: {
+              gte: item.quantity,
+            },
+          },
+          data: {
+            inventory: {
+              decrement: item.quantity,
+            },
+          },
+        });
+
+        if (inventoryUpdated.count !== 1) {
+          const book = booksById.get(item.bookId);
+          throw new BadRequestException(
+            `Insufficient inventory for book "${book?.title ?? item.bookId}". Available: ${book?.inventory ?? 0}, Requested: ${item.quantity}`,
+          );
+        }
+      }
+
+      const orderNumber = await this.generateUniqueOrderNumber(tx);
+
       const order = await tx.order.create({
         data: {
           orderNumber,
           userId,
-          totalAmount,
+          totalAmount: (totalAmountInCents / 100).toFixed(2),
           items: {
             create: orderItems,
           },
@@ -106,18 +152,6 @@ export class OrdersService {
           user: true,
         },
       });
-
-      // Update inventory for each book
-      for (const item of items) {
-        await tx.book.update({
-          where: { id: item.bookId },
-          data: {
-            inventory: {
-              decrement: item.quantity,
-            },
-          },
-        });
-      }
 
       return order;
     });

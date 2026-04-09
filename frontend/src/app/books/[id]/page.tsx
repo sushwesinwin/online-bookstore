@@ -8,6 +8,7 @@ import { useBook } from '@/lib/hooks/use-books';
 import { useAddToCart } from '@/lib/hooks/use-cart';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { formatPrice } from '@/lib/utils';
+// Removed global hook usages
 import {
   Star,
   ShoppingCart,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { WysiwygEditor } from '@/components/ui/wysiwyg-editor';
+import { useAuthModalStore } from '@/lib/stores/auth-modal-store';
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -30,6 +32,15 @@ export default function BookDetailPage() {
   const { data: book, isLoading } = useBook(bookId);
   const { mutate: addToCart, isPending } = useAddToCart();
   const { isAuthenticated } = useAuth();
+  
+  const {
+    isOpen: isAuthModalOpen,
+    view: authView,
+    message: authMessage,
+    openModal,
+    closeModal,
+    setView: setAuthView
+  } = useAuthModalStore();
   const [quantity, setQuantity] = useState(1);
   const [selectedTab, setSelectedTab] = useState<
     'description' | 'details' | 'reviews'
@@ -198,11 +209,10 @@ export default function BookDetailPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.floor(rating)
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
+                      className={`h-5 w-5 ${i < Math.floor(rating)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-300'
+                        }`}
                     />
                   ))}
                 </div>
@@ -274,13 +284,15 @@ export default function BookDetailPage() {
 
                 {!isAuthenticated && (
                   <p className="text-sm text-center text-gray-600 mt-3">
-                    <Link
-                      href="/login"
-                      className="text-indigo-600 hover:underline"
-                    >
-                      Sign in
-                    </Link>{' '}
-                    to purchase
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => openModal('login')}
+                        className="hidden sm:block text-sm font-semibold text-gray-500 hover:text-black px-4 py-2 transition-colors"
+                      >
+                        Sign in
+                      </button>
+                      to purchase
+                    </div>
                   </p>
                 )}
               </div>
@@ -342,11 +354,10 @@ export default function BookDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id as any)}
-                  className={`pb-4 px-2 font-semibold transition-colors relative ${
-                    selectedTab === tab.id
-                      ? 'text-indigo-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                  className={`pb-4 px-2 font-semibold transition-colors relative ${selectedTab === tab.id
+                    ? 'text-indigo-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                    }`}
                 >
                   {tab.label}
                   {selectedTab === tab.id && (
@@ -444,11 +455,10 @@ export default function BookDetailPage() {
                               className="focus:outline-none"
                             >
                               <Star
-                                className={`h-6 w-6 ${
-                                  star <= reviewRating
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'text-gray-300'
-                                }`}
+                                className={`h-6 w-6 ${star <= reviewRating
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-gray-300'
+                                  }`}
                               />
                             </button>
                           ))}
@@ -549,11 +559,10 @@ export default function BookDetailPage() {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'fill-yellow-400 text-yellow-400'
-                                      : 'text-gray-300'
-                                  }`}
+                                  className={`h-4 w-4 ${i < review.rating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-gray-300'
+                                    }`}
                                 />
                               ))}
                             </div>

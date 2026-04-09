@@ -73,7 +73,11 @@ export const ordersApi = {
 
   verifySession: async (
     sessionId: string
-  ): Promise<{ orderId: string; orderNumber: string }> => {
+  ): Promise<{
+    orderId: string;
+    orderNumber: string;
+    purchasedBookIds: string[];
+  }> => {
     const response = await apiClient.post('/orders/verify-session', {
       sessionId,
     });

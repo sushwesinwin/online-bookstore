@@ -14,12 +14,13 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { ordersApi } from '@/lib/api/orders';
 import { useCartStore } from '@/lib/stores/cart-store';
+import { Cart } from '@/lib/api/types';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { clearCart: clearCartStore } = useCartStore();
+  const { removeItems } = useCartStore();
   const sessionId = searchParams.get('session_id');
   const [countdown, setCountdown] = useState(10);
   const [isProcessing, setIsProcessing] = useState(true);
@@ -27,6 +28,7 @@ function CheckoutSuccessContent() {
   const [orderInfo, setOrderInfo] = useState<{
     orderId: string;
     orderNumber: string;
+    purchasedBookIds: string[];
   } | null>(null);
   const hasFulfilled = useRef(false);
 
@@ -40,9 +42,30 @@ function CheckoutSuccessContent() {
         const result = await ordersApi.verifySession(sessionId);
         setOrderInfo(result);
 
-        // Clear cart locally and in server cache
-        clearCartStore();
-        queryClient.setQueryData(['cart'], null);
+        // Remove only the purchased items locally and refresh server state.
+        removeItems(result.purchasedBookIds);
+        queryClient.setQueryData<Cart | undefined>(['cart'], currentCart => {
+          if (!currentCart) {
+            return currentCart;
+          }
+
+          const remainingItems = currentCart.items.filter(
+            item => !result.purchasedBookIds.includes(item.bookId)
+          );
+
+          return {
+            ...currentCart,
+            items: remainingItems,
+            itemCount: remainingItems.reduce(
+              (sum, item) => sum + item.quantity,
+              0
+            ),
+            total: remainingItems.reduce(
+              (sum, item) => sum + Number(item.book.price) * item.quantity,
+              0
+            ),
+          };
+        });
         queryClient.invalidateQueries({ queryKey: ['cart'] });
         queryClient.invalidateQueries({ queryKey: ['my-orders'] });
         queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -58,7 +81,7 @@ function CheckoutSuccessContent() {
     };
 
     fulfill();
-  }, [sessionId, queryClient, clearCartStore]);
+  }, [sessionId, queryClient, removeItems]);
 
   // Countdown timer — starts after processing is done
   useEffect(() => {
@@ -227,27 +250,29 @@ function CheckoutSuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#F9FCFB]">
-        <main className="container mx-auto px-4 py-20">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border border-[#E4E9E8]">
-              <div className="mb-8 flex justify-center">
-                <div className="relative rounded-full p-8 shadow-xl bg-[#0B7C6B]">
-                  <Loader2 className="h-16 w-16 text-white animate-spin" />
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F9FCFB]">
+          <main className="container mx-auto px-4 py-20">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border border-[#E4E9E8]">
+                <div className="mb-8 flex justify-center">
+                  <div className="relative rounded-full p-8 shadow-xl bg-[#0B7C6B]">
+                    <Loader2 className="h-16 w-16 text-white animate-spin" />
+                  </div>
                 </div>
+                <h1 className="text-4xl font-bold text-[#101313] mb-4">
+                  Processing...
+                </h1>
+                <p className="text-lg text-[#848785]">
+                  Please wait while we process your order.
+                </p>
               </div>
-              <h1 className="text-4xl font-bold text-[#101313] mb-4">
-                Processing...
-              </h1>
-              <p className="text-lg text-[#848785]">
-                Please wait while we process your order.
-              </p>
             </div>
-          </div>
-        </main>
-      </div>
-    }>
+          </main>
+        </div>
+      }
+    >
       <CheckoutSuccessContent />
     </Suspense>
   );
