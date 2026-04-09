@@ -16,6 +16,7 @@
     "lint": "pnpm run lint:frontend && pnpm run lint:backend",
     "lint:frontend": "pnpm --filter bookstore-frontend lint",
     "lint:backend": "pnpm --filter bookstore-backend lint",
+    "prepare": "husky",
     "format": "pnpm run format:frontend && pnpm run format:backend",
     "format:frontend": "pnpm --filter bookstore-frontend format",
     "format:backend": "pnpm --filter bookstore-backend format",
@@ -24,7 +25,8 @@
     "docker:down": "docker-compose down"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "husky": "^9.1.7"
   },
   "engines": {
     "node": ">=18.0.0",

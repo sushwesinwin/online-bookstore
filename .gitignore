@@ -175,6 +175,9 @@ Thumbs.db
 *.swo
 *~
 
+# Husky generated runtime files
+.husky/_
+
 # Docker
 .dockerignore
 
