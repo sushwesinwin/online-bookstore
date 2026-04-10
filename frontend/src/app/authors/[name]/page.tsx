@@ -6,109 +6,7 @@ import { BookCard } from '@/components/books/book-card';
 import { Button } from '@/components/ui/button';
 import { useBooks } from '@/lib/hooks/use-books';
 import { ArrowLeft, BookOpen, Award, Calendar } from 'lucide-react';
-
-// Famous authors data with real information
-const AUTHORS_DATA: Record<
-  string,
-  {
-    name: string;
-    image: string;
-    bio: string;
-    birthYear: string;
-    nationality: string;
-    genres: string[];
-    awards: string[];
-    famousWorks: string[];
-  }
-> = {
-  'Stephen King': {
-    name: 'Stephen King',
-    image:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    bio: 'Stephen Edwin King is an American author of horror, supernatural fiction, suspense, crime, science-fiction, and fantasy novels. Described as the "King of Horror", his books have sold more than 350 million copies, and many have been adapted into films, television series, miniseries, and comic books.',
-    birthYear: '1947',
-    nationality: 'American',
-    genres: ['Horror', 'Supernatural Fiction', 'Suspense', 'Fantasy'],
-    awards: [
-      'Bram Stoker Award',
-      'World Fantasy Award',
-      'British Fantasy Society Award',
-    ],
-    famousWorks: ['The Shining', 'It', 'The Stand', 'Carrie', 'Misery'],
-  },
-  'J.K. Rowling': {
-    name: 'J.K. Rowling',
-    image:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
-    bio: "Joanne Rowling, better known by her pen name J.K. Rowling, is a British author and philanthropist. She wrote Harry Potter, a seven-volume children's fantasy series published from 1997 to 2007. The series has sold over 500 million copies, been translated into 80 languages, and spawned a global media franchise.",
-    birthYear: '1965',
-    nationality: 'British',
-    genres: ['Fantasy', 'Drama', 'Young Adult', 'Crime Fiction'],
-    awards: ['Hugo Award', 'British Book Awards', 'Locus Award'],
-    famousWorks: [
-      'Harry Potter Series',
-      'The Casual Vacancy',
-      'Cormoran Strike Series',
-    ],
-  },
-  'Agatha Christie': {
-    name: 'Agatha Christie',
-    image:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
-    bio: 'Dame Agatha Mary Clarissa Christie was an English writer known for her 66 detective novels and 14 short story collections, particularly those revolving around fictional detectives Hercule Poirot and Miss Marple. She is the best-selling fiction writer of all time, with her novels having sold over two billion copies.',
-    birthYear: '1890-1976',
-    nationality: 'British',
-    genres: ['Mystery', 'Crime Fiction', 'Detective Fiction', 'Thriller'],
-    awards: ['Grand Master Award', 'Mystery Writers of America'],
-    famousWorks: [
-      'Murder on the Orient Express',
-      'And Then There Were None',
-      'The Murder of Roger Ackroyd',
-    ],
-  },
-  'Ernest Hemingway': {
-    name: 'Ernest Hemingway',
-    image:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
-    bio: 'Ernest Miller Hemingway was an American novelist, short-story writer, and journalist. His economical and understated style—which he termed the "iceberg theory"—had a strong influence on 20th-century fiction. Many of his works are considered classics of American literature.',
-    birthYear: '1899-1961',
-    nationality: 'American',
-    genres: ['Fiction', 'Non-fiction', 'Short Stories'],
-    awards: ['Nobel Prize in Literature', 'Pulitzer Prize'],
-    famousWorks: [
-      'The Old Man and the Sea',
-      'A Farewell to Arms',
-      'For Whom the Bell Tolls',
-    ],
-  },
-  'George Orwell': {
-    name: 'George Orwell',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/George_Orwell_press_photo.jpg/440px-George_Orwell_press_photo.jpg',
-    bio: 'Eric Arthur Blair, known by his pen name George Orwell, was an English novelist, essayist, journalist, and critic. His work is characterized by lucid prose, social criticism, opposition to totalitarianism, and support of democratic socialism.',
-    birthYear: '1903-1950',
-    nationality: 'British',
-    genres: ['Political Fiction', 'Dystopian', 'Social Criticism'],
-    awards: ['Prometheus Hall of Fame Award'],
-    famousWorks: ['1984', 'Animal Farm', 'Homage to Catalonia'],
-  },
-  'Jane Austen': {
-    name: 'Jane Austen',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg/440px-CassandraAusten-JaneAusten%28c.1810%29_hires.jpg',
-    bio: 'Jane Austen was an English novelist known primarily for her six major novels, which interpret, critique and comment upon the British landed gentry at the end of the 18th century. Her plots often explore the dependence of women on marriage in the pursuit of favorable social standing and economic security.',
-    birthYear: '1775-1817',
-    nationality: 'British',
-    genres: ['Romance', 'Social Commentary', 'Satire'],
-    awards: ['Inducted into the Hall of Fame for Great Women Writers'],
-    famousWorks: [
-      'Pride and Prejudice',
-      'Sense and Sensibility',
-      'Emma',
-      'Persuasion',
-    ],
-  },
-};
+import { getAuthorByName } from '@/lib/authors';
 
 export default function AuthorPage({
   params,
@@ -117,7 +15,7 @@ export default function AuthorPage({
 }) {
   const resolvedParams = use(params);
   const authorName = decodeURIComponent(resolvedParams.name);
-  const authorData = AUTHORS_DATA[authorName];
+  const authorData = getAuthorByName(authorName);
 
   const [page, setPage] = useState(1);
   const { data: booksData, isLoading } = useBooks({
@@ -189,7 +87,7 @@ export default function AuthorPage({
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{authorData.birthYear}</span>
+                    <span>{authorData.lifeSpan}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span>🌍</span>
@@ -200,7 +98,7 @@ export default function AuthorPage({
 
               {/* Bio */}
               <p className="text-gray-700 leading-relaxed mb-8">
-                {authorData.bio}
+                {authorData.biography}
               </p>
 
               {/* Statistics */}

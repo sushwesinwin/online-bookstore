@@ -4,193 +4,34 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, BookOpen, Search } from 'lucide-react';
-import { useState } from 'react';
-
-const authors = [
-  {
-    name: 'George Orwell',
-    books: '20+ Books',
-    genre: 'Political Fiction',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/George_Orwell_press_photo.jpg/440px-George_Orwell_press_photo.jpg',
-    bio: 'Author of 1984 and Animal Farm',
-    color: 'from-[#0B7C6B] to-[#17BD8D]',
-    nationality: 'British',
-    born: '1903',
-    famousWorks: ['1984', 'Animal Farm', 'Homage to Catalonia'],
-  },
-  {
-    name: 'Jane Austen',
-    books: '6 Major Novels',
-    genre: 'Romance',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg/440px-CassandraAusten-JaneAusten%28c.1810%29_hires.jpg',
-    bio: 'Author of Pride and Prejudice',
-    color: 'from-[#FF6320] to-[#FFA118]',
-    nationality: 'British',
-    born: '1775',
-    famousWorks: ['Pride and Prejudice', 'Sense and Sensibility', 'Emma'],
-  },
-  {
-    name: 'Ernest Hemingway',
-    books: '20+ Books',
-    genre: 'Classic Literature',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/ErnestHemingway.jpg/440px-ErnestHemingway.jpg',
-    bio: 'Nobel Prize winning author',
-    color: 'from-[#219FFF] to-[#17BD8D]',
-    nationality: 'American',
-    born: '1899',
-    famousWorks: [
-      'The Old Man and the Sea',
-      'A Farewell to Arms',
-      'For Whom the Bell Tolls',
-    ],
-  },
-  {
-    name: 'Agatha Christie',
-    books: '80+ Books',
-    genre: 'Mystery',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Agatha_Christie_%281925%29.jpg/440px-Agatha_Christie_%281925%29.jpg',
-    bio: 'Queen of mystery novels',
-    color: 'from-[#FF4E3E] to-[#FF6320]',
-    nationality: 'British',
-    born: '1890',
-    famousWorks: [
-      'Murder on the Orient Express',
-      'And Then There Were None',
-      'The Murder of Roger Ackroyd',
-    ],
-  },
-  {
-    name: 'F. Scott Fitzgerald',
-    books: '5 Novels',
-    genre: 'Classic Fiction',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/F_Scott_Fitzgerald_1921.jpg/440px-F_Scott_Fitzgerald_1921.jpg',
-    bio: 'Author of The Great Gatsby',
-    color: 'from-[#0B7C6B] to-[#219FFF]',
-    nationality: 'American',
-    born: '1896',
-    famousWorks: [
-      'The Great Gatsby',
-      'Tender Is the Night',
-      'This Side of Paradise',
-    ],
-  },
-  {
-    name: 'Virginia Woolf',
-    books: '9 Novels',
-    genre: 'Modernist Literature',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/George_Charles_Beresford_-_Virginia_Woolf_in_1902_-_Restoration.jpg/440px-George_Charles_Beresford_-_Virginia_Woolf_in_1902_-_Restoration.jpg',
-    bio: 'Pioneer of modernist literature',
-    color: 'from-[#17BD8D] to-[#FFA118]',
-    nationality: 'British',
-    born: '1882',
-    famousWorks: ['Mrs Dalloway', 'To the Lighthouse', 'Orlando'],
-  },
-  {
-    name: 'Mark Twain',
-    books: '28 Books',
-    genre: 'Satire & Humor',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Mark_Twain_by_AF_Bradley.jpg/440px-Mark_Twain_by_AF_Bradley.jpg',
-    bio: 'Father of American literature',
-    color: 'from-[#FFA118] to-[#FF6320]',
-    nationality: 'American',
-    born: '1835',
-    famousWorks: [
-      'The Adventures of Tom Sawyer',
-      'Adventures of Huckleberry Finn',
-      'The Prince and the Pauper',
-    ],
-  },
-  {
-    name: 'Leo Tolstoy',
-    books: '12 Novels',
-    genre: 'Realist Fiction',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/L.N.Tolstoy_Prokudin-Gorsky.jpg/440px-L.N.Tolstoy_Prokudin-Gorsky.jpg',
-    bio: 'Master of realistic fiction',
-    color: 'from-[#219FFF] to-[#0B7C6B]',
-    nationality: 'Russian',
-    born: '1828',
-    famousWorks: ['War and Peace', 'Anna Karenina', 'The Death of Ivan Ilyich'],
-  },
-  {
-    name: 'Charles Dickens',
-    books: '15 Novels',
-    genre: 'Victorian Literature',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Dickens_Gurney_head.jpg/440px-Dickens_Gurney_head.jpg',
-    bio: 'Greatest novelist of Victorian era',
-    color: 'from-[#FF4E3E] to-[#FFA118]',
-    nationality: 'British',
-    born: '1812',
-    famousWorks: ['Great Expectations', 'A Tale of Two Cities', 'Oliver Twist'],
-  },
-  {
-    name: 'J.K. Rowling',
-    books: '14 Books',
-    genre: 'Fantasy',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/J._K._Rowling_2010.jpg/440px-J._K._Rowling_2010.jpg',
-    bio: 'Creator of Harry Potter series',
-    color: 'from-[#0B7C6B] to-[#FF6320]',
-    nationality: 'British',
-    born: '1965',
-    famousWorks: [
-      'Harry Potter series',
-      'The Casual Vacancy',
-      'Cormoran Strike series',
-    ],
-  },
-  {
-    name: 'Stephen King',
-    books: '60+ Books',
-    genre: 'Horror & Suspense',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Stephen_King%2C_Comicon.jpg/440px-Stephen_King%2C_Comicon.jpg',
-    bio: 'Master of horror fiction',
-    color: 'from-[#FF4E3E] to-[#219FFF]',
-    nationality: 'American',
-    born: '1947',
-    famousWorks: ['The Shining', 'It', 'The Stand'],
-  },
-  {
-    name: 'Gabriel García Márquez',
-    books: '18 Books',
-    genre: 'Magical Realism',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Gabriel_Garcia_Marquez.jpg/440px-Gabriel_Garcia_Marquez.jpg',
-    bio: 'Nobel Prize winning author',
-    color: 'from-[#17BD8D] to-[#219FFF]',
-    nationality: 'Colombian',
-    born: '1927',
-    famousWorks: [
-      'One Hundred Years of Solitude',
-      'Love in the Time of Cholera',
-      'Chronicle of a Death Foretold',
-    ],
-  },
-];
+import { useMemo, useState } from 'react';
+import { AUTHOR_PROFILES, getAuthorHref } from '@/lib/authors';
 
 export default function AuthorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('All');
 
-  const genres = ['All', ...Array.from(new Set(authors.map(a => a.genre)))];
+  const genres = useMemo(
+    () => [
+      'All',
+      ...Array.from(new Set(AUTHOR_PROFILES.map(author => author.genre))),
+    ],
+    []
+  );
 
-  const filteredAuthors = authors.filter(author => {
-    const matchesSearch =
-      author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      author.bio.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre =
-      selectedGenre === 'All' || author.genre === selectedGenre;
-    return matchesSearch && matchesGenre;
-  });
+  const filteredAuthors = useMemo(
+    () =>
+      AUTHOR_PROFILES.filter(author => {
+        const query = searchQuery.trim().toLowerCase();
+        const matchesSearch =
+          author.name.toLowerCase().includes(query) ||
+          author.summary.toLowerCase().includes(query);
+        const matchesGenre =
+          selectedGenre === 'All' || author.genre === selectedGenre;
+        return matchesSearch && matchesGenre;
+      }),
+    [searchQuery, selectedGenre]
+  );
 
   return (
     <div className="min-h-screen bg-[#F9FCFB]">
@@ -254,7 +95,8 @@ export default function AuthorsPage() {
 
             {/* Results Count */}
             <div className="mt-4 text-sm text-[#848785]">
-              Showing {filteredAuthors.length} of {authors.length} authors
+              Showing {filteredAuthors.length} of {AUTHOR_PROFILES.length}{' '}
+              authors
             </div>
           </div>
         </section>
@@ -274,9 +116,9 @@ export default function AuthorsPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {filteredAuthors.map((author, index) => (
+                {filteredAuthors.map(author => (
                   <div
-                    key={index}
+                    key={author.name}
                     className="group bg-white rounded-xl p-6 border border-[#E4E9E8] hover:shadow-xl transition-all duration-300"
                   >
                     <div className="relative mb-4">
@@ -298,10 +140,12 @@ export default function AuthorsPage() {
                       <div className="flex items-center justify-center gap-2 text-xs text-[#848785]">
                         <span>{author.nationality}</span>
                         <span>•</span>
-                        <span>Born {author.born}</span>
+                        <span>{author.lifeSpan}</span>
                       </div>
 
-                      <p className="text-sm text-[#848785]">{author.books}</p>
+                      <p className="text-sm text-[#848785]">
+                        {author.booksLabel}
+                      </p>
 
                       <div
                         className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-linear-to-r ${author.color} text-white`}
@@ -310,7 +154,7 @@ export default function AuthorsPage() {
                       </div>
 
                       <p className="text-sm text-[#848785] pt-2">
-                        {author.bio}
+                        {author.summary}
                       </p>
 
                       {/* Famous Works */}
@@ -319,9 +163,9 @@ export default function AuthorsPage() {
                           Famous Works:
                         </p>
                         <div className="flex flex-wrap gap-1 justify-center">
-                          {author.famousWorks.slice(0, 2).map((work, i) => (
+                          {author.famousWorks.slice(0, 2).map(work => (
                             <span
-                              key={i}
+                              key={work}
                               className="text-xs bg-[#F4F8F8] text-[#848785] px-2 py-1 rounded"
                             >
                               {work}
@@ -331,7 +175,7 @@ export default function AuthorsPage() {
                       </div>
                     </div>
 
-                    <Link href={`/authors/${encodeURIComponent(author.name)}`}>
+                    <Link href={getAuthorHref(author.name)}>
                       <Button
                         variant="outline"
                         size="sm"
