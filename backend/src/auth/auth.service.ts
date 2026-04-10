@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from './email.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -20,8 +20,37 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
+const authUserSelect = {
+  id: true,
+  email: true,
+  password: true,
+  firstName: true,
+  lastName: true,
+  profileImage: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect;
+
+const publicAuthUserSelect = {
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  profileImage: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect;
+
+type AuthUserRecord = Prisma.UserGetPayload<{ select: typeof authUserSelect }>;
+type PublicAuthUserRecord = Prisma.UserGetPayload<{
+  select: typeof publicAuthUserSelect;
+}>;
+type SafeAuthUser = PublicAuthUserRecord;
+
 interface AuthResult {
-  user: Omit<User, 'password'>;
+  user: SafeAuthUser;
   accessToken: string;
   refreshToken: string;
 }
@@ -38,12 +67,28 @@ export class AuthService {
     private emailService: EmailService,
   ) { }
 
+  private getJwtSecret(): string | undefined {
+    return this.configService.get<string>('JWT_SECRET');
+  }
+
+  private getRefreshJwtSecret(): string | undefined {
+    return (
+      this.configService.get<string>('JWT_REFRESH_SECRET') ||
+      this.getJwtSecret()
+    );
+  }
+
+  private toSafeAuthUser(user: PublicAuthUserRecord): SafeAuthUser {
+    return user;
+  }
+
   async register(createUserDto: CreateUserDto): Promise<AuthResult> {
     const { email, password, firstName, lastName, role } = createUserDto;
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
+      select: { id: true },
     });
 
     if (existingUser) {
@@ -62,16 +107,14 @@ export class AuthService {
         lastName,
         ...(role && { role }), // Only include role if provided, otherwise uses default USER
       },
+      select: authUserSelect,
     });
 
     // Generate tokens
     const tokens = this.generateTokens(user);
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
-
     return {
-      user: userWithoutPassword,
+      user: this.toSafeAuthUser(user),
       ...tokens,
     };
   }
@@ -86,6 +129,7 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email },
+      select: authUserSelect,
     });
 
     if (!user) {
@@ -101,11 +145,8 @@ export class AuthService {
     // Generate tokens
     const tokens = this.generateTokens(user);
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
-
     return {
-      user: userWithoutPassword,
+      user: this.toSafeAuthUser(user),
       ...tokens,
     };
   }
@@ -116,7 +157,7 @@ export class AuthService {
     try {
       // Verify refresh token
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: this.getRefreshJwtSecret(),
       });
 
       // Check if token is invalidated
@@ -127,6 +168,7 @@ export class AuthService {
       // Find user
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub },
+        select: authUserSelect,
       });
 
       if (!user) {
@@ -139,11 +181,8 @@ export class AuthService {
       // Generate new tokens
       const tokens = this.generateTokens(user);
 
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = user;
-
       return {
-        user: userWithoutPassword,
+        user: this.toSafeAuthUser(user),
         ...tokens,
       };
     } catch (error) {
@@ -176,6 +215,7 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email },
+      select: { id: true, email: true },
     });
 
     if (!user) {
@@ -219,6 +259,7 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email: resetData.email },
+      select: { id: true, email: true },
     });
 
     if (!user) {
@@ -243,29 +284,29 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<Omit<User, 'password'> | null> {
+  ): Promise<SafeAuthUser | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      select: authUserSelect,
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password: _, ...result } = user;
-      return result;
+      return this.toSafeAuthUser(user);
     }
     return null;
   }
 
-  async findUserById(id: string): Promise<Omit<User, 'password'> | null> {
+  async findUserById(id: string): Promise<SafeAuthUser | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      select: publicAuthUserSelect,
     });
 
     if (!user) {
       return null;
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return this.toSafeAuthUser(user);
   }
 
   isTokenInvalidated(token: string): boolean {
@@ -275,7 +316,7 @@ export class AuthService {
   async updateProfile(
     userId: string,
     dto: UpdateProfileDto,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<SafeAuthUser> {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -283,19 +324,25 @@ export class AuthService {
         ...(dto.lastName !== undefined && { lastName: dto.lastName }),
         ...(dto.profileImage !== undefined && { profileImage: dto.profileImage }),
       },
+      select: publicAuthUserSelect,
     });
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return this.toSafeAuthUser(user);
   }
 
   async changePassword(
     userId: string,
     dto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new UnauthorizedException('User not found');
+    const selectedUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true },
+    });
+    if (!selectedUser) throw new UnauthorizedException('User not found');
 
-    const isValid = await bcrypt.compare(dto.currentPassword, user.password);
+    const isValid = await bcrypt.compare(
+      dto.currentPassword,
+      selectedUser.password,
+    );
     if (!isValid)
       throw new BadRequestException('Current password is incorrect');
 
@@ -307,10 +354,13 @@ export class AuthService {
     return { message: 'Password changed successfully' };
   }
 
-  private generateTokens(user: User): {
+  private generateTokens(user: Pick<User, 'id' | 'email' | 'role'>): {
     accessToken: string;
     refreshToken: string;
   } {
+    const jwtSecret = this.getJwtSecret();
+    const refreshSecret = this.getRefreshJwtSecret();
+
     const payload = {
       sub: user.id,
       email: user.email,
@@ -318,12 +368,12 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
+      secret: jwtSecret,
       expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      secret: refreshSecret,
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
     });
 

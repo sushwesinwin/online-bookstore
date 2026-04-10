@@ -19,6 +19,10 @@ export function useAuth() {
       toast.success('Successfully logged in!', {
         description: `Welcome back, ${data.user.firstName}!`,
       });
+
+      if (data.user.role === 'ADMIN') {
+        router.push('/admin');
+      }
     },
   });
 
