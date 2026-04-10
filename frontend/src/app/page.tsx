@@ -67,7 +67,7 @@ export default function HomePage() {
             
             {/* Top Center Title */}
             <div className="animate-fade-in flex flex-col items-center w-full z-30 mb-8 lg:mb-2 relative pointer-events-none">
-              <h1 className="text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-bold leading-none text-[#1D1D1F] tracking-tighter flex flex-col text-center" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+              <h1 className="text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-bold leading-none text-[#1D1D1F] tracking-tighter flex flex-col text-center">
                 <span>Where Stories</span>
                 <span className="relative flex items-center justify-center gap-2 md:gap-4 mt-2">
                   Come to Light
@@ -99,8 +99,7 @@ export default function HomePage() {
                 <img
                   src="/hero.svg"
                   alt="Lumora Hero Illustration"
-                  className="w-full max-w-xs md:max-w-max lg:max-w-lg max-h-[30vh] md:max-h-[35vh] lg:max-h-[45vh] object-contain drop-shadow-2xl animate-fade-in"
-                  style={{ animationDelay: '0.2s' }}
+                  className="w-full max-w-xs md:max-w-max lg:max-w-lg max-h-[30vh] md:max-h-[35vh] lg:max-h-[45vh] object-contain drop-shadow-2xl animate-fade-in animate-fade-in-delay-200"
                 />
               </div>
 
@@ -147,7 +146,7 @@ export default function HomePage() {
                     WEEKLY TOP 8
                   </Badge>
                 </div>
-                <h2 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter leading-[0.9]" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                <h2 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter leading-[0.9]">
                   Trending <br />
                   <span className="text-gray-300">Books.</span>
                 </h2>
@@ -293,7 +292,7 @@ export default function HomePage() {
                     ALL-TIME BEST
                   </Badge>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
                   Global Bestsellers
                 </h2>
                 <p className="text-gray-500 mt-2 text-lg">The world's most beloved literature, curated for you.</p>
@@ -372,7 +371,7 @@ export default function HomePage() {
                 <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-gray-200 text-gray-500">
                   LITERARY MASTERS
                 </Badge>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
                   Featured Authors
                 </h2>
                 <p className="text-gray-500 text-lg">Celebrate the voices that define generations.</p>
@@ -476,7 +475,7 @@ export default function HomePage() {
                 <Badge variant="outline" className="text-[10px] font-black tracking-[0.4em] uppercase border-white/20 text-white/60 px-4 py-1.5 rounded-full">
                   THE LUMORA NEWSLETTER
                 </Badge>
-                <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight">
                   Stories, delivered <br />
                   <span className="text-white/40 italic">to your inbox.</span>
                 </h2>
@@ -514,7 +513,7 @@ export default function HomePage() {
             <div className="md:col-span-4 space-y-8">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-8 w-8 text-[#0B7C6B]" />
-                <span className="font-bold text-2xl tracking-tighter" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>Lumora</span>
+                <span className="font-bold text-2xl tracking-tighter">Lumora</span>
               </div>
               <p className="text-gray-500 leading-relaxed text-base font-light">
                 Where stories come to light. We curate the finest collection of literature to inspire and enlighten your mind. Discover your next great adventure with us.

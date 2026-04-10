@@ -65,7 +65,9 @@ export default function AdminDashboard() {
           change: `${dashboardStats.totalRevenue.change >= 0 ? '+' : ''}${dashboardStats.totalRevenue.change.toFixed(1)}%`,
           trend: dashboardStats.totalRevenue.trend,
           icon: TrendingUp,
-          color: '#17BD8D',
+          iconClassName: 'text-[#17BD8D]',
+          toneClassName: 'bg-[#17BD8D]/10 text-[#17BD8D]',
+          ghostClassName: 'text-[#17BD8D]',
         },
         {
           name: 'Books in Catalog',
@@ -73,7 +75,9 @@ export default function AdminDashboard() {
           change: `${dashboardStats.booksInCatalog.value} total`,
           trend: dashboardStats.booksInCatalog.trend,
           icon: BookOpen,
-          color: '#0B7C6B',
+          iconClassName: 'text-[#0B7C6B]',
+          toneClassName: 'bg-[#0B7C6B]/10 text-[#0B7C6B]',
+          ghostClassName: 'text-[#0B7C6B]',
         },
         {
           name: 'Total Orders',
@@ -81,7 +85,9 @@ export default function AdminDashboard() {
           change: `${dashboardStats.totalOrders.change >= 0 ? '+' : ''}${dashboardStats.totalOrders.change.toFixed(1)}%`,
           trend: dashboardStats.totalOrders.trend,
           icon: ShoppingCart,
-          color: '#F9B959',
+          iconClassName: 'text-[#F9B959]',
+          toneClassName: 'bg-[#F9B959]/10 text-[#F9B959]',
+          ghostClassName: 'text-[#F9B959]',
         },
         {
           name: 'Active Customers',
@@ -89,7 +95,9 @@ export default function AdminDashboard() {
           change: `${dashboardStats.activeCustomers.value} total`,
           trend: dashboardStats.activeCustomers.trend,
           icon: Users,
-          color: '#101313',
+          iconClassName: 'text-[#101313]',
+          toneClassName: 'bg-[#101313]/10 text-[#101313]',
+          ghostClassName: 'text-[#101313]',
         },
       ]
     : [];
@@ -99,21 +107,28 @@ export default function AdminDashboard() {
       name: 'Add New Book',
       icon: Plus,
       href: '/admin/books/new',
-      color: '#0B7C6B',
+      iconClassName: 'text-[#0B7C6B]',
     },
     {
       name: 'Manage Orders',
       icon: ShoppingCart,
       href: '/admin/orders',
-      color: '#F9B959',
+      iconClassName: 'text-[#F9B959]',
     },
     {
       name: 'View Customers',
       icon: Users,
       href: '/admin/users',
-      color: '#101313',
+      iconClassName: 'text-[#101313]',
     },
   ];
+
+  const activityToneClassMap: Record<RecentActivity['severity'], string> = {
+    critical: 'bg-[#FF4E3E]/15 text-[#FF4E3E]',
+    warning: 'bg-[#F9B959]/15 text-[#F9B959]',
+    info: 'bg-[#0066FF]/15 text-[#0066FF]',
+    success: 'bg-[#17BD8D]/15 text-[#17BD8D]',
+  };
 
   // Format relative time
   const getRelativeTime = (dateString: string) => {
@@ -148,10 +163,7 @@ export default function AdminDashboard() {
                 variant="outline"
                 className="h-11 rounded-xl border-[#E4E9E8] hover:bg-[#F3F5F5] font-semibold gap-2"
               >
-                <action.icon
-                  className="h-4 w-4"
-                  style={{ color: action.color }}
-                />
+                <action.icon className={`h-4 w-4 ${action.iconClassName}`} />
                 <span className="hidden sm:inline">{action.name}</span>
               </Button>
             </Link>
@@ -185,11 +197,7 @@ export default function AdminDashboard() {
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl transition-transform group-hover:scale-110"
-                    style={{
-                      backgroundColor: `${stat.color}10`,
-                      color: stat.color,
-                    }}
+                    className={`flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl transition-transform group-hover:scale-110 ${stat.toneClassName}`}
                   >
                     <stat.icon className="h-6 w-6 md:h-7 md:w-7" />
                   </div>
@@ -219,8 +227,7 @@ export default function AdminDashboard() {
 
                 {/* Subtle background pattern element */}
                 <div
-                  className="absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0"
-                  style={{ color: stat.color }}
+                  className={`absolute -right-4 -bottom-4 h-32 w-32 opacity-[0.03] rotate-12 transition-transform group-hover:rotate-0 ${stat.ghostClassName}`}
                 >
                   <stat.icon className="h-full w-full" />
                 </div>
@@ -375,14 +382,10 @@ export default function AdminDashboard() {
                   new_order: ShoppingCart,
                   system: CheckCircleIcon,
                 };
-                const colorMap: Record<RecentActivity['severity'], string> = {
-                  critical: '#FF4E3E',
-                  warning: '#F9B959',
-                  info: '#0066FF',
-                  success: '#17BD8D',
-                };
                 const ActivityIcon = iconMap[activity.type] || CheckCircleIcon;
-                const color = colorMap[activity.severity] || '#101313';
+                const toneClassName =
+                  activityToneClassMap[activity.severity] ||
+                  'bg-[#101313]/15 text-[#101313]';
 
                 return (
                   <div
@@ -390,8 +393,7 @@ export default function AdminDashboard() {
                     className="group flex space-x-4 rounded-3xl border border-[#E4E9E8] bg-white p-5 shadow-sm transition-all hover:shadow-md hover:border-[#0B7C6B]/20"
                   >
                     <div
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
-                      style={{ backgroundColor: `${color}15`, color }}
+                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${toneClassName}`}
                     >
                       <ActivityIcon className="h-5 w-5" />
                     </div>

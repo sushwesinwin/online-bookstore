@@ -55,8 +55,9 @@
   --color-destructive-foreground: #ffffff;
 
   --radius: 0.5rem;
-  --font-sans: var(--font-jetbrains-mono);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-roboto);
+  --font-mono:
+    "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 * {
@@ -112,6 +113,29 @@ body {
   animation: fade-in 0.8s ease-out forwards;
 }
 
+.animate-fade-in-delay-200 {
+  animation-delay: 0.2s;
+}
+
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
+}
+
+.font-blog-modern-sans {
+  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+}
+
+.font-blog-editorial-serif {
+  font-family:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
+    serif;
+}
+
+.font-blog-literary-serif {
+  font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+}
+
+.font-blog-classic-mono {
+  font-family:
+    "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
