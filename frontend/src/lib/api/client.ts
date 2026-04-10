@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { AuthResponse } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -50,12 +51,30 @@ apiClient.interceptors.response.use(
           throw new Error('No refresh token');
         }
 
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
-        });
+        const response = await axios.post<AuthResponse>(
+          `${API_URL}/auth/refresh`,
+          {
+            refreshToken,
+          }
+        );
 
-        const { accessToken } = response.data;
+        const {
+          accessToken,
+          refreshToken: nextRefreshToken,
+          user,
+        } = response.data;
         localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', nextRefreshToken);
+        localStorage.setItem(
+          'auth-storage',
+          JSON.stringify({
+            state: {
+              user,
+              isAuthenticated: true,
+            },
+            version: 0,
+          })
+        );
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);

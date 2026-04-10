@@ -23,13 +23,6 @@ export const authApi = {
     return response.data;
   },
 
-  refreshToken: async (
-    refreshToken: string
-  ): Promise<{ accessToken: string }> => {
-    const response = await apiClient.post('/auth/refresh', { refreshToken });
-    return response.data;
-  },
-
   forgotPassword: async (email: string): Promise<void> => {
     await apiClient.post('/auth/forgot-password', { email });
   },
@@ -41,6 +34,7 @@ export const authApi = {
   updateProfile: async (data: {
     firstName?: string;
     lastName?: string;
+    profileImage?: string;
   }): Promise<User> => {
     const response = await apiClient.patch('/auth/profile', data);
     return response.data;

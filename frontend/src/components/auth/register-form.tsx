@@ -6,16 +6,10 @@ import * as z from 'zod';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormField } from '@/components/ui/form';
 import { Mail, Lock, User, AlertCircle, LogIn } from 'lucide-react';
+import { FloatingAuthInput } from '@/components/auth/floating-auth-input';
+import { getApiErrorMessage, getApiErrorStatus } from '@/lib/api/error-utils';
 
 const registerSchema = z.object({
   firstName: z
@@ -69,7 +63,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
       await register({ ...data, role: 'USER' });
       // If we reach here, it succeeded. MutateAsync will throw on error.
       onSuccess?.();
-    } catch (err) {
+    } catch {
       // Error handled by hook and display in form
     }
   };
@@ -87,9 +81,12 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             <div className="flex items-start space-x-2 p-3 text-xs text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
-                {(registerError as any).response?.status === 409
+                {getApiErrorStatus(registerError) === 409
                   ? 'User with this email already exists.'
-                  : (registerError as any).response?.data?.message || 'Registration failed. Please try again.'}
+                  : getApiErrorMessage(
+                      registerError,
+                      'Registration failed. Please try again.'
+                    )}
               </span>
             </div>
           )}
@@ -99,23 +96,13 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
               control={form.control}
               name="firstName"
               render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-medium text-gray-900">
-                    First Name
-                  </FormLabel>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                    <FormControl>
-                      <Input
-                        placeholder="John"
-                        className="pl-10 h-11 rounded-xl text-xs"
-                        error={!!fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage className="text-xs" />
-                </FormItem>
+                <FloatingAuthInput
+                  {...field}
+                  autoComplete="given-name"
+                  icon={User}
+                  label="First Name"
+                  error={!!fieldState.error}
+                />
               )}
             />
 
@@ -123,23 +110,13 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
               control={form.control}
               name="lastName"
               render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-medium text-gray-900">
-                    Last Name
-                  </FormLabel>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                    <FormControl>
-                      <Input
-                        placeholder="Doe"
-                        className="pl-10 h-11 rounded-xl text-xs"
-                        error={!!fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage className="text-xs" />
-                </FormItem>
+                <FloatingAuthInput
+                  {...field}
+                  autoComplete="family-name"
+                  icon={User}
+                  label="Last Name"
+                  error={!!fieldState.error}
+                />
               )}
             />
           </div>
@@ -148,24 +125,14 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             control={form.control}
             name="email"
             render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-medium text-gray-900">
-                  Email Address
-                </FormLabel>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      className="pl-10 h-11 rounded-xl text-xs"
-                      error={!!fieldState.error}
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage className="text-xs" />
-              </FormItem>
+              <FloatingAuthInput
+                {...field}
+                type="email"
+                autoComplete="email"
+                icon={Mail}
+                label="Email Address"
+                error={!!fieldState.error}
+              />
             )}
           />
 
@@ -173,24 +140,14 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-medium text-gray-900">
-                  Password
-                </FormLabel>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Min. 8 characters (A-Z, a-z, 0-9)"
-                      className="pl-10 h-11 rounded-xl text-xs"
-                      error={!!fieldState.error}
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage className="text-xs" />
-              </FormItem>
+              <FloatingAuthInput
+                {...field}
+                type="password"
+                autoComplete="new-password"
+                icon={Lock}
+                label="Create Password"
+                error={!!fieldState.error}
+              />
             )}
           />
 
@@ -224,11 +181,17 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
 
           <p className="text-[10px] text-center text-gray-400 font-medium">
             By signing up, you agree to our{' '}
-            <Link href="/terms" className="text-black hover:underline underline-offset-4">
+            <Link
+              href="/terms"
+              className="text-black hover:underline underline-offset-4"
+            >
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-black hover:underline underline-offset-4">
+            <Link
+              href="/privacy"
+              className="text-black hover:underline underline-offset-4"
+            >
               Privacy Policy
             </Link>
           </p>

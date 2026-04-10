@@ -5,16 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Mail, Lock, AlertCircle, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormField } from '@/components/ui/form';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { FloatingAuthInput } from '@/components/auth/floating-auth-input';
+import { getApiErrorMessage, getApiErrorStatus } from '@/lib/api/error-utils';
 
 const loginSchema = z.object({
   email: z
@@ -49,7 +43,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     try {
       await login(data);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       // Error handled by hook
     }
   };
@@ -67,10 +61,12 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
             <div className="flex items-start space-x-2 p-3 text-xs text-[#FF4E3E] bg-[#FFECEB] rounded-lg border border-[#FF4E3E]/20">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
-                {(loginError as any).response?.data?.message ||
-                  ((loginError as any).response?.status === 401
-                    ? 'Invalid email or password. Please try again.'
-                    : 'Login failed. Please check your credentials.')}
+                {getApiErrorStatus(loginError) === 401
+                  ? 'Invalid email or password. Please try again.'
+                  : getApiErrorMessage(
+                      loginError,
+                      'Login failed. Please check your credentials.'
+                    )}
               </span>
             </div>
           )}
@@ -79,24 +75,14 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
             control={form.control}
             name="email"
             render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-medium text-gray-900">
-                  Email Address
-                </FormLabel>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      className="pl-10 h-11 rounded-xl text-xs"
-                      error={!!fieldState.error}
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage className="text-xs" />
-              </FormItem>
+              <FloatingAuthInput
+                {...field}
+                type="email"
+                autoComplete="email"
+                icon={Mail}
+                label="Email Address"
+                error={!!fieldState.error}
+              />
             )}
           />
 
@@ -104,11 +90,11 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
-              <FormItem>
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <FormLabel className="text-xs font-medium text-gray-900">
+                  <span className="pl-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#66726F]">
                     Password
-                  </FormLabel>
+                  </span>
                   <button
                     type="button"
                     className="text-xs text-black hover:underline underline-offset-4 font-medium"
@@ -116,20 +102,15 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                     Forgot password?
                   </button>
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      className="pl-10 h-11 rounded-xl text-xs"
-                      error={!!fieldState.error}
-                      {...field}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage className="text-xs" />
-              </FormItem>
+                <FloatingAuthInput
+                  {...field}
+                  type="password"
+                  autoComplete="current-password"
+                  icon={Lock}
+                  label="Enter your password"
+                  error={!!fieldState.error}
+                />
+              </div>
             )}
           />
 

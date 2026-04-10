@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { getApiErrorMessage } from '@/lib/api/error-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,7 +24,6 @@ export default function ProfilePage() {
   const {
     user,
     isAuthenticated,
-    logout,
     updateProfile,
     isUpdatingProfile,
     updateProfileError,
@@ -43,7 +43,6 @@ export default function ProfilePage() {
     profileImage: '',
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // Password form state
   const [passwordForm, setPasswordForm] = useState({
@@ -68,7 +67,6 @@ export default function ProfilePage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -79,7 +77,6 @@ export default function ProfilePage() {
   };
 
   const removeImage = () => {
-    setImageFile(null);
     setImagePreview(null);
     setProfileForm(p => ({ ...p, profileImage: '' }));
   };
@@ -188,7 +185,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-
           {/* Tabs */}
           <div className="bg-white rounded-3xl border border-[#E4E9E8] overflow-hidden shadow-sm">
             {/* Tab Headers */}
@@ -231,8 +227,10 @@ export default function ProfilePage() {
                 {updateProfileError && (
                   <div className="flex items-center gap-3 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">
                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                    {(updateProfileError as any)?.response?.data?.message ||
-                      'Failed to update profile.'}
+                    {getApiErrorMessage(
+                      updateProfileError,
+                      'Failed to update profile.'
+                    )}
                   </div>
                 )}
 
@@ -400,8 +398,10 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 text-sm">
                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
                     {passwordMatchError ||
-                      (changePasswordError as any)?.response?.data?.message ||
-                      'Failed to change password.'}
+                      getApiErrorMessage(
+                        changePasswordError,
+                        'Failed to change password.'
+                      )}
                   </div>
                 )}
 

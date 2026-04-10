@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BlogPostVisibility, blogsApi } from '@/lib/api/blogs';
-import { BlogFontFamily } from '@/lib/blog-posts';
+import { blogsApi } from '@/lib/api/blogs';
+import { BlogFontFamily, BlogPostVisibility } from '@/lib/blog-posts';
 
 export function useBlogs() {
   return useQuery({
