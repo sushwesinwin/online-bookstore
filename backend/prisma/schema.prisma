@@ -7,19 +7,23 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  password     String
-  firstName    String
-  lastName     String
-  profileImage String?
-  role         Role       @default(USER)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  cart         CartItem[]
-  favorites    Favorite[]
-  orders       Order[]
-  blogPosts    BlogPost[]
+  id                  String           @id @default(cuid())
+  email               String           @unique
+  password            String
+  firstName           String
+  lastName            String
+  profileImage        String?
+  role                Role             @default(USER)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  cart                CartItem[]
+  favorites           Favorite[]
+  orders              Order[]
+  blogPosts           BlogPost[]
+  following           UserFollow[]     @relation("FollowFollower")
+  followers           UserFollow[]     @relation("FollowFollowing")
+  friendshipsStarted  UserFriendship[] @relation("FriendshipUserOne")
+  friendshipsReceived UserFriendship[] @relation("FriendshipUserTwo")
 
   @@map("users")
 }
@@ -127,15 +131,55 @@ enum PaymentStatus {
 }
 
 model BlogPost {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  content      String
+  featureImage String?
+  fontFamily   String   @default("modern-sans")
+  visibility   BlogPostVisibility @default(PUBLIC)
+  authorId     String
+  author       User     @relation(fields: [authorId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([visibility])
 
   @@map("blog_posts")
+}
+
+enum BlogPostVisibility {
+  PUBLIC
+  FOLLOWERS
+  FRIENDS
+  PRIVATE
+}
+
+model UserFollow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("FollowFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("FollowFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("user_follows")
+}
+
+model UserFriendship {
+  id        String   @id @default(cuid())
+  userOneId String
+  userTwoId String
+  createdAt DateTime @default(now())
+  userOne   User     @relation("FriendshipUserOne", fields: [userOneId], references: [id], onDelete: Cascade)
+  userTwo   User     @relation("FriendshipUserTwo", fields: [userTwoId], references: [id], onDelete: Cascade)
+
+  @@unique([userOneId, userTwoId])
+  @@index([userTwoId])
+  @@map("user_friendships")
 }
 
 model Quote {

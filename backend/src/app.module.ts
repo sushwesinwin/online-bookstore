@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -12,11 +13,16 @@ import { AdminModule } from './admin/admin.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { QuotesModule } from './quotes/quotes.module';
+import { SocialModule } from './social/social.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [
+        join(process.cwd(), 'backend/.env'),
+        join(process.cwd(), '.env'),
+      ],
     }),
     ThrottlerModule.forRoot([
       {
@@ -33,6 +39,7 @@ import { QuotesModule } from './quotes/quotes.module';
     FavoritesModule,
     BlogsModule,
     QuotesModule,
+    SocialModule,
   ],
   controllers: [AppController],
   providers: [AppService],
