@@ -1,9 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ExecutionContext } from '@nestjs/common';
 
 @Injectable()
 export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Attempt authentication but don't fail if it doesn't succeed
+    try {
+      await super.canActivate(context);
+    } catch {
+      // Ignore authentication errors - this is optional auth
+    }
+    return true;
+  }
+
   handleRequest<TUser = unknown>(
     err: unknown,
     user: TUser,
@@ -11,10 +20,10 @@ export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
     _context: ExecutionContext,
     _status?: unknown,
   ): TUser | null {
-    if (err) {
+    // Don't throw on errors - just return null for unauthenticated requests
+    if (err || !user) {
       return null;
     }
-
-    return user ?? null;
+    return user;
   }
 }

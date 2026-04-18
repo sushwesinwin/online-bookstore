@@ -23,9 +23,9 @@ export default function InventoryPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
-  const [sortBy, setSortBy] = useState<'title' | 'author' | 'price' | 'createdAt' | 'inventory'>(
-    'inventory'
-  );
+  const [sortBy, setSortBy] = useState<
+    'title' | 'author' | 'price' | 'createdAt' | 'inventory'
+  >('inventory');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -138,7 +138,9 @@ export default function InventoryPage() {
               </div>
 
               <div className="flex items-center gap-2 rounded-2xl border border-[#E4E9E8] bg-white px-3 h-12 shadow-sm">
-                <span className="text-xs font-semibold text-[#848785]">Sort</span>
+                <span className="text-xs font-semibold text-[#848785]">
+                  Sort
+                </span>
                 <select
                   value={`${sortBy}:${sortOrder}`}
                   onChange={e => {

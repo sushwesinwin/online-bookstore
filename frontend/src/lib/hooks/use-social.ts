@@ -45,7 +45,9 @@ export function useUnfollowWriter(userIdsToRefresh: string[]) {
       toast.success('Writer unfollowed');
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to unfollow writer');
+      toast.error(
+        error?.response?.data?.message || 'Failed to unfollow writer'
+      );
     },
   });
 }
@@ -81,9 +83,7 @@ export function useRemoveFriend(userIdsToRefresh: string[]) {
       toast.success('Writer removed from friends');
     },
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message || 'Failed to remove friend'
-      );
+      toast.error(error?.response?.data?.message || 'Failed to remove friend');
     },
   });
 }

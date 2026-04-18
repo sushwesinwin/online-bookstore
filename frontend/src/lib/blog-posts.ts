@@ -26,11 +26,7 @@ export const BLOG_FONT_OPTIONS = [
 ] as const;
 
 export type BlogFontFamily = (typeof BLOG_FONT_OPTIONS)[number]['value'];
-export type BlogPostVisibility =
-  | 'PUBLIC'
-  | 'FOLLOWERS'
-  | 'FRIENDS'
-  | 'PRIVATE';
+export type BlogPostVisibility = 'PUBLIC' | 'FOLLOWERS' | 'FRIENDS' | 'PRIVATE';
 
 export const DEFAULT_BLOG_FONT_FAMILY: BlogFontFamily = 'modern-sans';
 export const DEFAULT_BLOG_POST_VISIBILITY: BlogPostVisibility = 'PUBLIC';
@@ -70,8 +66,8 @@ export function getBlogVisibilityLabel(
   visibility?: BlogPostVisibility
 ): string {
   return (
-    BLOG_VISIBILITY_OPTIONS.find(option => option.value === visibility)?.label ??
-    BLOG_VISIBILITY_OPTIONS[0].label
+    BLOG_VISIBILITY_OPTIONS.find(option => option.value === visibility)
+      ?.label ?? BLOG_VISIBILITY_OPTIONS[0].label
   );
 }
 
@@ -98,15 +94,13 @@ export function getAuthorInitials(
   firstName?: string,
   lastName?: string
 ): string {
-  const initials = `${firstName?.trim().charAt(0) ?? ''}${lastName?.trim().charAt(0) ?? ''}`.toUpperCase();
+  const initials =
+    `${firstName?.trim().charAt(0) ?? ''}${lastName?.trim().charAt(0) ?? ''}`.toUpperCase();
 
   return initials || 'LB';
 }
 
-export function getAuthorHandle(
-  firstName?: string,
-  lastName?: string
-): string {
+export function getAuthorHandle(firstName?: string, lastName?: string): string {
   const parts = [firstName, lastName]
     .map(value =>
       value

@@ -13,6 +13,14 @@ export interface AdminUser extends User {
   orderCount: number;
 }
 
+export interface AdminUserDetails extends AdminUser {}
+
+export interface UpdateAdminUserData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export interface Book {
   id: string;
   isbn: string;

@@ -2,14 +2,54 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OrderStatus, Role } from '@prisma/client';
+import { OrderStatus, Prisma, Role } from '@prisma/client';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+const adminUserSelect = {
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  profileImage: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+  _count: { select: { orders: true } },
+} satisfies Prisma.UserSelect;
+
+type AdminUserRecord = Prisma.UserGetPayload<{
+  select: typeof adminUserSelect;
+}>;
 
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
+
+  private mapAdminUser(user: AdminUserRecord) {
+    const { _count, ...rest } = user;
+
+    return {
+      ...rest,
+      orderCount: _count.orders,
+    };
+  }
+
+  private async ensureAdminAccountRemains(excludedUserId: string) {
+    const remainingAdmins = await this.prisma.user.count({
+      where: {
+        role: Role.ADMIN,
+        id: { not: excludedUserId },
+      },
+    });
+
+    if (remainingAdmins === 0) {
+      throw new BadRequestException('At least one admin account must remain.');
+    }
+  }
 
   async getDashboardStats() {
     // Get total revenue from completed orders
@@ -208,7 +248,8 @@ export class AdminService {
     search?: string;
     role?: Role;
   }) {
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
+
     if (search) {
       where.OR = [
         { firstName: { contains: search, mode: 'insensitive' } },
@@ -224,23 +265,14 @@ export class AdminService {
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: { select: { orders: true } },
-        },
+        select: adminUserSelect,
       }),
       this.prisma.user.count({ where }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
     return {
-      data: users.map(u => ({ ...u, orderCount: u._count.orders })),
+      data: users.map(user => this.mapAdminUser(user)),
       meta: {
         total,
         page,
@@ -255,52 +287,126 @@ export class AdminService {
   async getUserById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      select: adminUserSelect,
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.mapAdminUser(user);
+  }
+
+  async updateUser(id: string, dto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: { select: { orders: true } },
       },
     });
+
     if (!user) throw new NotFoundException('User not found');
-    return { ...user, orderCount: user._count.orders };
+
+    const nextEmail = dto.email?.trim();
+
+    if (nextEmail && nextEmail !== user.email) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email: nextEmail },
+        select: { id: true },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: {
+        ...(nextEmail !== undefined && { email: nextEmail }),
+        ...(dto.firstName !== undefined && { firstName: dto.firstName.trim() }),
+        ...(dto.lastName !== undefined && { lastName: dto.lastName.trim() }),
+      },
+      select: adminUserSelect,
+    });
+
+    return this.mapAdminUser(updated);
   }
 
-  async updateUserRole(id: string, dto: UpdateUserRoleDto) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+  async updateUserRole(id: string, dto: UpdateUserRoleDto, actorId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
     if (!user) throw new NotFoundException('User not found');
+
+    if (id === actorId && dto.role !== Role.ADMIN) {
+      throw new BadRequestException(
+        'You cannot remove your own admin access.',
+      );
+    }
+
+    if (user.role === Role.ADMIN && dto.role !== Role.ADMIN) {
+      await this.ensureAdminAccountRemains(id);
+    }
+
     const updated = await this.prisma.user.update({
       where: { id },
       data: { role: dto.role },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: adminUserSelect,
     });
-    return updated;
+
+    return this.mapAdminUser(updated);
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: string, actorId: string) {
+    if (id === actorId) {
+      throw new BadRequestException(
+        'You cannot delete your own account from the admin panel.',
+      );
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { _count: { select: { orders: true } } },
+      select: {
+        id: true,
+        role: true,
+        _count: { select: { orders: true } },
+      },
     });
+
     if (!user) throw new NotFoundException('User not found');
+
     if (user._count.orders > 0) {
       throw new BadRequestException(
         'Cannot delete a user who has placed orders.',
       );
     }
-    await this.prisma.user.delete({ where: { id } });
+
+    if (user.role === Role.ADMIN) {
+      await this.ensureAdminAccountRemains(id);
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.cartItem.deleteMany({ where: { userId: id } }),
+      this.prisma.favorite.deleteMany({ where: { userId: id } }),
+      this.prisma.blogPost.deleteMany({ where: { authorId: id } }),
+      this.prisma.userFollow.deleteMany({
+        where: {
+          OR: [{ followerId: id }, { followingId: id }],
+        },
+      }),
+      this.prisma.userFriendship.deleteMany({
+        where: {
+          OR: [{ userOneId: id }, { userTwoId: id }],
+        },
+      }),
+      this.prisma.user.delete({ where: { id } }),
+    ]);
+
     return { message: 'User deleted successfully' };
   }
 }

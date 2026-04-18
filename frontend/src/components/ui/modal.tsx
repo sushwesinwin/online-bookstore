@@ -60,7 +60,9 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             <X className="h-5 w-5 text-[#848785]" />
           </button>
         )}
-        <div className={`p-4 sm:p-6 lg:p-8 max-h-[calc(90vh-${title ? '80px' : '40px'})] sm:max-h-[calc(85vh-${title ? '80px' : '40px'})] overflow-y-auto ${!title ? 'pt-10' : ''}`}>
+        <div
+          className={`p-4 sm:p-6 lg:p-8 max-h-[calc(90vh-${title ? '80px' : '40px'})] sm:max-h-[calc(85vh-${title ? '80px' : '40px'})] overflow-y-auto ${!title ? 'pt-10' : ''}`}
+        >
           {children}
         </div>
       </div>

@@ -145,7 +145,10 @@ export default function CreateBlogPage() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-7 px-6 py-6 md:px-8">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-7 px-6 py-6 md:px-8"
+            >
               {submitError && (
                 <div className="flex items-start gap-2 rounded-2xl border border-[#FF4E3E]/20 bg-[#FFECEB] p-4 text-sm text-[#B42318]">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -334,7 +337,11 @@ export default function CreateBlogPage() {
                     {getEstimatedReadTime(content)}
                   </span>
                   <span className="rounded-full bg-white px-3 py-2">
-                    {BLOG_FONT_OPTIONS.find(option => option.value === fontFamily)?.label}
+                    {
+                      BLOG_FONT_OPTIONS.find(
+                        option => option.value === fontFamily
+                      )?.label
+                    }
                   </span>
                   <span className="rounded-full bg-white px-3 py-2">
                     {getBlogVisibilityLabel(visibility)}
@@ -424,9 +431,15 @@ export default function CreateBlogPage() {
                   Posting Notes
                 </p>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-[#66726F]">
-                  <li>Lead with the strongest thought in the first sentence.</li>
-                  <li>Use an image when the post depends on visual atmosphere.</li>
-                  <li>Shorter feed copy usually performs better than heavy intros.</li>
+                  <li>
+                    Lead with the strongest thought in the first sentence.
+                  </li>
+                  <li>
+                    Use an image when the post depends on visual atmosphere.
+                  </li>
+                  <li>
+                    Shorter feed copy usually performs better than heavy intros.
+                  </li>
                 </ul>
               </div>
             </div>

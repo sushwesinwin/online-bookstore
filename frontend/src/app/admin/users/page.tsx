@@ -1,50 +1,118 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '@/lib/api/admin';
-import { formatDate } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import type { AdminUser } from '@/lib/api/types';
+import { useEffect, useState } from 'react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Search,
-  Users,
-  ShieldCheck,
-  UserCircle2,
-  Trash2,
+  AlertCircle,
+  Calendar,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
-  AlertCircle,
-  ShoppingBag,
-  Calendar,
+  Clock3,
+  Eye,
   Filter,
+  Loader2,
+  Mail,
+  MoreHorizontal,
+  PencilLine,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  Trash2,
+  UserCircle2,
+  Users,
+  X,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
+import { adminApi } from '@/lib/api/admin';
+import type {
+  AdminUser,
+  AdminUserDetails,
+  UpdateAdminUserData,
+} from '@/lib/api/types';
+import { getApiErrorMessage } from '@/lib/api/error-utils';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { useAuthStore } from '@/lib/stores/auth-store';
+import { formatDate } from '@/lib/utils';
 
-const ROLE_OPTIONS = [
+type UserRole = AdminUser['role'];
+type RoleFilter = '' | UserRole;
+type SortBy = 'name' | 'role' | 'orders' | 'joined';
+type SortOrder = 'asc' | 'desc';
+type HeaderTab = 'profiles' | 'roles';
+type VisibleColumnKey = 'user' | 'role' | 'orders' | 'joined' | 'actions';
+type EditUserFormState = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
+const ROLE_OPTIONS: Array<{ label: string; value: RoleFilter }> = [
   { label: 'All Roles', value: '' },
   { label: 'Users', value: 'USER' },
   { label: 'Admins', value: 'ADMIN' },
 ];
 
-function UserAvatar({ user }: { user: AdminUser }) {
+const HEADER_TABS: Array<{ id: HeaderTab; label: string }> = [
+  { id: 'profiles', label: 'User List & Profiles' },
+  { id: 'roles', label: 'Roles & Permissions' },
+];
+
+const COLUMN_OPTIONS: Array<{ key: VisibleColumnKey; label: string }> = [
+  { key: 'user', label: 'User' },
+  { key: 'role', label: 'Role' },
+  { key: 'orders', label: 'Orders' },
+  { key: 'joined', label: 'Joined' },
+  { key: 'actions', label: 'Actions' },
+];
+
+function getUserName(user: Pick<AdminUser, 'firstName' | 'lastName'>) {
+  return `${user.firstName} ${user.lastName}`.trim() || 'Unnamed User';
+}
+
+function UserAvatar({
+  user,
+  size = 'md',
+}: {
+  user: Pick<AdminUser, 'firstName' | 'lastName' | 'profileImage' | 'role'>;
+  size?: 'md' | 'lg';
+}) {
   const initials =
     `${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.toUpperCase();
   const isAdmin = user.role === 'ADMIN';
+  const sizeClass =
+    size === 'lg'
+      ? 'h-16 w-16 rounded-2xl text-lg'
+      : 'h-10 w-10 rounded-xl text-sm';
+
+  if (user.profileImage) {
+    return (
+      <img
+        src={user.profileImage}
+        alt={getUserName(user)}
+        className={`${sizeClass} object-cover flex-shrink-0 ring-1 ring-border`}
+      />
+    );
+  }
+
   return (
     <div
-      className={`h-10 w-10 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${isAdmin ? 'bg-gradient-to-br from-[#FF6320] to-[#FF8F6B]' : 'bg-gradient-to-br from-[#0B7C6B] to-[#17BD8D]'}`}
+      className={`${sizeClass} flex items-center justify-center text-white font-bold flex-shrink-0 ${isAdmin ? 'bg-gradient-to-br from-secondary to-orange-400' : 'bg-gradient-to-br from-primary to-zinc-500'}`}
     >
       {initials || '?'}
     </div>
   );
 }
 
-function RoleBadge({ role }: { role: 'USER' | 'ADMIN' }) {
+function RoleBadge({ role }: { role: UserRole }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${role === 'ADMIN' ? 'bg-[#FFF4ED] text-[#FF6320] border border-[#FF6320]/20' : 'bg-[#E4FFFB] text-[#0B7C6B] border border-[#0B7C6B]/20'}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${role === 'ADMIN' ? 'bg-secondary/10 text-secondary border border-secondary/20' : 'bg-primary/10 text-primary border border-primary/20'}`}
     >
       {role === 'ADMIN' ? (
         <ShieldCheck className="h-3 w-3" />
@@ -56,43 +124,164 @@ function RoleBadge({ role }: { role: 'USER' | 'ADMIN' }) {
   );
 }
 
+function SummaryCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string | number;
+  tone: 'neutral' | 'admin' | 'user';
+}) {
+  const toneClass =
+    tone === 'admin'
+      ? 'bg-secondary/10 text-secondary'
+      : tone === 'user'
+        ? 'bg-primary/10 text-primary'
+        : 'bg-muted text-foreground';
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div
+        className={`mb-3 inline-flex rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] ${toneClass}`}
+      >
+        {label}
+      </div>
+      <p className="text-3xl font-black tracking-tight text-foreground">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function UserActionsMenu({
+  user,
+  canDeleteUser,
+  isDeletingUser,
+  onView,
+  onEdit,
+  onDelete,
+}: {
+  user: AdminUser;
+  canDeleteUser: boolean;
+  isDeletingUser: boolean;
+  onView: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          aria-label={`Open actions for ${getUserName(user)}`}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={8}
+          className="z-50 w-56 rounded-2xl border border-border bg-white p-2 shadow-xl"
+        >
+          <DropdownMenu.Item
+            onSelect={() => {
+              setOpen(false);
+              onView();
+            }}
+            className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus:bg-muted"
+          >
+            <Eye className="h-4 w-4" />
+            View
+          </DropdownMenu.Item>
+
+          <DropdownMenu.Item
+            onSelect={() => {
+              setOpen(false);
+              onEdit();
+            }}
+            className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus:bg-muted"
+          >
+            <PencilLine className="h-4 w-4" />
+            Edit
+          </DropdownMenu.Item>
+
+          <DropdownMenu.Separator className="my-2 h-px bg-border" />
+
+          <DropdownMenu.Item
+            disabled={!canDeleteUser || isDeletingUser}
+            onSelect={event => {
+              if (!canDeleteUser || isDeletingUser) {
+                event.preventDefault();
+                return;
+              }
+              setOpen(false);
+              onDelete();
+            }}
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-destructive outline-none transition-colors focus:bg-destructive/10 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
+  const syncCurrentUser = useAuthStore(state => state.updateUser);
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'' | 'USER' | 'ADMIN'>('');
-  const [sortBy, setSortBy] = useState<'name' | 'role' | 'orders' | 'joined'>(
-    'joined'
-  );
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('');
+  const [headerTab, setHeaderTab] = useState<HeaderTab>('profiles');
+  const [sortBy, setSortBy] = useState<SortBy>('joined');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState({
+  const [visibleColumns, setVisibleColumns] = useState<
+    Record<VisibleColumnKey, boolean>
+  >({
     user: true,
     role: true,
     orders: true,
     joined: true,
     actions: true,
   });
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [confirmRole, setConfirmRole] = useState<{
     id: string;
-    newRole: 'USER' | 'ADMIN';
+    name: string;
+    newRole: UserRole;
   } | null>(null);
+  const [editUserForm, setEditUserForm] = useState<EditUserFormState | null>(
+    null
+  );
 
-  // Debounce search
   useEffect(() => {
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
     }, 350);
-    return () => clearTimeout(t);
+
+    return () => clearTimeout(timer);
   }, [search]);
 
   const queryKey = ['admin', 'users', page, limit, debouncedSearch, roleFilter];
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey,
     queryFn: () =>
       adminApi.getUsers({
@@ -103,70 +292,221 @@ export default function AdminUsersPage() {
       }),
   });
 
+  const {
+    data: selectedUser,
+    isLoading: isSelectedUserLoading,
+    isError: isSelectedUserError,
+    error: selectedUserError,
+  } = useQuery({
+    queryKey: ['admin', 'users', 'detail', selectedUserId],
+    queryFn: () => adminApi.getUserById(selectedUserId!),
+    enabled: Boolean(selectedUserId),
+  });
+
   const updateRoleMutation = useMutation({
-    mutationFn: ({ id, role }: { id: string; role: 'USER' | 'ADMIN' }) =>
+    mutationFn: ({ id, role }: { id: string; role: UserRole }) =>
       adminApi.updateUserRole(id, role),
-    onSuccess: () => {
+    onSuccess: updatedUser => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.setQueryData(
+        ['admin', 'users', 'detail', updatedUser.id],
+        updatedUser
+      );
       setConfirmRole(null);
+      toast.success(
+        `${getUserName(updatedUser)} is now ${updatedUser.role.toLowerCase()}`
+      );
+    },
+    onError: mutationError => {
+      toast.error(
+        getApiErrorMessage(mutationError, 'Failed to update user role.')
+      );
+    },
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateAdminUserData }) =>
+      adminApi.updateUser(id, data),
+    onSuccess: updatedUser => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.setQueryData(
+        ['admin', 'users', 'detail', updatedUser.id],
+        updatedUser
+      );
+      if (currentUser?.id === updatedUser.id) {
+        syncCurrentUser({
+          ...currentUser,
+          email: updatedUser.email,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+        });
+      }
+      setEditUserForm(null);
+      toast.success(`${getUserName(updatedUser)} updated successfully`);
+    },
+    onError: mutationError => {
+      toast.error(getApiErrorMessage(mutationError, 'Failed to update user.'));
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteUser(id),
-    onSuccess: () => {
+    onSuccess: (_, deletedUserId) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.removeQueries({
+        queryKey: ['admin', 'users', 'detail', deletedUserId],
+      });
+      if (selectedUserId === deletedUserId) {
+        setSelectedUserId(null);
+      }
       setConfirmDelete(null);
+      toast.success('User deleted successfully');
+    },
+    onError: mutationError => {
+      toast.error(getApiErrorMessage(mutationError, 'Failed to delete user.'));
     },
   });
 
   const users = data?.data ?? [];
   const meta = data?.meta;
   const pageSize = meta?.limit ?? limit;
+
   const sortedUsers = [...users].sort((a, b) => {
-    const dir = sortOrder === 'asc' ? 1 : -1;
+    const direction = sortOrder === 'asc' ? 1 : -1;
+
     if (sortBy === 'name') {
-      const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
-      const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-      return nameA.localeCompare(nameB) * dir;
+      return getUserName(a).localeCompare(getUserName(b)) * direction;
     }
+
     if (sortBy === 'role') {
-      return a.role.localeCompare(b.role) * dir;
+      return a.role.localeCompare(b.role) * direction;
     }
+
     if (sortBy === 'orders') {
-      return (a.orderCount - b.orderCount) * dir;
+      return (a.orderCount - b.orderCount) * direction;
     }
+
     return (
-      (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * dir
+      (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) *
+      direction
     );
   });
 
-  const handleRoleToggle = (user: AdminUser) => {
-    const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
-    setConfirmRole({ id: user.id, newRole });
+  const adminsOnPage = sortedUsers.filter(user => user.role === 'ADMIN').length;
+  const readersOnPage = sortedUsers.length - adminsOnPage;
+
+  const isCurrentUser = (userId: string) => currentUser?.id === userId;
+
+  const canChangeRole = (user: AdminUser | AdminUserDetails) =>
+    !isCurrentUser(user.id);
+
+  const canDeleteUser = (user: AdminUser | AdminUserDetails) =>
+    !isCurrentUser(user.id) && user.orderCount === 0;
+
+  const getRoleActionTitle = (user: AdminUser | AdminUserDetails) => {
+    if (isCurrentUser(user.id)) {
+      return 'You cannot change your own role';
+    }
+
+    return user.role === 'ADMIN' ? 'Demote to User' : 'Promote to Admin';
   };
+
+  const getDeleteActionTitle = (user: AdminUser | AdminUserDetails) => {
+    if (isCurrentUser(user.id)) {
+      return 'You cannot delete your own account';
+    }
+
+    if (user.orderCount > 0) {
+      return 'Cannot delete: user has orders';
+    }
+
+    return 'Delete user';
+  };
+
+  const handleRoleToggle = (user: AdminUser | AdminUserDetails) => {
+    updateRoleMutation.reset();
+    setConfirmRole({
+      id: user.id,
+      name: getUserName(user),
+      newRole: user.role === 'ADMIN' ? 'USER' : 'ADMIN',
+    });
+  };
+
+  const handleDeleteRequest = (user: AdminUser | AdminUserDetails) => {
+    deleteMutation.reset();
+    setConfirmDelete({
+      id: user.id,
+      name: getUserName(user),
+    });
+  };
+
+  const handleEditRequest = (user: AdminUser | AdminUserDetails) => {
+    updateUserMutation.reset();
+    setEditUserForm({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  };
+
+  const isEditFormValid = Boolean(
+    editUserForm?.email.trim() &&
+    editUserForm.firstName.trim() &&
+    editUserForm.lastName.trim()
+  );
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-[#101313] flex items-center gap-3">
-            <div className="p-2.5 bg-[#E4FFFB] rounded-xl">
-              <Users className="h-7 w-7 text-[#0B7C6B]" />
+          <h1 className="text-4xl font-black tracking-tight text-foreground flex items-center gap-3">
+            <div className="p-2.5 bg-primary/10 rounded-xl">
+              <Users className="h-7 w-7 text-primary" />
             </div>
-            User Management
+            Users
           </h1>
-          <p className="text-[#848785] mt-2 font-medium">
-            {meta ? `${meta.total} total users` : 'Loading...'}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {HEADER_TABS.map(tab => {
+              const isActive = headerTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setHeaderTab(tab.id)}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-white text-muted-foreground border border-border hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-muted-foreground mt-3 font-medium">
+            {headerTab === 'profiles'
+              ? 'Browse user accounts, profiles, and activity.'
+              : 'Review role assignments and permissions.'}
           </p>
         </div>
       </div>
 
-      {/* Filters Row */}
+      <div className="grid gap-3 md:grid-cols-3">
+        <SummaryCard
+          label="Directory"
+          value={meta?.total ?? '...'}
+          tone="neutral"
+        />
+        <SummaryCard label="Admins On Page" value={adminsOnPage} tone="admin" />
+        <SummaryCard label="Users On Page" value={readersOnPage} tone="user" />
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#848785]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name or email..."
             value={search}
@@ -175,34 +515,38 @@ export default function AdminUsersPage() {
           />
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
-            <Filter className="h-4 w-4 text-[#848785] flex-shrink-0" />
+          <div className="flex items-center gap-2 bg-white border border-border rounded-xl px-3 h-11 md:h-12">
+            <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <select
               value={roleFilter}
               onChange={e => {
-                setRoleFilter(e.target.value as any);
+                setRoleFilter(e.target.value as RoleFilter);
                 setPage(1);
               }}
-              className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
+              className="text-sm font-medium text-foreground bg-transparent outline-none cursor-pointer"
             >
-              {ROLE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
+              {ROLE_OPTIONS.map(option => (
+                <option key={option.value || 'all'} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-white border border-[#E4E9E8] rounded-xl px-3 h-11 md:h-12">
-            <span className="text-xs font-semibold text-[#848785]">Sort</span>
+          <div className="flex items-center gap-2 bg-white border border-border rounded-xl px-3 h-11 md:h-12">
+            <span className="text-xs font-semibold text-muted-foreground">
+              Sort
+            </span>
             <select
               value={`${sortBy}:${sortOrder}`}
               onChange={e => {
-                const [by, order] = e.target.value.split(':');
-                setSortBy(by as any);
-                setSortOrder(order as any);
+                const [nextSortBy, nextSortOrder] = e.target.value.split(
+                  ':'
+                ) as [SortBy, SortOrder];
+                setSortBy(nextSortBy);
+                setSortOrder(nextSortOrder);
               }}
-              className="text-sm font-medium text-[#101313] bg-transparent outline-none cursor-pointer"
+              className="text-sm font-medium text-foreground bg-transparent outline-none cursor-pointer"
             >
               <option value="joined:desc">Newest first</option>
               <option value="joined:asc">Oldest first</option>
@@ -218,36 +562,30 @@ export default function AdminUsersPage() {
           <div className="relative">
             <button
               type="button"
-              onClick={() => setIsColumnsOpen(o => !o)}
-              className="h-11 md:h-12 rounded-xl border border-[#E4E9E8] bg-white px-4 text-sm font-semibold text-[#101313] shadow-sm"
+              onClick={() => setIsColumnsOpen(open => !open)}
+              className="h-11 md:h-12 rounded-xl border border-border bg-white px-4 text-sm font-semibold text-foreground shadow-sm"
             >
               Columns
             </button>
             {isColumnsOpen && (
-              <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-[#E4E9E8] bg-white shadow-lg p-2">
-                {[
-                  { key: 'user', label: 'User' },
-                  { key: 'role', label: 'Role' },
-                  { key: 'orders', label: 'Orders' },
-                  { key: 'joined', label: 'Joined' },
-                  { key: 'actions', label: 'Actions' },
-                ].map(col => (
+              <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-border bg-white shadow-lg p-2">
+                {COLUMN_OPTIONS.map(column => (
                   <label
-                    key={col.key}
-                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-[#101313] cursor-pointer"
+                    key={column.key}
+                    className="flex items-center gap-2 px-2 py-1.5 text-sm text-foreground cursor-pointer"
                   >
                     <input
                       type="checkbox"
-                      checked={(visibleColumns as any)[col.key]}
+                      checked={visibleColumns[column.key]}
                       onChange={() =>
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          [col.key]: !(prev as any)[col.key],
+                        setVisibleColumns(previous => ({
+                          ...previous,
+                          [column.key]: !previous[column.key],
                         }))
                       }
-                      className="h-4 w-4 rounded border-[#E4E9E8] text-[#0B7C6B] focus:ring-[#0B7C6B]/30"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary/30"
                     />
-                    {col.label}
+                    {column.label}
                   </label>
                 ))}
               </div>
@@ -256,60 +594,78 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Mobile Cards */}
+      {isError && (
+        <div className="rounded-2xl border border-[#FFD8D5] bg-[#FFF4F3] px-5 py-4 text-sm text-[#A53024]">
+          {getApiErrorMessage(error, 'Failed to load users.')}
+        </div>
+      )}
+
       <div className="block lg:hidden space-y-3">
         {isLoading ? (
-          Array.from({ length: 6 }).map((_, i) => (
+          Array.from({ length: 6 }).map((_, index) => (
             <div
-              key={i}
-              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 animate-pulse"
+              key={index}
+              className="bg-white rounded-2xl border border-border p-4 animate-pulse"
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-[#F3F5F5]" />
+                <div className="h-10 w-10 rounded-xl bg-muted" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-32 bg-[#F3F5F5] rounded" />
-                  <div className="h-3 w-44 bg-[#F3F5F5] rounded" />
+                  <div className="h-4 w-32 bg-muted rounded" />
+                  <div className="h-3 w-44 bg-muted rounded" />
                 </div>
               </div>
             </div>
           ))
-        ) : users.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#E4E9E8] p-12 text-center">
-            <Users className="h-12 w-12 opacity-20 mx-auto mb-3 text-[#848785]" />
-            <p className="font-semibold text-[#848785]">No users found</p>
+        ) : sortedUsers.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-border p-12 text-center">
+            <Users className="h-12 w-12 opacity-20 mx-auto mb-3 text-muted-foreground" />
+            <p className="font-semibold text-muted-foreground">
+              No users found
+            </p>
             {(debouncedSearch || roleFilter) && (
               <button
                 onClick={() => {
                   setSearch('');
                   setRoleFilter('');
                 }}
-                className="text-sm text-[#0B7C6B] hover:underline mt-2"
+                className="text-sm text-primary hover:underline mt-2"
               >
                 Clear filters
               </button>
             )}
           </div>
         ) : (
-          users.map(user => (
+          sortedUsers.map(user => (
             <div
               key={user.id}
-              className="bg-white rounded-2xl border border-[#E4E9E8] p-4 shadow-sm"
+              className="bg-white rounded-2xl border border-border p-4 shadow-sm"
             >
               <div className="flex items-start gap-3">
                 <UserAvatar user={user} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-[#101313] truncate">
-                        {user.firstName} {user.lastName}
+                      <p className="font-bold text-foreground truncate">
+                        {getUserName(user)}
                       </p>
-                      <p className="text-sm text-[#848785] truncate">
+                      <p className="text-sm text-muted-foreground truncate">
                         {user.email}
                       </p>
                     </div>
-                    <RoleBadge role={user.role} />
+                    <div className="flex items-start gap-2">
+                      <RoleBadge role={user.role} />
+                      <UserActionsMenu
+                        user={user}
+                        canDeleteUser={canDeleteUser(user)}
+                        isDeletingUser={deleteMutation.isPending}
+                        onView={() => setSelectedUserId(user.id)}
+                        onEdit={() => handleEditRequest(user)}
+                        onDelete={() => handleDeleteRequest(user)}
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-4 text-xs text-[#848785] mb-3">
+
+                  <div className="flex gap-4 text-xs text-muted-foreground mb-3">
                     <div className="flex items-center gap-1">
                       <ShoppingBag className="h-3.5 w-3.5" />
                       {user.orderCount} orders
@@ -319,33 +675,6 @@ export default function AdminUsersPage() {
                       {formatDate(user.createdAt)}
                     </div>
                   </div>
-                  <div className="flex gap-2 pt-2 border-t border-[#E4E9E8]">
-                    <button
-                      onClick={() => handleRoleToggle(user)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
-                        user.role === 'ADMIN'
-                          ? 'border-[#E4E9E8] text-[#848785] active:border-[#0B7C6B]/40 active:text-[#0B7C6B] active:bg-[#E4FFFB]'
-                          : 'border-[#E4E9E8] text-[#848785] active:border-[#FF6320]/40 active:text-[#FF6320] active:bg-[#FFF4ED]'
-                      }`}
-                    >
-                      {user.role === 'ADMIN' ? (
-                        <>
-                          <UserCircle2 className="h-3.5 w-3.5" /> Make User
-                        </>
-                      ) : (
-                        <>
-                          <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setConfirmDelete(user.id)}
-                      disabled={user.orderCount > 0}
-                      className="p-2 rounded-xl text-[#848785] active:text-[#FF4E3E] active:bg-[#FFECEB] transition-all disabled:opacity-30"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -353,70 +682,69 @@ export default function AdminUsersPage() {
         )}
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden lg:block bg-white rounded-3xl border border-[#E4E9E8] shadow-sm overflow-hidden">
+      <div className="hidden lg:block bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#E4E9E8] bg-[#F8FAFB]">
+              <tr className="border-b border-border bg-muted/70">
                 {visibleColumns.user && (
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
                     User
                   </th>
                 )}
                 {visibleColumns.role && (
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
                     Role
                   </th>
                 )}
                 {visibleColumns.orders && (
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
                     Orders
                   </th>
                 )}
                 {visibleColumns.joined && (
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785]">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
                     Joined
                   </th>
                 )}
                 {visibleColumns.actions && (
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-[#848785] text-right">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-muted-foreground text-right">
                     Actions
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E4E9E8]">
+            <tbody className="divide-y divide-border">
               {isLoading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <tr key={i}>
+                Array.from({ length: 6 }).map((_, index) => (
+                  <tr key={index}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#F3F5F5] animate-pulse" />
+                        <div className="h-10 w-10 rounded-xl bg-muted animate-pulse" />
                         <div className="space-y-2">
-                          <div className="h-4 w-32 bg-[#F3F5F5] animate-pulse rounded" />
-                          <div className="h-3 w-44 bg-[#F3F5F5] animate-pulse rounded" />
+                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                          <div className="h-3 w-44 bg-muted animate-pulse rounded" />
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-6 w-16 bg-[#F3F5F5] animate-pulse rounded-full" />
+                      <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-4 w-8 bg-[#F3F5F5] animate-pulse rounded" />
+                      <div className="h-4 w-8 bg-muted animate-pulse rounded" />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-4 w-24 bg-[#F3F5F5] animate-pulse rounded" />
+                      <div className="h-4 w-24 bg-muted animate-pulse rounded" />
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="h-8 w-20 bg-[#F3F5F5] animate-pulse rounded-xl ml-auto" />
+                      <div className="h-8 w-28 bg-muted animate-pulse rounded-xl ml-auto" />
                     </td>
                   </tr>
                 ))
-              ) : users.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
-                    <div className="flex flex-col items-center gap-3 text-[#848785]">
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground">
                       <Users className="h-12 w-12 opacity-20" />
                       <p className="font-semibold">No users found</p>
                       {(debouncedSearch || roleFilter) && (
@@ -425,7 +753,7 @@ export default function AdminUsersPage() {
                             setSearch('');
                             setRoleFilter('');
                           }}
-                          className="text-sm text-[#0B7C6B] hover:underline"
+                          className="text-sm text-primary hover:underline"
                         >
                           Clear filters
                         </button>
@@ -437,18 +765,17 @@ export default function AdminUsersPage() {
                 sortedUsers.map(user => (
                   <tr
                     key={user.id}
-                    className="group hover:bg-[#F8FAFB]/50 transition-colors"
+                    className="group hover:bg-muted/60 transition-colors"
                   >
-                    {/* User info */}
                     {visibleColumns.user && (
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <UserAvatar user={user} />
                           <div className="min-w-0">
-                            <p className="font-bold text-[#101313] truncate group-hover:text-[#0B7C6B] transition-colors">
-                              {user.firstName} {user.lastName}
+                            <p className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                              {getUserName(user)}
                             </p>
-                            <p className="text-sm text-[#848785] truncate">
+                            <p className="text-sm text-muted-foreground truncate">
                               {user.email}
                             </p>
                           </div>
@@ -456,77 +783,43 @@ export default function AdminUsersPage() {
                       </td>
                     )}
 
-                    {/* Role */}
                     {visibleColumns.role && (
                       <td className="px-6 py-4">
                         <RoleBadge role={user.role} />
                       </td>
                     )}
 
-                    {/* Orders */}
                     {visibleColumns.orders && (
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-sm text-[#848785]">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <ShoppingBag className="h-3.5 w-3.5" />
-                          <span className="font-semibold text-[#101313]">
+                          <span className="font-semibold text-foreground">
                             {user.orderCount}
                           </span>
                         </div>
                       </td>
                     )}
 
-                    {/* Joined */}
                     {visibleColumns.joined && (
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-sm text-[#848785]">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <Calendar className="h-3.5 w-3.5" />
                           {formatDate(user.createdAt)}
                         </div>
                       </td>
                     )}
 
-                    {/* Actions */}
                     {visibleColumns.actions && (
                       <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          {/* Toggle role */}
-                          <button
-                            onClick={() => handleRoleToggle(user)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                              user.role === 'ADMIN'
-                                ? 'border-[#E4E9E8] text-[#848785] hover:border-[#0B7C6B]/40 hover:text-[#0B7C6B] hover:bg-[#E4FFFB]'
-                                : 'border-[#E4E9E8] text-[#848785] hover:border-[#FF6320]/40 hover:text-[#FF6320] hover:bg-[#FFF4ED]'
-                            }`}
-                            title={
-                              user.role === 'ADMIN'
-                                ? 'Demote to User'
-                                : 'Promote to Admin'
-                            }
-                          >
-                            {user.role === 'ADMIN' ? (
-                              <>
-                                <UserCircle2 className="h-3.5 w-3.5" /> Make User
-                              </>
-                            ) : (
-                              <>
-                                <ShieldCheck className="h-3.5 w-3.5" /> Make Admin
-                              </>
-                            )}
-                          </button>
-
-                          {/* Delete */}
-                          <button
-                            onClick={() => setConfirmDelete(user.id)}
-                            disabled={user.orderCount > 0}
-                            className="p-2 rounded-xl text-[#848785] hover:text-[#FF4E3E] hover:bg-[#FFECEB] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                            title={
-                              user.orderCount > 0
-                                ? 'Cannot delete: user has orders'
-                                : 'Delete user'
-                            }
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                        <div className="flex items-center justify-end">
+                          <UserActionsMenu
+                            user={user}
+                            canDeleteUser={canDeleteUser(user)}
+                            isDeletingUser={deleteMutation.isPending}
+                            onView={() => setSelectedUserId(user.id)}
+                            onEdit={() => handleEditRequest(user)}
+                            onDelete={() => handleDeleteRequest(user)}
+                          />
                         </div>
                       </td>
                     )}
@@ -536,91 +829,355 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {meta && (
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-6 py-4 border-t border-[#E4E9E8] bg-[#F8FAFB]">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <select
-                  className="h-10 w-32 appearance-none rounded-lg border border-[#E4E9E8] bg-white px-3 pr-9 text-sm text-[#101313] focus:outline-none focus:ring-2 focus:ring-[#0B7C6B]/20"
-                  value={limit}
-                  onChange={e => {
-                    setLimit(Number(e.target.value));
-                    setPage(1);
-                  }}
-                >
-                  {[10, 20, 50, 100].map(size => (
-                    <option key={size} value={size}>
-                      {size} / page
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6AAA9]" />
-              </div>
-              <p className="text-sm text-[#848785]">
-                Showing{' '}
-                <span className="font-semibold text-[#101313]">
-                  {meta.total === 0 ? 0 : (meta.page - 1) * pageSize + 1}
-                </span>
-                –{Math.min(meta.page * pageSize, meta.total)} of {meta.total}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={!meta.hasPreviousPage}
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="h-9 w-9 rounded-lg border-[#E4E9E8]"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex h-9 min-w-[36px] items-center justify-center rounded-lg bg-white px-3 text-sm font-bold text-[#101313] shadow-sm">
-                {meta.page}
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={!meta.hasNextPage}
-                onClick={() => setPage(p => p + 1)}
-                className="h-9 w-9 rounded-lg border-[#E4E9E8]"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Confirm Role Change Modal */}
+      {meta && (
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 md:px-0">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <select
+                className="h-10 w-32 appearance-none rounded-lg border border-border bg-white px-3 pr-9 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                value={limit}
+                onChange={e => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                {[10, 20, 50, 100].map(size => (
+                  <option key={size} value={size}>
+                    {size} / page
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Showing{' '}
+              <span className="font-semibold text-foreground">
+                {meta.total === 0 ? 0 : (meta.page - 1) * pageSize + 1}
+              </span>
+              –{Math.min(meta.page * pageSize, meta.total)} of {meta.total}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={!meta.hasPreviousPage}
+              onClick={() =>
+                setPage(currentPage => Math.max(1, currentPage - 1))
+              }
+              className="h-9 w-9 rounded-lg border-border"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex h-9 min-w-[36px] items-center justify-center rounded-lg bg-white px-3 text-sm font-bold text-foreground shadow-sm">
+              {meta.page}
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={!meta.hasNextPage}
+              onClick={() => setPage(currentPage => currentPage + 1)}
+              className="h-9 w-9 rounded-lg border-border"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {selectedUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.24em] text-muted-foreground">
+                  User Detail
+                </p>
+                <h3 className="mt-1 text-2xl font-black tracking-tight text-foreground">
+                  Account Overview
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedUserId(null)}
+                className="rounded-xl border border-border p-2 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[calc(90vh-90px)] overflow-y-auto px-6 py-6">
+              {isSelectedUserLoading ? (
+                <div className="flex min-h-[280px] items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : isSelectedUserError ? (
+                <div className="rounded-2xl border border-[#FFD8D5] bg-[#FFF4F3] px-5 py-4 text-sm text-[#A53024]">
+                  {getApiErrorMessage(
+                    selectedUserError,
+                    'Failed to load user details.'
+                  )}
+                </div>
+              ) : selectedUser ? (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <UserAvatar user={selectedUser} size="lg" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h4 className="text-2xl font-black tracking-tight text-foreground">
+                          {getUserName(selectedUser)}
+                        </h4>
+                        <RoleBadge role={selectedUser.role} />
+                      </div>
+                      <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground break-all">
+                        <Mail className="h-4 w-4 flex-shrink-0" />
+                        {selectedUser.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-border bg-muted p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        Orders
+                      </p>
+                      <p className="mt-2 text-3xl font-black tracking-tight text-foreground">
+                        {selectedUser.orderCount}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-border bg-muted p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        User ID
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-foreground break-all">
+                        {selectedUser.id}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-border bg-white p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        Joined
+                      </p>
+                      <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        {formatDate(selectedUser.createdAt)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-border bg-white p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-muted-foreground">
+                        Last Updated
+                      </p>
+                      <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <Clock3 className="h-4 w-4 text-muted-foreground" />
+                        {formatDate(selectedUser.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-white p-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-muted-foreground">
+                      Management Actions
+                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditRequest(selectedUser)}
+                        className="border-border"
+                      >
+                        Edit User
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleRoleToggle(selectedUser)}
+                        disabled={!canChangeRole(selectedUser)}
+                        title={getRoleActionTitle(selectedUser)}
+                        className="border-border"
+                      >
+                        {selectedUser.role === 'ADMIN'
+                          ? 'Make User'
+                          : 'Make Admin'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDeleteRequest(selectedUser)}
+                        disabled={!canDeleteUser(selectedUser)}
+                        title={getDeleteActionTitle(selectedUser)}
+                        className="border-[#FF4E3E]/20 text-[#FF4E3E] hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
+                      >
+                        Delete User
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={Boolean(editUserForm)}
+        onClose={() => {
+          setEditUserForm(null);
+          updateUserMutation.reset();
+        }}
+        title="Edit User"
+      >
+        {editUserForm && (
+          <form
+            className="space-y-5"
+            onSubmit={event => {
+              event.preventDefault();
+              updateUserMutation.mutate({
+                id: editUserForm.id,
+                data: {
+                  email: editUserForm.email.trim(),
+                  firstName: editUserForm.firstName.trim(),
+                  lastName: editUserForm.lastName.trim(),
+                },
+              });
+            }}
+          >
+            <div className="space-y-2">
+              <label
+                htmlFor="edit-user-first-name"
+                className="text-sm font-semibold text-foreground"
+              >
+                First name
+              </label>
+              <Input
+                id="edit-user-first-name"
+                value={editUserForm.firstName}
+                onChange={event =>
+                  setEditUserForm(current =>
+                    current
+                      ? { ...current, firstName: event.target.value }
+                      : current
+                  )
+                }
+                placeholder="First name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="edit-user-last-name"
+                className="text-sm font-semibold text-foreground"
+              >
+                Last name
+              </label>
+              <Input
+                id="edit-user-last-name"
+                value={editUserForm.lastName}
+                onChange={event =>
+                  setEditUserForm(current =>
+                    current
+                      ? { ...current, lastName: event.target.value }
+                      : current
+                  )
+                }
+                placeholder="Last name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="edit-user-email"
+                className="text-sm font-semibold text-foreground"
+              >
+                Email
+              </label>
+              <Input
+                id="edit-user-email"
+                type="email"
+                value={editUserForm.email}
+                onChange={event =>
+                  setEditUserForm(current =>
+                    current
+                      ? { ...current, email: event.target.value }
+                      : current
+                  )
+                }
+                placeholder="Email address"
+              />
+            </div>
+
+            {updateUserMutation.isError && (
+              <p className="rounded-xl bg-[#FFECEB] p-3 text-sm text-[#FF4E3E]">
+                {getApiErrorMessage(
+                  updateUserMutation.error,
+                  'Failed to update user.'
+                )}
+              </p>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                disabled={updateUserMutation.isPending}
+                onClick={() => {
+                  setEditUserForm(null);
+                  updateUserMutation.reset();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-primary hover:bg-primary/90"
+                disabled={!isEditFormValid || updateUserMutation.isPending}
+              >
+                {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
       {confirmRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 space-y-6">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-[#FFF4ED]">
-                <ShieldCheck className="h-6 w-6 text-[#FF6320]" />
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <ShieldCheck className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101313] text-lg">
+                <h3 className="font-bold text-foreground text-lg">
                   Change Role
                 </h3>
-                <p className="text-sm text-[#848785]">
-                  Set role to <strong>{confirmRole.newRole}</strong>?
+                <p className="text-sm text-muted-foreground">
+                  Set <strong>{confirmRole.name}</strong> to{' '}
+                  <strong>{confirmRole.newRole}</strong>?
                 </p>
               </div>
             </div>
+            {updateRoleMutation.isError && (
+              <p className="text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-xl p-3">
+                {getApiErrorMessage(
+                  updateRoleMutation.error,
+                  'Failed to update role.'
+                )}
+              </p>
+            )}
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => setConfirmRole(null)}
+                onClick={() => {
+                  setConfirmRole(null);
+                  updateRoleMutation.reset();
+                }}
                 disabled={updateRoleMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
-                className="flex-1 bg-[#0B7C6B] hover:bg-[#096B5B]"
+                className="flex-1 bg-primary hover:bg-primary/90"
                 disabled={updateRoleMutation.isPending}
                 onClick={() =>
                   updateRoleMutation.mutate({
@@ -636,27 +1193,29 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* Confirm Delete Modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 space-y-6">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-2xl bg-[#FFECEB]">
                 <AlertCircle className="h-6 w-6 text-[#FF4E3E]" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101313] text-lg">
+                <h3 className="font-bold text-foreground text-lg">
                   Delete User
                 </h3>
-                <p className="text-sm text-[#848785]">
-                  This action cannot be undone.
+                <p className="text-sm text-muted-foreground">
+                  Delete <strong>{confirmDelete.name}</strong>? This action
+                  cannot be undone.
                 </p>
               </div>
             </div>
             {deleteMutation.isError && (
               <p className="text-sm text-[#FF4E3E] bg-[#FFECEB] rounded-xl p-3">
-                {(deleteMutation.error as any)?.response?.data?.message ??
-                  'Failed to delete user.'}
+                {getApiErrorMessage(
+                  deleteMutation.error,
+                  'Failed to delete user.'
+                )}
               </p>
             )}
             <div className="flex gap-3">
@@ -674,7 +1233,7 @@ export default function AdminUsersPage() {
               <Button
                 className="flex-1 bg-[#FF4E3E] hover:bg-[#E03E2F] text-white"
                 disabled={deleteMutation.isPending}
-                onClick={() => deleteMutation.mutate(confirmDelete)}
+                onClick={() => deleteMutation.mutate(confirmDelete.id)}
               >
                 {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </Button>

@@ -6,7 +6,6 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
-  Printer,
   Download,
   CheckCircle2,
   Truck,
@@ -29,9 +28,9 @@ export default function AdminOrders() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'>(
-    'createdAt'
-  );
+  const [sortBy, setSortBy] = useState<
+    'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'
+  >('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -449,56 +448,56 @@ export default function AdminOrders() {
                     )}
                     {visibleColumns.status && (
                       <td className="px-6 py-5">
-                      <div
-                        className="relative"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <button
-                          onClick={() =>
-                            setOpenDropdownId(
-                              openDropdownId === order.id ? null : order.id
-                            )
-                          }
-                          className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
+                        <div
+                          className="relative"
+                          onClick={e => e.stopPropagation()}
                         >
-                          {getStatusIcon(order.status)}
-                          {order.status}
-                          <ChevronDown className="ml-1.5 h-3 w-3" />
-                        </button>
+                          <button
+                            onClick={() =>
+                              setOpenDropdownId(
+                                openDropdownId === order.id ? null : order.id
+                              )
+                            }
+                            className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80 ${getStatusColor(order.status)}`}
+                          >
+                            {getStatusIcon(order.status)}
+                            {order.status}
+                            <ChevronDown className="ml-1.5 h-3 w-3" />
+                          </button>
 
-                        {openDropdownId === order.id && (
-                          <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                            {[
-                              'PENDING',
-                              'CONFIRMED',
-                              'SHIPPED',
-                              'DELIVERED',
-                              'CANCELLED',
-                            ].map(s => (
-                              <button
-                                key={s}
-                                onClick={() => {
-                                  handleUpdateStatus(order.id, s);
-                                  setOpenDropdownId(null);
-                                }}
-                                disabled={
-                                  updateStatus.isPending || order.status === s
-                                }
-                                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-                                  order.status === s
-                                    ? 'bg-[#F8FAFB] text-[#101313]'
-                                    : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
-                              >
-                                {s}
-                                {order.status === s && (
-                                  <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                          {openDropdownId === order.id && (
+                            <div className="absolute left-0 top-full mt-2 w-44 z-50 rounded-xl border border-[#E4E9E8] bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                              {[
+                                'PENDING',
+                                'CONFIRMED',
+                                'SHIPPED',
+                                'DELIVERED',
+                                'CANCELLED',
+                              ].map(s => (
+                                <button
+                                  key={s}
+                                  onClick={() => {
+                                    handleUpdateStatus(order.id, s);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  disabled={
+                                    updateStatus.isPending || order.status === s
+                                  }
+                                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                                    order.status === s
+                                      ? 'bg-[#F8FAFB] text-[#101313]'
+                                      : 'text-[#848785] hover:bg-[#F8FAFB] hover:text-[#101313]'
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                  {s}
+                                  {order.status === s && (
+                                    <CheckCircle2 className="h-3.5 w-3.5 text-[#0B7C6B]" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </td>
                     )}
                     {visibleColumns.action && (

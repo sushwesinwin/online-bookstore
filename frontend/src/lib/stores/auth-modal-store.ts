@@ -9,12 +9,12 @@ interface AuthModalState {
   setView: (view: 'login' | 'register') => void;
 }
 
-export const useAuthModalStore = create<AuthModalState>((set) => ({
+export const useAuthModalStore = create<AuthModalState>(set => ({
   isOpen: false,
   view: 'register',
   message: null,
-  openModal: (view = 'register', message = null) => 
+  openModal: (view = 'register', message = null) =>
     set({ isOpen: true, view, message }),
   closeModal: () => set({ isOpen: false, message: null }),
-  setView: (view) => set({ view }),
+  setView: view => set({ view }),
 }));

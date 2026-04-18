@@ -27,14 +27,14 @@ export default function AdminSales() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'>(
-    'DELIVERED'
-  );
+  const [status, setStatus] = useState<
+    'ALL' | 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+  >('DELIVERED');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'>(
-    'createdAt'
-  );
+  const [sortBy, setSortBy] = useState<
+    'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'
+  >('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -64,7 +64,10 @@ export default function AdminSales() {
     sortOrder,
   });
 
-  const pageSize = useMemo(() => data?.meta?.limit ?? limit, [data?.meta?.limit, limit]);
+  const pageSize = useMemo(
+    () => data?.meta?.limit ?? limit,
+    [data?.meta?.limit, limit]
+  );
 
   if (!mounted) return null;
 
@@ -89,7 +92,8 @@ export default function AdminSales() {
   };
 
   const renderSortIcon = (column: typeof sortBy) => {
-    if (sortBy !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-[#A6AAA9]" />;
+    if (sortBy !== column)
+      return <ArrowUpDown className="h-3.5 w-3.5 text-[#A6AAA9]" />;
     return sortOrder === 'asc' ? (
       <ArrowUp className="h-3.5 w-3.5 text-[#0B7C6B]" />
     ) : (
@@ -200,7 +204,9 @@ export default function AdminSales() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-[#848785]">From date</span>
+            <span className="text-xs font-semibold text-[#848785]">
+              From date
+            </span>
             <Input
               type="date"
               className="h-12 rounded-xl border-[#E4E9E8]"
@@ -213,7 +219,9 @@ export default function AdminSales() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-[#848785]">To date</span>
+            <span className="text-xs font-semibold text-[#848785]">
+              To date
+            </span>
             <Input
               type="date"
               className="h-12 rounded-xl border-[#E4E9E8]"
@@ -226,7 +234,9 @@ export default function AdminSales() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-[#848785]">Columns</span>
+            <span className="text-xs font-semibold text-[#848785]">
+              Columns
+            </span>
             <div className="relative">
               <button
                 type="button"
@@ -268,7 +278,6 @@ export default function AdminSales() {
               )}
             </div>
           </div>
-
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[#848785]">

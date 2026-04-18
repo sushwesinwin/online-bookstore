@@ -1,10 +1,12 @@
 import { apiClient } from './client';
 import type {
   AdminUser,
+  AdminUserDetails,
   DashboardStats,
   RecentOrder,
   RecentActivity,
   PaginatedResponse,
+  UpdateAdminUserData,
 } from './types';
 
 export const adminApi = {
@@ -36,6 +38,19 @@ export const adminApi = {
     role?: 'USER' | 'ADMIN';
   }): Promise<PaginatedResponse<AdminUser>> => {
     const response = await apiClient.get('/admin/users', { params });
+    return response.data;
+  },
+
+  getUserById: async (id: string): Promise<AdminUserDetails> => {
+    const response = await apiClient.get(`/admin/users/${id}`);
+    return response.data;
+  },
+
+  updateUser: async (
+    id: string,
+    data: UpdateAdminUserData
+  ): Promise<AdminUser> => {
+    const response = await apiClient.patch(`/admin/users/${id}`, data);
     return response.data;
   },
 

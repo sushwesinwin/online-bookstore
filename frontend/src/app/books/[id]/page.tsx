@@ -32,15 +32,8 @@ export default function BookDetailPage() {
   const { data: book, isLoading } = useBook(bookId);
   const { mutate: addToCart, isPending } = useAddToCart();
   const { isAuthenticated } = useAuth();
-  
-  const {
-    isOpen: isAuthModalOpen,
-    view: authView,
-    message: authMessage,
-    openModal,
-    closeModal,
-    setView: setAuthView
-  } = useAuthModalStore();
+
+  const { openModal } = useAuthModalStore();
   const [quantity, setQuantity] = useState(1);
   const [selectedTab, setSelectedTab] = useState<
     'description' | 'details' | 'reviews'
@@ -209,10 +202,11 @@ export default function BookDetailPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${i < Math.floor(rating)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
-                        }`}
+                      className={`h-5 w-5 ${
+                        i < Math.floor(rating)
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-gray-300'
+                      }`}
                     />
                   ))}
                 </div>
@@ -354,10 +348,11 @@ export default function BookDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id as any)}
-                  className={`pb-4 px-2 font-semibold transition-colors relative ${selectedTab === tab.id
-                    ? 'text-indigo-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                  className={`pb-4 px-2 font-semibold transition-colors relative ${
+                    selectedTab === tab.id
+                      ? 'text-indigo-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
                   {tab.label}
                   {selectedTab === tab.id && (
@@ -455,10 +450,11 @@ export default function BookDetailPage() {
                               className="focus:outline-none"
                             >
                               <Star
-                                className={`h-6 w-6 ${star <= reviewRating
-                                  ? 'fill-yellow-400 text-yellow-400'
-                                  : 'text-gray-300'
-                                  }`}
+                                className={`h-6 w-6 ${
+                                  star <= reviewRating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-gray-300'
+                                }`}
                               />
                             </button>
                           ))}
@@ -562,10 +558,11 @@ export default function BookDetailPage() {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${i < review.rating
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'text-gray-300'
-                                    }`}
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
+                                      ? 'fill-yellow-400 text-yellow-400'
+                                      : 'text-gray-300'
+                                  }`}
                                 />
                               ))}
                             </div>

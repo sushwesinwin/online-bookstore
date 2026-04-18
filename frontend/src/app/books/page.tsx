@@ -213,24 +213,26 @@ function BooksPageContent() {
 
 export default function BooksPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen">
-        <main className="container mx-auto py-8 px-4">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4">Browse Books</h1>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 aspect-[3/4] rounded-lg mb-4" />
-                <div className="h-4 bg-gray-200 rounded mb-2" />
-                <div className="h-3 bg-gray-200 rounded w-2/3" />
-              </div>
-            ))}
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen">
+          <main className="container mx-auto py-8 px-4">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-4">Browse Books</h1>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 aspect-[3/4] rounded-lg mb-4" />
+                  <div className="h-4 bg-gray-200 rounded mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      }
+    >
       <BooksPageContent />
     </Suspense>
   );

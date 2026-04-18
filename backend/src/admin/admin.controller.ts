@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,7 +24,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateOrderDto } from '../orders/dto/create-order.dto';
+
+interface AuthenticatedAdminRequest {
+  user: {
+    id: string;
+  };
+}
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -102,12 +110,24 @@ export class AdminController {
     return this.adminService.getUserById(id);
   }
 
+  @Patch('users/:id')
+  @ApiOperation({ summary: 'Update user details' })
+  @ApiResponse({ status: 200, description: 'User updated' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  updateUser(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.adminService.updateUser(id, dto);
+  }
+
   @Patch('users/:id/role')
   @ApiOperation({ summary: 'Update user role' })
   @ApiResponse({ status: 200, description: 'User role updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  updateUserRole(@Param('id') id: string, @Body() dto: UpdateUserRoleDto) {
-    return this.adminService.updateUserRole(id, dto);
+  updateUserRole(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserRoleDto,
+    @Request() req: AuthenticatedAdminRequest,
+  ) {
+    return this.adminService.updateUserRole(id, dto, req.user.id);
   }
 
   @Delete('users/:id')
@@ -115,7 +135,10 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'User deleted' })
   @ApiResponse({ status: 400, description: 'User has orders — cannot delete' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  deleteUser(@Param('id') id: string) {
-    return this.adminService.deleteUser(id);
+  deleteUser(
+    @Param('id') id: string,
+    @Request() req: AuthenticatedAdminRequest,
+  ) {
+    return this.adminService.deleteUser(id, req.user.id);
   }
 }

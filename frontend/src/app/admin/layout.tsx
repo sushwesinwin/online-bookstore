@@ -46,21 +46,21 @@ export default function AdminLayout({
         <div className="flex min-h-screen w-full m-0 p-0">
           {/* Sidebar Container */}
           <div className="w-72 lg:fixed lg:left-0 lg:top-0 lg:h-screen">
-            <div className="w-full z-50 bg-white border-b border-[#E4E9E8] lg:hidden fixed left-0 top-0">
+            <div className="w-full z-50 bg-white border-b border-border lg:hidden fixed left-0 top-0">
               <div className="flex items-center justify-between p-4">
                 <Link href="/" className="flex items-center">
-                  <span className="text-lg font-black tracking-tight text-[#101313]">
+                  <span className="text-lg font-black tracking-tight text-primary">
                     Lumora
                   </span>
                 </Link>
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 rounded-lg hover:bg-[#F3F5F5] transition-colors"
+                  className="p-2 rounded-lg hover:bg-muted transition-colors"
                 >
                   {mobileMenuOpen ? (
-                    <X className="h-6 w-6 text-[#101313]" />
+                    <X className="h-6 w-6 text-foreground" />
                   ) : (
-                    <Menu className="h-6 w-6 text-[#101313]" />
+                    <Menu className="h-6 w-6 text-foreground" />
                   )}
                 </button>
               </div>
@@ -68,7 +68,7 @@ export default function AdminLayout({
 
             {mobileMenuOpen && (
               <div
-                className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+                className="fixed inset-0 z-40 bg-foreground/40 lg:hidden"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <aside
@@ -78,7 +78,7 @@ export default function AdminLayout({
                   <div className="flex h-full flex-col pt-20">
                     <div className="px-4 space-y-8">
                       <div>
-                        <p className="px-4 text-[10px] font-black uppercase tracking-widest text-[#A6AAA9] mb-4">
+                        <p className="px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 mb-4">
                           Management
                         </p>
                         <nav className="space-y-1.5">
@@ -91,16 +91,16 @@ export default function AdminLayout({
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
                                   isActive
-                                    ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
-                                    : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
+                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                 }`}
                               >
                                 <div className="flex items-center">
                                   <item.icon
                                     className={`mr-3 h-5 w-5 transition-colors ${
                                       isActive
-                                        ? 'text-white'
-                                        : 'text-[#848785] group-hover:text-[#101313]'
+                                        ? 'text-primary-foreground'
+                                        : 'text-muted-foreground group-hover:text-foreground'
                                     }`}
                                   />
                                   {item.name}
@@ -116,16 +116,16 @@ export default function AdminLayout({
                     </div>
 
                     <div className="p-4 mt-auto">
-                      <div className="bg-[#F8FAFB] rounded-3xl p-4 mb-4 border border-[#E4E9E8]">
+                      <div className="bg-muted rounded-3xl p-4 mb-4 border border-border">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
+                          <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
                             {user?.firstName?.charAt(0) || 'A'}
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <p className="text-sm font-bold text-[#101313] truncate">
+                            <p className="text-sm font-bold text-foreground truncate">
                               {user?.firstName} {user?.lastName}
                             </p>
-                            <p className="text-[10px] text-[#848785] truncate">
+                            <p className="text-[10px] text-muted-foreground truncate">
                               {user?.email}
                             </p>
                           </div>
@@ -133,7 +133,7 @@ export default function AdminLayout({
                       </div>
                       <button
                         onClick={() => logout()}
-                        className="flex w-full items-center justify-center rounded-2xl bg-white border border-[#E4E9E8] px-4 py-3 text-sm font-bold text-[#FF4E3E] transition-all hover:bg-[#FFECEB] hover:border-[#FF4E3E]/20"
+                        className="flex w-full items-center justify-center rounded-2xl bg-white border border-border px-4 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/20"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
                         Logout Session
@@ -144,15 +144,15 @@ export default function AdminLayout({
               </div>
             )}
 
-            <aside className="hidden h-screen border-r border-[#E4E9E8] lg:block shadow-sm bg-white">
+            <aside className="hidden h-screen border-r border-border lg:block shadow-sm bg-white">
               <div className="flex h-full flex-col overflow-y-auto">
                 <div className="p-8">
                   <Link href="/" className="flex items-center group">
                     <div className="flex flex-col">
-                      <span className="text-xl font-black tracking-tight text-[#101313]">
+                      <span className="text-xl font-black tracking-tight text-primary">
                         Lumora
                       </span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#17BD8D] bg-[#DFFEF5] px-2 py-0.5 rounded-full w-fit mt-0.5">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-full w-fit mt-0.5">
                         Admin Panel
                       </span>
                     </div>
@@ -161,7 +161,7 @@ export default function AdminLayout({
 
                 <div className="flex-1 px-4 space-y-8">
                   <div>
-                    <p className="px-4 text-[10px] font-black uppercase tracking-widest text-[#A6AAA9] mb-4">
+                    <p className="px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 mb-4">
                       Management
                     </p>
                     <nav className="space-y-1.5">
@@ -173,13 +173,13 @@ export default function AdminLayout({
                             href={item.href}
                             className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
                               isActive
-                                ? 'bg-[#0B7C6B] text-white shadow-lg shadow-[#0B7C6B]/20'
-                                : 'text-[#848785] hover:bg-[#F3F5F5] hover:text-[#101313]'
+                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                             }`}
                           >
                             <div className="flex items-center">
                               <item.icon
-                                className={`mr-3 h-5 w-5 transition-colors ${isActive ? 'text-white' : 'text-[#848785] group-hover:text-[#101313]'}`}
+                                className={`mr-3 h-5 w-5 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}
                               />
                               {item.name}
                             </div>
@@ -194,16 +194,16 @@ export default function AdminLayout({
                 </div>
 
                 <div className="p-4 mt-auto">
-                  <div className="bg-[#F8FAFB] rounded-3xl p-4 mb-4 border border-[#E4E9E8]">
+                  <div className="bg-muted rounded-3xl p-4 mb-4 border border-border">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-linear-to-br from-[#0B7C6B] to-[#17BD8D] flex items-center justify-center text-white font-bold text-sm">
+                      <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
                         {user?.firstName?.charAt(0) || 'A'}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <p className="text-sm font-bold text-[#101313] truncate">
+                        <p className="text-sm font-bold text-foreground truncate">
                           {user?.firstName} {user?.lastName}
                         </p>
-                        <p className="text-[10px] text-[#848785] truncate">
+                        <p className="text-[10px] text-muted-foreground truncate">
                           {user?.email}
                         </p>
                       </div>
@@ -211,7 +211,7 @@ export default function AdminLayout({
                   </div>
                   <button
                     onClick={() => logout()}
-                    className="flex w-full items-center justify-center rounded-2xl bg-white border border-[#E4E9E8] px-4 py-3 text-sm font-bold text-[#FF4E3E] transition-all hover:bg-[#FFECEB] hover:border-[#FF4E3E]/20"
+                    className="flex w-full items-center justify-center rounded-2xl bg-white border border-border px-4 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/20"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout Session

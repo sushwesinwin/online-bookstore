@@ -3,8 +3,8 @@
 @theme {
   /* Color Palette */
   /* Primary Colors */
-  --color-primary: #0b7c6b;
-  --color-primary-light: #e4fffb;
+  --color-primary: #111111;
+  --color-primary-light: #f3f4f6;
   --color-primary-foreground: #ffffff;
 
   /* Secondary Colors */
@@ -13,42 +13,42 @@
   --color-secondary-foreground: #ffffff;
 
   /* Dark Colors */
-  --color-dark: #101313;
-  --color-dark-2: #383a3a;
-  --color-dark-3: #848785;
-  --color-dark-4: #cccccc;
-  --color-dark-5: #e4e9e8;
-  --color-dark-6: #f4f8f8;
-  --color-dark-7: #f9fcfb;
+  --color-dark: #111111;
+  --color-dark-2: #3f3f46;
+  --color-dark-3: #71717a;
+  --color-dark-4: #d4d4d8;
+  --color-dark-5: #e5e7eb;
+  --color-dark-6: #f4f4f5;
+  --color-dark-7: #fafafa;
 
   /* Status Colors */
   --color-info: #219fff;
   --color-info-light: #e4f4ff;
-  --color-success: #17bd8d;
-  --color-success-light: #dffef5;
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
   --color-warning: #ffa118;
   --color-warning-light: #fff1dc;
   --color-error: #ff4e3e;
   --color-error-light: #ffeceb;
 
   /* Backgrounds */
-  --color-background: #f9fcfb;
-  --color-foreground: #101313;
+  --color-background: #fafafa;
+  --color-foreground: #111111;
   --color-card: #ffffff;
-  --color-card-foreground: #101313;
+  --color-card-foreground: #111111;
   --color-popover: #ffffff;
-  --color-popover-foreground: #101313;
+  --color-popover-foreground: #111111;
 
   /* Text Colors */
-  --color-muted: #f4f8f8;
-  --color-muted-foreground: #848785;
-  --color-accent: #e4fffb;
-  --color-accent-foreground: #0b7c6b;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #111111;
 
   /* Borders & Inputs */
-  --color-border: #e4e9e8;
-  --color-input: #e4e9e8;
-  --color-ring: #0b7c6b;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #111111;
 
   /* Destructive */
   --color-destructive: #ff4e3e;

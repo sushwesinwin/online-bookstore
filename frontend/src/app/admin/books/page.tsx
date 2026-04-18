@@ -30,9 +30,9 @@ export default function AdminBooks() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<'title' | 'author' | 'price' | 'createdAt' | 'inventory'>(
-    'createdAt'
-  );
+  const [sortBy, setSortBy] = useState<
+    'title' | 'author' | 'price' | 'createdAt' | 'inventory'
+  >('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -385,88 +385,88 @@ export default function AdminBooks() {
                       className="group transition-colors hover:bg-[#F8FAFB]/50"
                     >
                       {visibleColumns.book && (
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-[#F3F5F5] shadow-sm">
-                            {book.imageUrl ? (
-                              <img
-                                src={book.imageUrl}
-                                alt={book.title}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[#A6AAA9]">
-                                <ImageIcon className="h-5 w-5" />
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-md bg-[#F3F5F5] shadow-sm">
+                              {book.imageUrl ? (
+                                <img
+                                  src={book.imageUrl}
+                                  alt={book.title}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-[#A6AAA9]">
+                                  <ImageIcon className="h-5 w-5" />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-bold text-[#101313] line-clamp-1">
+                                {book.title}
                               </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-bold text-[#101313] line-clamp-1">
-                              {book.title}
-                            </div>
-                            <div className="text-xs text-[#848785]">
-                              {book.author}
-                            </div>
-                            <div className="mt-1 text-[10px] text-[#A6AAA9]">
-                              {book.isbn}
+                              <div className="text-xs text-[#848785]">
+                                {book.author}
+                              </div>
+                              <div className="mt-1 text-[10px] text-[#A6AAA9]">
+                                {book.isbn}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
                       )}
                       {visibleColumns.category && (
-                      <td className="px-6 py-4">
-                        <Badge
-                          variant="outline"
-                          className="border-[#E4E9E8] bg-[#F8FAFB] px-3 font-medium text-[#101313]"
-                        >
-                          {book.category}
-                        </Badge>
-                      </td>
+                        <td className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className="border-[#E4E9E8] bg-[#F8FAFB] px-3 font-medium text-[#101313]"
+                          >
+                            {book.category}
+                          </Badge>
+                        </td>
                       )}
                       {visibleColumns.inventory && (
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div
-                            className={`mr-2 h-2 w-2 rounded-full ${
-                              book.inventory > 10
-                                ? 'bg-[#17BD8D]'
-                                : book.inventory > 0
-                                  ? 'bg-[#F9B959]'
-                                  : 'bg-[#FF4E3E]'
-                            }`}
-                          />
-                          <span className="font-semibold text-[#101313]">
-                            {book.inventory}
-                          </span>
-                          <span className="ml-1 text-xs text-[#848785]">
-                            in stock
-                          </span>
-                        </div>
-                      </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <div
+                              className={`mr-2 h-2 w-2 rounded-full ${
+                                book.inventory > 10
+                                  ? 'bg-[#17BD8D]'
+                                  : book.inventory > 0
+                                    ? 'bg-[#F9B959]'
+                                    : 'bg-[#FF4E3E]'
+                              }`}
+                            />
+                            <span className="font-semibold text-[#101313]">
+                              {book.inventory}
+                            </span>
+                            <span className="ml-1 text-xs text-[#848785]">
+                              in stock
+                            </span>
+                          </div>
+                        </td>
                       )}
                       {visibleColumns.price && (
-                      <td className="px-6 py-4 font-bold text-[#101313]">
-                        ${parseFloat(book.price.toString()).toFixed(2)}
-                      </td>
+                        <td className="px-6 py-4 font-bold text-[#101313]">
+                          ${parseFloat(book.price.toString()).toFixed(2)}
+                        </td>
                       )}
                       {visibleColumns.actions && (
-                      <td className="px-4 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-1">
-                          <button
-                            onClick={() => handleOpenModal(book)}
-                            className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#F3F5F5] hover:text-[#0B7C6B]"
-                          >
-                            <Edit2 className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(book.id)}
-                            className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </td>
+                        <td className="px-4 py-4 text-right">
+                          <div className="flex items-center justify-end space-x-1">
+                            <button
+                              onClick={() => handleOpenModal(book)}
+                              className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#F3F5F5] hover:text-[#0B7C6B]"
+                            >
+                              <Edit2 className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(book.id)}
+                              className="rounded-lg p-2 text-[#848785] transition-colors hover:bg-[#FFECEB] hover:text-[#FF4E3E]"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </td>
                       )}
                     </tr>
                   ))}

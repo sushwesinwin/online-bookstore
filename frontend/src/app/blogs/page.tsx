@@ -214,13 +214,17 @@ export default function BlogsPage() {
                     <p className="text-3xl font-black text-[#101313]">
                       {blogs?.length ?? 0}
                     </p>
-                    <p className="text-sm text-[#66726F]">posts in the stream</p>
+                    <p className="text-sm text-[#66726F]">
+                      posts in the stream
+                    </p>
                   </div>
                   <div>
                     <p className="text-3xl font-black text-[#101313]">
                       {authors.length}
                     </p>
-                    <p className="text-sm text-[#66726F]">active contributors</p>
+                    <p className="text-sm text-[#66726F]">
+                      active contributors
+                    </p>
                   </div>
                   <div>
                     <p className="text-3xl font-black text-[#101313]">
@@ -399,7 +403,10 @@ export default function BlogsPage() {
                           getBlogFontClass(blog.fontFamily)
                         )}
                       >
-                        {getPlainTextExcerpt(blog.content, blog.featureImage ? 210 : 280)}
+                        {getPlainTextExcerpt(
+                          blog.content,
+                          blog.featureImage ? 210 : 280
+                        )}
                       </p>
                     </div>
                   </div>
@@ -508,8 +515,12 @@ export default function BlogsPage() {
                 </div>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-[#66726F]">
                   <li>Lead with one strong idea, not a full essay opening.</li>
-                  <li>Add a feature image when the post should stop the scroll.</li>
-                  <li>Pick a reading font that matches the tone of the post.</li>
+                  <li>
+                    Add a feature image when the post should stop the scroll.
+                  </li>
+                  <li>
+                    Pick a reading font that matches the tone of the post.
+                  </li>
                 </ul>
                 <Link href="/blogs/create" className="mt-5 inline-flex">
                   <Button className="rounded-full bg-[#0B7C6B] px-5 hover:bg-[#096B5B]">

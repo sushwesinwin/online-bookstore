@@ -11,6 +11,7 @@ import {
   Heart,
   Package,
   ChevronDown,
+  LayoutDashboard,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart-store';
@@ -40,6 +41,7 @@ export function Navbar() {
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const isAdmin = user?.role === 'ADMIN';
 
   const hiddenRoutes = ['/admin'];
   const isHiddenRoute = hiddenRoutes.some(route => pathname?.startsWith(route));
@@ -101,7 +103,7 @@ export function Navbar() {
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-500 ${
           scrolled
-            ? 'bg-white/80 backdrop-blur-2xl border-b border-black/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2'
+            ? 'bg-white/85 backdrop-blur-2xl border-b border-border shadow-[0_12px_30px_rgba(17,17,17,0.08)] py-2'
             : 'bg-transparent border-transparent py-4'
         }`}
       >
@@ -111,7 +113,7 @@ export function Navbar() {
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-500 hover:text-black transition-colors"
+                className="p-2 text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
@@ -131,14 +133,16 @@ export function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={e => handleProtectedClick(e, !!link.protected)}
-                    className={`group relative inline-flex h-9 w-max items-center justify-center bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:text-black focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                      isActive ? 'text-black font-semibold' : 'text-gray-500'
+                    className={`group relative inline-flex h-9 w-max items-center justify-center bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                      isActive
+                        ? 'text-primary font-semibold'
+                        : 'text-muted-foreground'
                     }`}
                   >
                     {link.name}
                     {/* Animated Underline */}
                     <span
-                      className={`absolute bottom-0 left-4 right-4 h-0.5 bg-black transform origin-left transition-transform duration-300 ${
+                      className={`absolute bottom-0 left-4 right-4 h-0.5 bg-primary transform origin-left transition-transform duration-300 ${
                         isActive
                           ? 'scale-x-100'
                           : 'scale-x-0 group-hover:scale-x-100'
@@ -152,31 +156,49 @@ export function Navbar() {
             {/* Center: Brand Name (absolute centered) */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Link href="/" className="flex items-center group">
-                <span className="font-bold tracking-tight text-xl text-black">
+                <span className="font-bold tracking-tight text-xl text-primary">
                   Lumora
                 </span>
               </Link>
             </div>
 
-            {/* Right: Cart & Sign Up */}
+            {/* Right: Authenticated Actions / Auth CTAs */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {isAuthenticated && (
+              {isAuthenticated && !isAdmin && (
                 <Link href="/cart">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="group relative h-10 w-10 shrink-0 text-gray-500 hover:text-black hover:bg-black/5 rounded-full transition-all duration-300"
+                    className="group relative h-10 w-10 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all duration-300"
                   >
                     <ShoppingBag className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                     {itemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-black text-[10px] text-white flex items-center justify-center font-black ring-2 ring-white shadow-md transform group-hover:scale-110 transition-transform duration-300">
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-[10px] text-primary-foreground flex items-center justify-center font-black ring-2 ring-white shadow-md transform group-hover:scale-110 transition-transform duration-300">
                         {itemCount}
                       </span>
                     )}
                   </Button>
                 </Link>
               )}
-              {isAuthenticated ? (
+              {isAuthenticated && isAdmin ? (
+                <div className="flex items-center gap-2">
+                  <Link href="/admin">
+                    <Button className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[13px] font-bold px-5 py-2.5 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 h-10">
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => logout()}
+                    title="Logout"
+                    className="rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </div>
+              ) : isAuthenticated ? (
                 <div className="flex items-center gap-2 pl-2">
                   <div
                     className="hidden sm:block relative"
@@ -187,24 +209,24 @@ export function Navbar() {
                       onClick={() =>
                         setIsProfileDropdownOpen(!isProfileDropdownOpen)
                       }
-                      className="flex items-center gap-2 rounded-full px-3 hover:bg-black/5 transition-all duration-300 h-10 group"
+                      className="flex items-center gap-2 rounded-full px-3 hover:bg-primary/10 transition-all duration-300 h-10 group"
                     >
                       {user?.profileImage ? (
                         <img
                           src={user.profileImage}
                           alt={user.firstName}
-                          className="h-7 w-7 rounded-full object-cover ring-2 ring-black/5 group-hover:ring-black/10 transition-all"
+                          className="h-7 w-7 rounded-full object-cover ring-2 ring-primary/10 group-hover:ring-primary/20 transition-all"
                         />
                       ) : (
-                        <div className="h-7 w-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold uppercase ring-2 ring-black/5 group-hover:ring-black/10 transition-all">
+                        <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[10px] font-bold uppercase ring-2 ring-primary/10 group-hover:ring-primary/20 transition-all">
                           {user?.firstName?.[0] || 'U'}
                         </div>
                       )}
-                      <span className="text-sm font-semibold text-black tracking-tight">
+                      <span className="text-sm font-semibold text-foreground tracking-tight">
                         {user?.firstName}
                       </span>
                       <ChevronDown
-                        className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`}
+                        className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`}
                       />
                     </Button>
 
@@ -220,10 +242,10 @@ export function Navbar() {
                           <Link
                             href="/profile"
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors group"
                           >
-                            <User className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
-                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">
+                            <User className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <span className="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">
                               Profile
                             </span>
                           </Link>
@@ -231,10 +253,10 @@ export function Navbar() {
                           <Link
                             href="/orders"
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors group"
                           >
-                            <Package className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
-                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">
+                            <Package className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <span className="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">
                               My Orders
                             </span>
                           </Link>
@@ -242,10 +264,10 @@ export function Navbar() {
                           <Link
                             href="/favorites"
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-accent transition-colors group"
                           >
-                            <Heart className="h-5 w-5 text-gray-500 group-hover:text-black transition-colors" />
-                            <span className="text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">
+                            <Heart className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <span className="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">
                               Favourites
                             </span>
                           </Link>
@@ -275,7 +297,7 @@ export function Navbar() {
                     size="icon"
                     onClick={() => logout()}
                     title="Logout"
-                    className="sm:hidden rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
+                    className="sm:hidden rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 h-10 w-10 transition-all duration-300"
                   >
                     <LogOut className="h-5 w-5" />
                   </Button>
@@ -284,13 +306,13 @@ export function Navbar() {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => openModal('login')}
-                    className="hidden sm:block text-sm font-semibold text-gray-500 hover:text-black px-4 py-2 transition-colors"
+                    className="hidden sm:block text-sm font-semibold text-muted-foreground hover:text-primary px-4 py-2 transition-colors"
                   >
                     Sign in
                   </button>
                   <Button
                     onClick={() => openModal('register')}
-                    className="rounded-full bg-black hover:bg-gray-800 text-white text-[13px] font-bold px-6 py-2.5 shadow-lg shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 h-10"
+                    className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[13px] font-bold px-6 py-2.5 shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 h-10"
                   >
                     Join
                   </Button>
@@ -323,7 +345,7 @@ export function Navbar() {
             <button
               onClick={() => setAuthView('login')}
               className={`relative z-10 flex-1 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
-                authView === 'login' ? 'text-black' : 'text-gray-400'
+                authView === 'login' ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               Sign In
@@ -331,7 +353,9 @@ export function Navbar() {
             <button
               onClick={() => setAuthView('register')}
               className={`relative z-10 flex-1 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
-                authView === 'register' ? 'text-black' : 'text-gray-400'
+                authView === 'register'
+                  ? 'text-primary'
+                  : 'text-muted-foreground'
               }`}
             >
               Sign Up
@@ -370,7 +394,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 sm:top-20 z-40 bg-white shadow-2xl md:hidden border-b border-gray-100 overflow-hidden"
+            className="fixed inset-x-0 top-16 sm:top-20 z-40 bg-white shadow-2xl md:hidden border-b border-border overflow-hidden"
             ref={menuRef}
           >
             <div className="container mx-auto px-4 py-8 flex flex-col gap-6">
@@ -385,13 +409,13 @@ export function Navbar() {
                         onClick={e => handleProtectedClick(e, !!link.protected)}
                         className={`px-4 py-4 text-xl font-bold transition-all flex items-center justify-between group ${
                           isActive
-                            ? 'text-black'
-                            : 'text-gray-500 hover:text-black'
+                            ? 'text-primary'
+                            : 'text-muted-foreground hover:text-primary'
                         }`}
                       >
                         {link.name}
                         <div
-                          className={`h-1.5 w-1.5 rounded-full bg-black ${isActive ? 'opacity-100' : 'opacity-0'}`}
+                          className={`h-1.5 w-1.5 rounded-full bg-primary ${isActive ? 'opacity-100' : 'opacity-0'}`}
                         />
                       </Link>
                     );
@@ -400,74 +424,98 @@ export function Navbar() {
               </div>
 
               <div className="pt-6 border-t border-gray-100 space-y-4">
-                {isAuthenticated && (
+                {isAuthenticated && !isAdmin && (
                   <Link
                     href="/cart"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
+                    className="flex items-center justify-between px-4 py-3 bg-muted rounded-2xl group hover:bg-primary transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <ShoppingBag className="h-5 w-5 text-gray-500 group-hover:text-white" />
-                      <span className="font-bold text-gray-900 group-hover:text-white">
+                      <ShoppingBag className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground" />
+                      <span className="font-bold text-foreground group-hover:text-primary-foreground">
                         Shopping Cart
                       </span>
                     </div>
                     {itemCount > 0 && (
-                      <span className="bg-black text-white group-hover:bg-white group-hover:text-black text-xs font-black h-6 w-6 rounded-full flex items-center justify-center">
+                      <span className="bg-primary text-primary-foreground group-hover:bg-white group-hover:text-primary text-xs font-black h-6 w-6 rounded-full flex items-center justify-center">
                         {itemCount}
                       </span>
                     )}
                   </Link>
                 )}
                 {isAuthenticated ? (
-                  <>
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
-                    >
-                      <User className="h-5 w-5 text-gray-500 group-hover:text-white" />
-                      <span className="font-bold text-gray-900 group-hover:text-white">
-                        Profile
-                      </span>
-                    </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
-                    >
-                      <Package className="h-5 w-5 text-gray-500 group-hover:text-white" />
-                      <span className="font-bold text-gray-900 group-hover:text-white">
-                        My Orders
-                      </span>
-                    </Link>
-                    <Link
-                      href="/favorites"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-2xl group hover:bg-black transition-all"
-                    >
-                      <Heart className="h-5 w-5 text-gray-500 group-hover:text-white" />
-                      <span className="font-bold text-gray-900 group-hover:text-white">
-                        Favourites
-                      </span>
-                    </Link>
-                    <Button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        logout();
-                      }}
-                      className="w-full rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 h-14 font-bold text-lg transition-colors"
-                    >
-                      Logout
-                    </Button>
-                  </>
+                  isAdmin ? (
+                    <>
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-muted rounded-2xl group hover:bg-primary transition-all"
+                      >
+                        <LayoutDashboard className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground" />
+                        <span className="font-bold text-foreground group-hover:text-primary-foreground">
+                          Dashboard
+                        </span>
+                      </Link>
+                      <Button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          logout();
+                        }}
+                        className="w-full rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 h-14 font-bold text-lg transition-colors"
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-muted rounded-2xl group hover:bg-primary transition-all"
+                      >
+                        <User className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground" />
+                        <span className="font-bold text-foreground group-hover:text-primary-foreground">
+                          Profile
+                        </span>
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-muted rounded-2xl group hover:bg-primary transition-all"
+                      >
+                        <Package className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground" />
+                        <span className="font-bold text-foreground group-hover:text-primary-foreground">
+                          My Orders
+                        </span>
+                      </Link>
+                      <Link
+                        href="/favorites"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-muted rounded-2xl group hover:bg-primary transition-all"
+                      >
+                        <Heart className="h-5 w-5 text-muted-foreground group-hover:text-primary-foreground" />
+                        <span className="font-bold text-foreground group-hover:text-primary-foreground">
+                          Favourites
+                        </span>
+                      </Link>
+                      <Button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          logout();
+                        }}
+                        className="w-full rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 h-14 font-bold text-lg transition-colors"
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  )
                 ) : (
                   <Button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       openModal('register');
                     }}
-                    className="w-full rounded-2xl bg-black text-white h-14 font-bold text-lg shadow-xl shadow-black/10 transition-transform active:scale-95"
+                    className="w-full rounded-2xl bg-primary text-primary-foreground h-14 font-bold text-lg shadow-xl shadow-primary/20 transition-transform active:scale-95"
                   >
                     Get Started
                   </Button>

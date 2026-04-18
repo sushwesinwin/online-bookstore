@@ -91,7 +91,10 @@ export default function BlogDetailPage() {
               <div className="px-5 py-6 md:px-8">
                 <div className="flex items-start gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-[linear-gradient(135deg,#0B7C6B,#17BD8D)] text-base font-black text-white shadow-[0_14px_30px_rgba(11,124,107,0.24)]">
-                    {getAuthorInitials(blog.author.firstName, blog.author.lastName)}
+                    {getAuthorInitials(
+                      blog.author.firstName,
+                      blog.author.lastName
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -99,7 +102,10 @@ export default function BlogDetailPage() {
                         {blog.author.firstName} {blog.author.lastName}
                       </span>
                       <span className="text-sm text-[#8B9794]">
-                        {getAuthorHandle(blog.author.firstName, blog.author.lastName)}
+                        {getAuthorHandle(
+                          blog.author.firstName,
+                          blog.author.lastName
+                        )}
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#66726F]">
@@ -195,14 +201,20 @@ export default function BlogDetailPage() {
                 </p>
                 <div className="mt-5 flex items-start gap-4">
                   <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#101313] text-base font-black text-white">
-                    {getAuthorInitials(blog.author.firstName, blog.author.lastName)}
+                    {getAuthorInitials(
+                      blog.author.firstName,
+                      blog.author.lastName
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-[#101313]">
                       {blog.author.firstName} {blog.author.lastName}
                     </p>
                     <p className="text-sm text-[#66726F]">
-                      {getAuthorHandle(blog.author.firstName, blog.author.lastName)}
+                      {getAuthorHandle(
+                        blog.author.firstName,
+                        blog.author.lastName
+                      )}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[#66726F]">
                       Posted {getRelativeBlogTime(blog.createdAt)} with a{' '}
