@@ -42,7 +42,7 @@ export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly ordersService: OrdersService,
-  ) { }
+  ) {}
 
   @Post('orders')
   @ApiOperation({ summary: 'Create a new order for a user (Admin only)' })

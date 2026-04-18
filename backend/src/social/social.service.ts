@@ -23,7 +23,9 @@ export class SocialService {
 
   private assertNotSelf(currentUserId: string, targetUserId: string) {
     if (currentUserId === targetUserId) {
-      throw new BadRequestException('You cannot perform this action on yourself');
+      throw new BadRequestException(
+        'You cannot perform this action on yourself',
+      );
     }
   }
 
@@ -33,9 +35,12 @@ export class SocialService {
       : { userOneId: userBId, userTwoId: userAId };
   }
 
-  async getRelationshipStatuses(currentUserId: string, targetUserIds: string[]) {
+  async getRelationshipStatuses(
+    currentUserId: string,
+    targetUserIds: string[],
+  ) {
     const uniqueTargetIds = Array.from(
-      new Set(targetUserIds.filter(targetUserId => targetUserId))
+      new Set(targetUserIds.filter(targetUserId => targetUserId)),
     );
 
     if (uniqueTargetIds.length === 0) {
@@ -83,8 +88,8 @@ export class SocialService {
       friendships.map(friendship =>
         friendship.userOneId === currentUserId
           ? friendship.userTwoId
-          : friendship.userOneId
-      )
+          : friendship.userOneId,
+      ),
     );
 
     return uniqueTargetIds.map(targetUserId => ({
@@ -166,7 +171,9 @@ export class SocialService {
     });
 
     if (existingFriendship) {
-      throw new ConflictException('This writer is already in your friends list');
+      throw new ConflictException(
+        'This writer is already in your friends list',
+      );
     }
 
     await this.prisma.userFriendship.create({

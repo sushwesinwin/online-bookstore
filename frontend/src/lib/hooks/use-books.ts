@@ -6,6 +6,7 @@ export function useBooks(params?: BookQueryParams) {
   return useQuery({
     queryKey: ['books', params],
     queryFn: () => booksApi.getBooks(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
@@ -14,6 +15,7 @@ export function useBook(id: string) {
     queryKey: ['book', id],
     queryFn: () => booksApi.getBook(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -21,6 +23,7 @@ export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => booksApi.getCategories(),
+    staleTime: 60 * 60 * 1000, // 1 hour for categories
   });
 }
 

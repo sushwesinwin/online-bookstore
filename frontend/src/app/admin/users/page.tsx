@@ -457,7 +457,7 @@ export default function AdminUsersPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto px-4 py-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-foreground flex items-center gap-3">

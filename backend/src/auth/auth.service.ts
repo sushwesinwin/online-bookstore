@@ -43,7 +43,7 @@ const publicAuthUserSelect = {
   updatedAt: true,
 } satisfies Prisma.UserSelect;
 
-type AuthUserRecord = Prisma.UserGetPayload<{ select: typeof authUserSelect }>;
+
 type PublicAuthUserRecord = Prisma.UserGetPayload<{
   select: typeof publicAuthUserSelect;
 }>;
@@ -65,7 +65,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private emailService: EmailService,
-  ) { }
+  ) {}
 
   private getJwtSecret(): string | undefined {
     return this.configService.get<string>('JWT_SECRET');
@@ -322,7 +322,9 @@ export class AuthService {
       data: {
         ...(dto.firstName !== undefined && { firstName: dto.firstName }),
         ...(dto.lastName !== undefined && { lastName: dto.lastName }),
-        ...(dto.profileImage !== undefined && { profileImage: dto.profileImage }),
+        ...(dto.profileImage !== undefined && {
+          profileImage: dto.profileImage,
+        }),
       },
       select: publicAuthUserSelect,
     });

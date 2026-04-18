@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +35,7 @@ export default function HomePage() {
 
   const { data: bestsellers, isLoading: bestsellersLoading } = useBooks({
     page: 1,
-    limit: 6,
+    limit: 3,
     sortBy: 'price',
     sortOrder: 'desc',
   });
@@ -120,9 +121,12 @@ export default function HomePage() {
 
               {/* Center Image */}
               <div className="md:col-span-6 flex justify-center order-1 md:order-2 z-10 relative">
-                <img
+                <Image
                   src="/hero.svg"
                   alt="Lumora Hero Illustration"
+                  width={600}
+                  height={600}
+                  priority
                   className="w-full max-w-xs md:max-w-max lg:max-w-lg max-h-[30vh] md:max-h-[35vh] lg:max-h-[45vh] object-contain drop-shadow-2xl animate-fade-in animate-fade-in-delay-200"
                 />
               </div>
@@ -224,13 +228,15 @@ export default function HomePage() {
 
                     <div className="relative z-10 cursor-pointer">
                       <div className="relative mb-6 overflow-hidden rounded-[2rem] bg-gray-50 aspect-[3/4.2] shadow-sm group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-all duration-700 group-hover:-translate-y-3">
-                        <img
+                        <Image
                           src={
                             book.imageUrl ||
                             'https://covers.openlibrary.org/b/id/10909258-L.jpg'
                           }
                           alt={book.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+                          fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 12vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                         />
 
                         {/* Status Badge */}
@@ -333,32 +339,30 @@ export default function HomePage() {
         </section>
 
         {/* Bestsellers Section */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4 bg-[#E2504E]">
           <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-14 gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-yellow-50 rounded-lg shadow-sm">
-                    <Award className="h-6 w-6 text-yellow-500" />
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-black tracking-widest uppercase border-yellow-200 text-yellow-600"
-                  >
-                    ALL-TIME BEST
-                  </Badge>
+            <div className="flex flex-col items-center text-center mb-14 gap-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-white/20 rounded-lg shadow-sm">
+                  <Award className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
-                  Global Bestsellers
-                </h2>
-                <p className="text-gray-500 mt-2 text-lg">
-                  The world&apos;s most beloved literature, curated for you.
-                </p>
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-black tracking-widest uppercase border-white/30 text-white"
+                >
+                  ALL-TIME BEST
+                </Badge>
               </div>
-              <Link href="/books/bestsellers">
+              <h2 className="text-4xl md:text-5xl font-medium text-white tracking-tight">
+                Global Bestsellers
+              </h2>
+              <p className="text-white/80 text-lg">
+                The world&apos;s most beloved literature, curated for you.
+              </p>
+              <Link href="/books/bestsellers" className="mt-2">
                 <Button
                   variant="outline"
-                  className="rounded-full border-gray-200 hover:border-black hover:bg-black hover:text-white transition-all group font-medium text-base h-12 px-8"
+                  className="rounded-full border-white/30 text-white hover:border-white hover:bg-white hover:text-[#E2504E] transition-all group font-medium text-base h-12 px-8"
                 >
                   View all bestsellers
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -367,54 +371,56 @@ export default function HomePage() {
             </div>
 
             {bestsellersLoading ? (
-              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-[#F4F8F8] aspect-3/4 rounded-lg mb-3" />
-                    <div className="h-3 bg-[#F4F8F8] rounded mb-2" />
-                    <div className="h-3 bg-[#F4F8F8] rounded w-2/3" />
+              <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="animate-pulse max-w-[200px] mx-auto">
+                    <div className="bg-white/20 aspect-3/4 rounded-xl mb-4" />
+                    <div className="h-3 bg-white/20 rounded mb-2 mx-auto w-3/4" />
+                    <div className="h-3 bg-white/20 rounded mx-auto w-1/2" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
-                {bestsellers?.data.slice(0, 6).map((book, index) => (
+              <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto">
+                {bestsellers?.data.slice(0, 3).map((book, index) => (
                   <Link
                     key={book.id}
                     href={`/books/${book.id}`}
                     onMouseEnter={() => prefetchBook(book.id)}
                   >
-                    <div className="group cursor-pointer">
-                      <div className="relative mb-5 overflow-hidden rounded-2xl bg-gray-50 aspect-3/4 shadow-xs group-hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                        <img
+                    <div className="group cursor-pointer max-w-[200px] mx-auto">
+                      <div className="relative mb-4 overflow-hidden rounded-xl bg-gray-50 aspect-3/4 shadow-xs group-hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                        <Image
                           src={
                             book.imageUrl ||
                             'https://covers.openlibrary.org/b/id/12583098-L.jpg'
                           }
                           alt={book.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          fill
+                          sizes="(max-width: 768px) 33vw, 20vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
-                        <div className="absolute top-4 left-4 h-10 w-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-black border border-white shadow-lg overflow-hidden">
+                        <div className="absolute top-3 left-3 h-8 w-8 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-black border border-white shadow-lg overflow-hidden">
                           <div className="absolute inset-0 bg-yellow-400/10" />
-                          <span className="relative z-10 text-sm">
+                          <span className="relative z-10 text-xs">
                             #{index + 1}
                           </span>
                         </div>
                       </div>
-                      <div className="space-y-1 px-1">
-                        <h3 className="font-bold text-lg text-gray-900 line-clamp-1 group-hover:text-[#0B7C6B] transition-colors leading-tight">
+                      <div className="space-y-1 text-center">
+                        <h3 className="font-bold text-base text-white line-clamp-1 group-hover:text-white/90 transition-colors leading-tight">
                           {book.title}
                         </h3>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-sm text-white/70 font-medium">
                           {book.author}
                         </p>
-                        <div className="flex items-center justify-between pt-1">
-                          <span className="text-lg font-bold text-[#0B7C6B]">
+                        <div className="flex items-center justify-center gap-3 pt-1">
+                          <span className="text-base font-bold text-white">
                             {formatPrice(Number(book.price))}
                           </span>
-                          <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-yellow-50 rounded-full border border-yellow-100">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            <span className="text-[12px] font-black text-yellow-700 tracking-tight">
+                          <div className="flex items-center gap-1 px-2 py-0.5 bg-white/20 rounded-full border border-white/30">
+                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-[11px] font-black text-white tracking-tight">
                               4.8
                             </span>
                           </div>
@@ -467,14 +473,16 @@ export default function HomePage() {
                     className={`absolute top-0 right-0 w-32 h-32 bg-linear-to-br ${author.color} opacity-0 group-hover:opacity-5 blur-3xl transition-opacity duration-500`}
                   />
 
-                  <div className="relative mb-6">
+                  <div className="relative mb-6 w-36 h-36">
                     <div
                       className={`absolute -inset-4 bg-linear-to-br ${author.color} rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500`}
                     />
-                    <img
+                    <Image
                       src={author.image}
                       alt={author.name}
-                      className="relative w-36 h-36 object-cover rounded-full border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-700"
+                      fill
+                      sizes="144px"
+                      className="object-cover rounded-full border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
 

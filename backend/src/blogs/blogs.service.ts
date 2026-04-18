@@ -70,7 +70,7 @@ export class BlogsService {
               },
             ],
           },
-        }
+        },
       );
     }
 

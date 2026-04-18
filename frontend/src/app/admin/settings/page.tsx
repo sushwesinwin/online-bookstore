@@ -2,7 +2,7 @@
 
 export default function AdminSettings() {
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto px-4 py-8 space-y-6">
       <h1 className="text-3xl font-bold tracking-tight text-[#101313]">
         Settings
       </h1>

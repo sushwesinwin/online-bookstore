@@ -344,9 +344,7 @@ export class AdminService {
     if (!user) throw new NotFoundException('User not found');
 
     if (id === actorId && dto.role !== Role.ADMIN) {
-      throw new BadRequestException(
-        'You cannot remove your own admin access.',
-      );
+      throw new BadRequestException('You cannot remove your own admin access.');
     }
 
     if (user.role === Role.ADMIN && dto.role !== Role.ADMIN) {

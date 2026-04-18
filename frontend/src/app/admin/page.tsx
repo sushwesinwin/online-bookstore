@@ -145,7 +145,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-12 w-[100%]">
+    <div className="container mx-auto px-4 py-8 space-y-12">
       {/* Header with Greeting and Quick Actions */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>

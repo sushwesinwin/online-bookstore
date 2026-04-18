@@ -5,13 +5,11 @@ const path = require('path');
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../'),
   images: {
-    domains: [
-      'localhost',
-      'images.unsplash.com',
-      'covers.openlibrary.org',
-      'upload.wikimedia.org',
-    ],
     remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
       {
         protocol: 'https',
         hostname: 'covers.openlibrary.org',

@@ -19,14 +19,14 @@ export class SocialController {
   @Get('relationships')
   getRelationshipStatuses(
     @Request() req: any,
-    @Query('userIds') userIds: string = ''
+    @Query('userIds') userIds: string = '',
   ) {
     return this.socialService.getRelationshipStatuses(
       req.user.id,
       userIds
         .split(',')
         .map(value => value.trim())
-        .filter(Boolean)
+        .filter(Boolean),
     );
   }
 
