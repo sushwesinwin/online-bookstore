@@ -24,6 +24,7 @@ model User {
   followers           UserFollow[]     @relation("FollowFollowing")
   friendshipsStarted  UserFriendship[] @relation("FriendshipUserOne")
   friendshipsReceived UserFriendship[] @relation("FriendshipUserTwo")
+  reviews             Review[]
 
   @@map("users")
 }
@@ -36,14 +37,21 @@ model Book {
   description String?
   price       Decimal     @db.Decimal(10, 2)
   inventory   Int         @default(0)
-  category    String
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
   imageUrl    String?
+  stockStatus StockStatus @default(IN_STOCK)
+  deletedAt   DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
   favorites   Favorite[]
   orderItems  OrderItem[]
+  reviews     Review[]
 
+  @@index([title])
+  @@index([author])
+  @@index([categoryId])
   @@map("books")
 }
 
@@ -131,21 +139,20 @@ enum PaymentStatus {
 }
 
 model BlogPost {
-  id           String   @id @default(cuid())
+  id           String             @id @default(cuid())
   title        String
   content      String
   featureImage String?
-  fontFamily   String   @default("modern-sans")
+  fontFamily   String             @default("modern-sans")
   visibility   BlogPostVisibility @default(PUBLIC)
   authorId     String
-  author       User     @relation(fields: [authorId], references: [id])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  author       User               @relation(fields: [authorId], references: [id])
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
   @@index([authorId])
   @@index([createdAt])
   @@index([visibility])
-
   @@map("blog_posts")
 }
 
@@ -193,4 +200,38 @@ model Quote {
   updatedAt DateTime @updatedAt
 
   @@map("quotes")
+}
+
+enum StockStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  PRE_ORDER
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(0)
+  comment   String?
+  bookId    String
+  userId    String
+  book      Book     @relation(fields: [bookId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookId, userId])
+  @@index([bookId])
+  @@index([userId])
+  @@map("reviews")
 }
